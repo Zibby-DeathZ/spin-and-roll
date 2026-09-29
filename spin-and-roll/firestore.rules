@@ -37,7 +37,8 @@ service cloud.firestore {
              == resource.data.playerUids.toSet().union([request.auth.uid].toSet())
       );
 
-      // Character sheets: DM writes for now. Step 4 opens safe player actions.
+      // Character sheets: only the DM writes them. Player actions (using items,
+      // trading) go through events and trades, which the GM screen carries out.
       match /characters/{uid} {
         allow read: if signedIn();
         allow write: if isDM();
@@ -46,17 +47,30 @@ service cloud.firestore {
       // Action feed that the GM screen and TV animate from.
       match /events/{eid} {
         allow read: if signedIn();
-        allow create: if isDM()
-          || (inSession(sid) && request.resource.data.actorUid == request.auth.uid);
+        allow create: if isDM() || (
+          inSession(sid)
+          && request.resource.data.actorUid == request.auth.uid
+          && request.resource.data.type in ['item_used', 'trade_offered', 'gift_offered', 'trade_declined']
+        );
         allow update, delete: if isDM();
       }
 
-      // Trade offers between players.
+      // Trade offers. Only the receiver can accept or decline,
+      // only the sender can cancel, and only while pending.
       match /trades/{tid} {
         allow read: if signedIn();
-        allow create: if inSession(sid) && request.resource.data.fromUid == request.auth.uid;
-        allow update: if isDM()
-          || (signedIn() && request.auth.uid in [resource.data.fromUid, resource.data.toUid]);
+        allow create: if inSession(sid)
+          && request.resource.data.fromUid == request.auth.uid
+          && request.resource.data.toUid != request.auth.uid
+          && request.resource.data.status == 'pending';
+        allow update: if isDM() || (
+          resource.data.status == 'pending'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'respondedAt'])
+          && (
+            (request.auth.uid == resource.data.toUid && request.resource.data.status in ['accepted', 'declined'])
+            || (request.auth.uid == resource.data.fromUid && request.resource.data.status == 'cancelled')
+          )
+        );
       }
     }
   }

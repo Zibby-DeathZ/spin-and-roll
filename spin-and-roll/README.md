@@ -47,9 +47,9 @@ Your site: `https://<username>.github.io/<repo-name>/`
 ## Build status
 - [x] 1. Accounts, DM/player roles, dashboards
 - [x] 2. Campaign library and game creation (engine data files come with step 6)
-- [~] 3. Live sync — screens already update live; map and GM controls next
-- [ ] 4. Player phone character sheet and trading
-- [ ] 5. Event feed with animations on GM + TV
+- [x] 3. Live sync between GM, TV and phones (live map comes with step 6)
+- [x] 4. Player phone character sheet and trading
+- [~] 5. Event feed with toasts on GM + TV (bigger animations to come)
 - [ ] 6. Hollow Heir content (characters, wheels, clock, house points, minigames)
 - [x] 7. Win/loss history and trophies
 
