@@ -2,7 +2,8 @@ import { useCallback } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getCampaign, getCampaignData } from '../campaigns';
 import { useProfiles, useSession } from '../lib/sessions';
-import { answerKey, levelFor, useAnswers, useCharacters } from '../lib/game';
+import { answerKey, clockOf, levelFor, useAnswers, useCharacters } from '../lib/game';
+import { ClockChip } from '../components/Clock';
 import { HouseBoard, TVQuiz } from '../components/Ceremony';
 import { Splash } from '../components/Gate';
 import Bar from '../components/Bar';
@@ -41,7 +42,10 @@ export default function TVScreen() {
   return (
     <main className="tv tv-live">
       <div className="tv-topline">
-        <h1 className="tv-title">{title}</h1>
+        <div>
+          <h1 className="tv-title">{title}</h1>
+          {data.clock && <ClockChip data={data} clk={clockOf(session)} />}
+        </div>
         {data.quizzes && <HouseBoard points={session.state?.housePoints} compact />}
       </div>
       <div className="tv-stage">

@@ -50,7 +50,7 @@ service cloud.firestore {
         allow create: if isDM() || (
           inSession(sid)
           && request.resource.data.actorUid == request.auth.uid
-          && request.resource.data.type in ['item_used', 'purchase', 'ability_used', 'trade_offered', 'gift_offered', 'trade_declined']
+          && request.resource.data.type in ['item_used', 'purchase', 'ability_used', 'spell_cast', 'trade_offered', 'gift_offered', 'trade_declined']
         );
         allow update, delete: if isDM();
       }

@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { getCampaign, getCampaignData } from '../campaigns';
 import { useProfiles, useSession } from '../lib/sessions';
 import {
-  adjust, assignWand, awardPoints, createCharacter, defenceOf, describe, giveItem, levelFor, openVault,
+  adjust, assignWand, awardPoints, clockOf, createCharacter, defenceOf, describe, giveItem, levelFor, openVault,
   setField, setShopOpen, setStat, startQuiz, STATS, useAnswers, useCharacters, useEvents, useGameEngine,
 } from '../lib/game';
 import { Splash } from '../components/Gate';
@@ -11,6 +11,7 @@ import Bar from '../components/Bar';
 import StatusPill from '../components/StatusPill';
 import EventToasts from '../components/EventToasts';
 import { GMQuiz, HouseBoard } from '../components/Ceremony';
+import { GMClock } from '../components/Clock';
 
 function Buttons({ sid, uid, field, steps }) {
   return (
@@ -199,6 +200,7 @@ export default function GMScreen() {
           <StatusPill status={session.status} /> <strong className="code">{session.code}</strong>
         </span>
       </header>
+      {data.clock && <GMClock sid={sid} data={data} session={session} clk={clockOf(session)} chars={chars} />}
       {data.quizzes && <HouseBoard points={session.state?.housePoints} compact />}
       {quizState && data.quizzes?.[quizState.id] && (
         <GMQuiz sid={sid} quizState={quizState} data={data} chars={chars} answers={answers} />

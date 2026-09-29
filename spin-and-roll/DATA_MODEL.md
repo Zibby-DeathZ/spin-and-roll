@@ -13,7 +13,9 @@ sessions/{sessionId}          one game night (or a two-day campaign)
     shopOpen                  Diagon Alley shops open on phones
     quiz { id, uid }          the ceremony in progress ('sorting' | 'wand') and who's in it
     housePoints { Gryffindor, Hufflepuff, Ravenclaw, Slytherin }
-    (coming: day, timeBlock, timeTurnerUsed, mapLocation)
+    clock { day (0 = prologue), block, dawn }   dawn counts every new morning; drives once-per-day limits
+    taught { "<day>-<block>": true }            lessons already taught this week
+    timeTurnerUsed
 
   answers/{quiz}_{uid}        a player's ceremony answers: uid, quiz, picks [option index…], wish
 

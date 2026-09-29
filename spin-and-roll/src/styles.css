@@ -386,3 +386,33 @@ h4 { font: 700 1rem var(--body); margin: 0 0 .4rem; color: var(--muted); }
 .sheet-houses { margin-top: 1rem; }
 .sheet-houses h2 { font-size: 1.3rem; }
 @media (max-width: 700px) { .tv-options { grid-template-columns: 1fr; } }
+
+/* ---------- Clock ---------- */
+.clock-chip { margin: 0 0 .6rem; font-weight: 700; color: var(--gold); }
+.clock-chip span { color: var(--muted); font-weight: 500; }
+.gm-clock { background: var(--panel); border-radius: 14px; padding: 1rem 1.15rem; margin-bottom: 1rem; border-left: 4px solid var(--gold); }
+.clock-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; }
+.clock-row p { margin: 0; }
+.clock-label { font: 700 1.6rem var(--display); }
+.beat { margin: .8rem 0 0; padding: .6rem .8rem; border-radius: 10px; background: #2c2547; border-left: 4px solid var(--violet); }
+.beat.danger { background: #3a1f24; border-left-color: var(--ember); }
+.class-box { margin-top: .8rem; }
+.class-box p { margin-bottom: .5rem; }
+.attend { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: .6rem; }
+.attend label {
+  display: inline-flex; align-items: center; gap: .35rem; padding: .3rem .8rem; border-radius: 999px;
+  border: 1.5px solid var(--line); cursor: pointer; font-size: .9rem;
+}
+.attend label.on { border-color: var(--teal); color: var(--teal); }
+.attend input { accent-color: var(--teal); }
+.turner { margin-top: .8rem; }
+
+.spells { margin-top: 1.25rem; }
+.perks { display: flex; flex-wrap: wrap; gap: .4rem; }
+.perks .tag { font-size: .8rem; text-transform: none; letter-spacing: 0; padding: .15rem .7rem; }
+.timetable { margin-top: 1rem; background: var(--panel); border-radius: 12px; padding: .8rem 1rem; }
+.timetable summary { cursor: pointer; font-weight: 700; color: var(--gold); }
+.timetable table { width: 100%; border-collapse: collapse; margin: .6rem 0; font-size: .88rem; }
+.timetable th, .timetable td { text-align: left; padding: .35rem .4rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+.timetable th { color: var(--muted); font-weight: 500; }
+.timetable tr.today td { color: var(--gold); font-weight: 700; }

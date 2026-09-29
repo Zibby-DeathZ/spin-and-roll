@@ -53,7 +53,8 @@ Your site: `https://<username>.github.io/<repo-name>/`
 - [~] 6. Hollow Heir content
   - [x] Six premade families (locked once picked), vaults, Diagon Alley shops, wands, equipment buffs, Defence
   - [x] Family abilities, Sorting Hat and Ollivander ceremonies, house points
-  - [ ] 7-day clock and timetable, wheels, Time-Turner, class minigames, live map
+  - [x] 7-day clock, prologue stages, timetable, classes that teach spells/items, resting, spells with mana, Time-Turner
+  - [ ] Wheels, class minigames, live map
 - [x] 7. Win/loss history and trophies
 
 See `DATA_MODEL.md` for how the database is laid out.

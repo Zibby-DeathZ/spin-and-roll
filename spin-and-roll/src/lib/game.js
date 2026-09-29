@@ -1,5 +1,5 @@
 import {
-  addDoc, collection, deleteDoc, deleteField, doc, increment, limit, onSnapshot, orderBy, query,
+  addDoc, collection, deleteDoc, deleteField, doc, getDocs, increment, limit, onSnapshot, orderBy, query,
   runTransaction, serverTimestamp, setDoc, updateDoc, where,
 } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
@@ -217,7 +217,10 @@ export const claimFamily = (sid, uid, familyId, firstName) =>
   setDoc(doc(db, 'sessions', sid, 'claims', familyId), { uid, firstName, createdAt: serverTimestamp() });
 
 export const useAbility = (sid, uid, ability) =>
-  logEvent(sid, { type: 'ability_used', actorUid: uid, payload: { name: ability.name, icon: ability.icon } });
+  logEvent(sid, { type: 'ability_used', actorUid: uid, processed: false, payload: { name: ability.name, icon: ability.icon } });
+
+export const castSpell = (sid, uid, spellId) =>
+  logEvent(sid, { type: 'spell_cast', actorUid: uid, processed: false, payload: { spellId } });
 
 export const buy = (sid, uid, itemId) =>
   logEvent(sid, { type: 'purchase', actorUid: uid, processed: false, payload: { itemId } });
@@ -243,6 +246,118 @@ export async function respondTrade(sid, trade, accept) {
 
 export const cancelTrade = (sid, trade) =>
   updateDoc(doc(db, 'sessions', sid, 'trades', trade.id), { status: 'cancelled', respondedAt: serverTimestamp() });
+
+
+// ---------- The clock ----------
+
+export const clockOf = (session) => session?.state?.clock ?? { day: 0, block: 0, dawn: 0 };
+
+export function clockInfo(data, clk) {
+  if (!data.clock) return null;
+  if (clk.day === 0) {
+    const stage = data.clock.prologue[clk.block];
+    return { prologue: true, blockName: stage, label: `Prologue: ${stage}`, key: `0-${clk.block}` };
+  }
+  const blockName = data.clock.blocks[clk.block];
+  const slot = data.timetable?.[clk.day]?.[blockName] ?? null;
+  const cls = slot?.class ? data.classes[slot.class] : null;
+  return {
+    prologue: false, blockName, slot, cls,
+    label: `Day ${clk.day} of ${data.clock.days}, ${blockName}`,
+    key: `${clk.day}-${blockName}`,
+    last: clk.day === data.clock.days && clk.block === data.clock.blocks.length - 1,
+  };
+}
+
+export function lessonName(data, lesson) {
+  if (!lesson) return '';
+  if (lesson.type === 'spell') return data.spells[lesson.spell]?.name ?? lesson.spell;
+  return lesson.name ?? '';
+}
+
+// Sleeping restores everyone: the DnD "long rest".
+async function restEveryone(sid) {
+  const snap = await getDocs(col(sid, 'characters'));
+  const batch = writeBatch(db);
+  snap.docs.forEach((d) => batch.update(d.ref, { hp: d.data().maxHp, mana: d.data().maxMana }));
+  await batch.commit();
+}
+
+export async function moveClock(sid, data, clk, dir) {
+  let { day, block, dawn } = clk;
+  const P = data.clock.prologue.length, B = data.clock.blocks.length;
+  let newDawn = false;
+  if (dir > 0) {
+    if (day === 0) { if (block < P - 1) block++; else { day = 1; block = 0; dawn++; newDawn = true; } }
+    else if (block < B - 1) block++;
+    else if (day < data.clock.days) { day++; block = 0; dawn++; newDawn = true; }
+    else return;
+  } else {
+    if (day === 0) { if (block > 0) block--; else return; }
+    else if (block > 0) block--;
+    else if (day === 1) { day = 0; block = P - 1; }
+    else { day--; block = B - 1; }
+  }
+  const next = { day, block, dawn };
+  await updateDoc(doc(db, 'sessions', sid), { 'state.clock': next });
+  if (newDawn) await restEveryone(sid);
+  if (dir > 0) {
+    const info = clockInfo(data, next);
+    await logEvent(sid, {
+      type: 'time',
+      payload: { label: info.label, cls: info.cls?.name ?? null, prof: info.cls?.professor ?? null, dawn: newDawn },
+    });
+  }
+}
+
+export async function turnBackTime(sid, clk) {
+  await updateDoc(doc(db, 'sessions', sid), {
+    'state.clock': { day: 1, block: 0, dawn: clk.dawn + 1 },
+    'state.timeTurnerUsed': true,
+    'state.taught': deleteField(),
+  });
+  await restEveryone(sid);
+  await logEvent(sid, { type: 'time_turner' });
+}
+
+// Teaches the current lesson to the students who attended.
+export async function holdClass(sid, data, clk, uids) {
+  const info = clockInfo(data, clk);
+  const lesson = info?.slot?.lesson;
+  if (!lesson) return;
+  const xpGain = data.clock.xpPerClass ?? 10;
+  const names = [];
+  for (const uid of uids) {
+    let before = 0, after = 0;
+    await runTransaction(db, async (tx) => {
+      const snap = await tx.get(charRef(sid, uid));
+      const c = snap.data();
+      if (!c) return;
+      names.push(c.firstName ?? c.name);
+      before = c.xp; after = c.xp + xpGain;
+      const upd = { xp: after };
+      if (lesson.type === 'spell' && !(c.spells ?? []).some((x) => x.id === lesson.spell)) {
+        upd.spells = [...(c.spells ?? []), { id: lesson.spell, ...data.spells[lesson.spell] }];
+      }
+      if (lesson.type === 'item') {
+        upd.inventory = addItems(c.inventory, { id: lesson.item, ...data.items[lesson.item] }, lesson.qty ?? 1);
+      }
+      if (lesson.type === 'perk' && !(c.perks ?? []).includes(lesson.perk)) {
+        upd.perks = [...(c.perks ?? []), lesson.perk];
+      }
+      tx.update(snap.ref, upd);
+    });
+    if (levelFor(after) > levelFor(before)) {
+      await logEvent(sid, { type: 'level_up', targetUid: uid, payload: { level: levelFor(after) } });
+    }
+  }
+  await updateDoc(doc(db, 'sessions', sid), { [`state.taught.${info.key.replace(' ', '_')}`]: true });
+  await logEvent(sid, {
+    type: 'class_held',
+    payload: { names, cls: info.cls.name, lesson: lessonName(data, lesson), xp: xpGain },
+  });
+}
+export const taughtKey = (info) => info?.key?.replace(' ', '_');
 
 // ---------- Ceremonies: Sorting Hat and Ollivanders ----------
 
@@ -377,6 +492,8 @@ function buildCharacter(data, fam, firstName) {
     family: fam.id, familyName: fam.name, firstName,
     name: `${firstName} ${fam.name}`,
     vaultOpened: false,
+    spells: (fam.startSpells ?? []).filter((id) => data.spells?.[id]).map((id) => ({ id, ...data.spells[id] })),
+    perks: [],
     inventory: [],
     createdAt: serverTimestamp(),
   };
@@ -428,6 +545,48 @@ async function applyPurchase(sid, eid, data) {
   });
 }
 
+async function applyCast(sid, eid) {
+  const eRef = doc(db, 'sessions', sid, 'events', eid);
+  await runTransaction(db, async (tx) => {
+    const e = (await tx.get(eRef)).data();
+    if (!e || e.processed) return;
+    const cSnap = await tx.get(charRef(sid, e.actorUid));
+    const c = cSnap.data();
+    const spell = c?.spells?.find((x) => x.id === e.payload.spellId);
+    if (!spell || c.mana < spell.mana) {
+      tx.update(eRef, { processed: true, failed: true });
+      return;
+    }
+    const damage = spell.damage ? spell.damage + bonuses(c).spellPower : null;
+    tx.update(cSnap.ref, { mana: c.mana - spell.mana });
+    tx.update(eRef, { processed: true, payload: { ...e.payload, name: spell.name, icon: spell.icon, damage } });
+  });
+}
+
+async function applyAbility(sid, eid) {
+  const eRef = doc(db, 'sessions', sid, 'events', eid);
+  await runTransaction(db, async (tx) => {
+    const e = (await tx.get(eRef)).data();
+    if (!e || e.processed) return;
+    const sSnap = await tx.get(doc(db, 'sessions', sid));
+    const cSnap = await tx.get(charRef(sid, e.actorUid));
+    const dawn = clockOf(sSnap.data()).dawn;
+    if (!cSnap.exists() || cSnap.data().abilityDawn === dawn) {
+      tx.update(eRef, { processed: true, failed: true });
+      return;
+    }
+    tx.update(cSnap.ref, { abilityDawn: dawn });
+    tx.update(eRef, { processed: true });
+  });
+}
+
+const HANDLERS = {
+  purchase: (sid, id, data) => applyPurchase(sid, id, data),
+  spell_cast: (sid, id) => applyCast(sid, id),
+  ability_used: (sid, id) => applyAbility(sid, id),
+  item_used: (sid, id) => applyItemUse(sid, id),
+};
+
 export function useGameEngine(sid, data) {
   useEffect(() => {
     if (!data) return undefined; // wait until we know which campaign this is
@@ -440,8 +599,10 @@ export function useGameEngine(sid, data) {
     const stopTrades = onSnapshot(query(col(sid, 'trades'), where('status', '==', 'accepted')),
       (snap) => snap.docs.forEach((d) => run(d.id, () => executeTrade(sid, d.id))));
     const stopEvents = onSnapshot(query(col(sid, 'events'), where('processed', '==', false)),
-      (snap) => snap.docs.forEach((d) => run(d.id, () =>
-        d.data().type === 'purchase' ? applyPurchase(sid, d.id, data) : applyItemUse(sid, d.id))));
+      (snap) => snap.docs.forEach((d) => {
+        const handler = HANDLERS[d.data().type];
+        if (handler) run(d.id, () => handler(sid, d.id, data));
+      }));
     const stopClaims = onSnapshot(col(sid, 'claims'),
       (snap) => snap.docs.filter((d) => !d.data().status)
         .forEach((d) => run(`claim-${d.id}`, () => processClaim(sid, d.id, data))));
@@ -474,7 +635,14 @@ export function describe(e, nameOf) {
     case 'vault': return { icon: '🏦', text: `${target} opened the ${e.payload.family} vault: ${e.payload.amount} Galleons`, tone: 'gold', big: true };
     case 'wand_chosen': return { icon: '🪄', text: `The wand chooses ${target}: ${e.payload.name}`, tone: 'gold', big: true };
     case 'purchase': return e.failed ? null : { icon: e.payload.icon, text: `${actor} bought ${e.payload.name}`, tone: 'teal' };
-    case 'ability_used': return { icon: e.payload.icon, text: `${actor} uses ${e.payload.name}!`, tone: 'violet', big: true };
+    case 'time': return e.payload.cls
+      ? { icon: '🕰️', text: `${e.payload.label}: ${e.payload.cls} with ${e.payload.prof}`, tone: 'gold', big: true }
+      : { icon: e.payload.dawn ? '🌅' : '🕰️', text: e.payload.dawn ? `${e.payload.label}. Everyone wakes up rested.` : e.payload.label, tone: 'gold', big: true };
+    case 'time_turner': return { icon: '⌛', text: 'The Time-Turner spins… It’s Day 1 again. Then it cracks.', tone: 'violet', big: true };
+    case 'class_held': return { icon: '🎓', text: `${e.payload.names.join(', ')} learned ${e.payload.lesson} in ${e.payload.cls}`, tone: 'teal' };
+    case 'spell_cast': return e.failed ? null
+      : { icon: e.payload.icon, text: `${actor} casts ${e.payload.name}!${e.payload.damage ? ` (${e.payload.damage} damage)` : ''}`, tone: 'violet', big: true };
+    case 'ability_used': return e.failed ? null : { icon: e.payload.icon, text: `${actor} uses ${e.payload.name}!`, tone: 'violet', big: true };
     case 'quiz_started': return e.payload.quiz === 'sorting'
       ? { icon: '🎩', text: `${target}, step forward. The Sorting Hat awaits`, tone: 'gold' }
       : { icon: '🪄', text: `Mr Ollivander studies ${target} carefully…`, tone: 'gold' };

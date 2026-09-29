@@ -11,6 +11,8 @@ const items = {
   remembrall: { name: 'Remembrall', icon: '🔴', note: 'Ask the DM to remind you of one clue' },
   'extendable-ears': { name: 'Extendable Ears', icon: '👂', note: 'Overhear one private NPC conversation' },
   sneakoscope: { name: 'Pocket Sneakoscope', icon: '🌀', note: 'Spins when someone nearby lies' },
+  'mandrake-leaf': { name: 'Mandrake leaf', icon: '🌱', note: 'Key ingredient in the draught that restores drained students' },
+  'creature-treats': { name: 'Creature treats', icon: '🦴', note: 'Calms one magical creature instantly' },
 };
 
 export const hollowHeir = {
@@ -43,7 +45,7 @@ export const hollowHeir = {
       secret: 'Your grandmother’s diary mentions “the painted man” and a debt the Blackwoods never paid. Centuries ago, a Blackwood sealed a dark wizard inside a painting.',
     },
     {
-      id: 'sinclair', name: 'Sinclair', blood: 'Half-blood', wealth: 'Comfortable vault', vault: 300,
+      id: 'sinclair', name: 'Sinclair', startSpells: ['stupefy'], blood: 'Half-blood', wealth: 'Comfortable vault', vault: 300,
       ability: {
         name: 'Constant Vigilance', icon: '🛡️',
         passive: 'Auror training at home: you can’t be caught by surprise, and you start the game knowing Stupefy.',
@@ -298,6 +300,78 @@ export const hollowHeir = {
         },
       ],
     },
+  },
+
+  // ---------- The 7-day clock ----------
+  clock: {
+    days: 7,
+    prologue: ['Letters arrive', 'Gringotts and Diagon Alley', 'The Hogwarts Express', 'The Welcome Feast'],
+    blocks: ['Morning', 'Afternoon', 'Free time', 'Evening', 'Night'],
+    xpPerClass: 10,
+  },
+
+  // Spells a character can learn. damage gets the character's spell damage bonus added.
+  spells: {
+    stupefy: { name: 'Stupefy', icon: '💥', mana: 4, damage: 5, desc: 'Stunning spell. Knocks a target down.' },
+    lumos: { name: 'Lumos', icon: '💡', mana: 1, desc: 'Light in the dark. Reveals invisible ink.' },
+    expelliarmus: { name: 'Expelliarmus', icon: '🪄', mana: 3, desc: 'Disarms an opponent. Their next attack misses.' },
+    avifors: { name: 'Avifors', icon: '🐦', mana: 2, desc: 'Turns a small object into a flock of birds. A great distraction.' },
+    alohomora: { name: 'Alohomora', icon: '🔓', mana: 2, desc: 'Unlocks simple locks. Needed for more than one secret.' },
+    protego: { name: 'Protego', icon: '🛡️', mana: 3, desc: 'Shield charm. Blocks the next spell or attack against you or an ally.' },
+    incendio: { name: 'Incendio', icon: '🔥', mana: 4, damage: 6, desc: 'Conjures fire. Burns through vines and cobwebs.' },
+  },
+
+  classes: {
+    charms: { name: 'Charms', icon: '✨', professor: 'Professor Flitwick' },
+    potions: { name: 'Potions', icon: '⚗️', professor: 'Professor Grimsby' },
+    herbology: { name: 'Herbology', icon: '🌱', professor: 'Professor Longbottom' },
+    defence: { name: 'Defence Against the Dark Arts', icon: '🛡️', professor: 'Professor Ashgrove' },
+    transfiguration: { name: 'Transfiguration', icon: '🔄', professor: 'Professor Vance' },
+    creatures: { name: 'Care of Magical Creatures', icon: '🐾', professor: 'Professor Scamander' },
+    flying: { name: 'Flying Lessons', icon: '🧹', professor: 'Madam Hooch' },
+  },
+
+  // What each class teaches the students who show up (and pass the minigame).
+  timetable: {
+    1: {
+      Morning: { class: 'charms', lesson: { type: 'spell', spell: 'lumos' } },
+      Afternoon: { class: 'potions', lesson: { type: 'item', item: 'pepperup', qty: 2, name: 'Pepperup Potion' } },
+    },
+    2: {
+      Morning: { class: 'herbology', lesson: { type: 'item', item: 'mandrake-leaf', qty: 1, name: 'Mandrake care' } },
+      Afternoon: { class: 'defence', lesson: { type: 'spell', spell: 'expelliarmus' } },
+    },
+    3: {
+      Morning: { class: 'transfiguration', lesson: { type: 'spell', spell: 'avifors' } },
+      Afternoon: { class: 'creatures', lesson: { type: 'item', item: 'creature-treats', qty: 2, name: 'Handling magical creatures' } },
+    },
+    4: {
+      Morning: { class: 'potions', lesson: { type: 'item', item: 'wiggenweld', qty: 2, name: 'Wiggenweld Potion' } },
+      Afternoon: { class: 'flying', lesson: { type: 'perk', perk: 'Can fly a broom', name: 'Broom flying' } },
+    },
+    5: {
+      Morning: { class: 'charms', lesson: { type: 'spell', spell: 'alohomora' } },
+      Afternoon: { class: 'defence', lesson: { type: 'spell', spell: 'protego' } },
+    },
+    6: {
+      Morning: { note: 'Hogsmeade visit: no classes. Open the shops if you like.' },
+      Afternoon: { note: 'Hogsmeade visit: no classes.' },
+    },
+    7: {
+      Morning: { class: 'transfiguration', lesson: { type: 'spell', spell: 'incendio' } },
+      Afternoon: { note: 'Classes cancelled. The castle is on lockdown.' },
+    },
+  },
+
+  // Story beats, visible only on the GM screen, at the moment they happen.
+  beats: {
+    '1-Night': 'A covered painting is hung in the Undercroft corridor. A Quill feels its eyes.',
+    '2-Night': 'The Sinclair prefect is found drained outside the Ravenclaw tower. Cliffhanger for day one of play.',
+    '3-Evening': 'A second student is drained near the library. Portraits in that corridor are strangely silent.',
+    '4-Free time': 'The only book page about Corvin Vale vanishes from the Restricted Section.',
+    '5-Night': 'Professor Grimsby is caught standing over a third victim. (He was trying to help. Red herring.)',
+    '6-Evening': 'Ashgrove’s eyes flicker with paint. The truth can come out tonight if the party is close.',
+    '7-Night': 'The ritual. If Vale isn’t stopped before this block ends, he walks free and the game is lost.',
   },
 
   items,

@@ -5,18 +5,20 @@ import { getCampaign, getCampaignData } from '../campaigns';
 import { useSession } from '../lib/sessions';
 import {
   bonuses, bonusText, cancelTrade, consumeItem, defenceOf, fmtMod, levelFor, mod, nextLevelAt,
-  answerKey, offerTrade, respondTrade, statOf, STATS, useAbility, useAnswers, useCharacters, useClaims, useTrades,
+  answerKey, castSpell, clockOf, offerTrade, respondTrade, statOf, STATS, useAbility, useAnswers, useCharacters, useClaims, useTrades,
 } from '../lib/game';
 import FamilyPicker from './FamilyPicker';
 import Shop from './Shop';
 import { HouseBoard, PlayerQuiz } from '../components/Ceremony';
+import { ClockChip, Timetable } from '../components/Clock';
 import { Splash } from '../components/Gate';
 import Bar from '../components/Bar';
 import Wheel from '../components/Wheel';
 import TradeComposer from '../components/TradeComposer';
 
-function AbilityCard({ sid, c, ability }) {
+function AbilityCard({ sid, c, ability, dawn }) {
   const [used, setUsed] = useState(false);
+  const usedToday = c.abilityDawn === dawn;
   const fire = async () => {
     if (!confirm(`Use ${ability.name} now? It's once per day.`)) return;
     setUsed(true);
@@ -29,20 +31,54 @@ function AbilityCard({ sid, c, ability }) {
       <p><span className="tag">Always</span>{ability.passive}</p>
       <p><span className="tag">Once a day</span>{ability.active}</p>
       <p className="muted small"><span className="tag tag-warn">Drawback</span>{ability.drawback}</p>
-      <button className="btn gold" disabled={used} onClick={fire}>
-        {used ? 'Announced on the TV' : `Use ${ability.name}`}
+      <button className="btn gold" disabled={used || usedToday} onClick={fire}>
+        {usedToday ? 'Used today. Recharges after you sleep' : used ? 'Announced on the TV' : `Use ${ability.name}`}
       </button>
     </section>
   );
 }
 
-function Sheet({ sid, c, currency, data, points }) {
+function Spells({ sid, c }) {
+  const [cast, setCast] = useState(null);
+  const go = async (sp) => {
+    setCast(sp.id);
+    try { await castSpell(sid, c.uid, sp.id); } finally { setTimeout(() => setCast(null), 1500); }
+  };
+  return (
+    <section className="spells">
+      <h2>Spells</h2>
+      {!(c.spells ?? []).length && <p className="muted">Go to class to learn spells.</p>}
+      <ul className="rows">
+        {(c.spells ?? []).map((sp) => (
+          <li key={sp.id} className="item-row">
+            <span className="item-name">
+              <span className="item-icon">{sp.icon}</span>
+              <span>
+                <strong>{sp.name}</strong> <span className="muted small">{sp.mana} mana{sp.damage ? `, ${sp.damage} dmg` : ''}</span>
+                <br /><span className="muted small">{sp.desc}</span>
+              </span>
+            </span>
+            <button className="btn small gold" disabled={c.mana < sp.mana || cast === sp.id} onClick={() => go(sp)}>
+              {cast === sp.id ? 'Cast!' : 'Cast'}
+            </button>
+          </li>
+        ))}
+      </ul>
+      {(c.perks ?? []).length > 0 && (
+        <p className="perks">{c.perks.map((p) => <span key={p} className="tag">{p}</span>)}</p>
+      )}
+    </section>
+  );
+}
+
+function Sheet({ sid, c, currency, data, points, clk }) {
   const lvl = levelFor(c.xp);
   const next = nextLevelAt(c.xp);
   const b = bonuses(c);
   const fam = data.families?.find((f) => f.id === c.family);
   return (
     <>
+      {data.clock && <ClockChip data={data} clk={clk} />}
       <div className="char-head">
         <h1>{c.name}</h1>
         <p className="muted">{c.house ? `${c.house}, ` : ''}level {lvl}{fam ? `, ${fam.blood.toLowerCase()}` : ''}</p>
@@ -69,13 +105,15 @@ function Sheet({ sid, c, currency, data, points }) {
         })}
       </div>
       <p className="muted small">Roll a d20 and add the bonus of the stat the DM asks for. To hit you, enemies must roll your Defence or higher.</p>
+      {data.spells && <Spells sid={sid} c={c} />}
+      {data.clock && <Timetable data={data} clk={clk} />}
       {c.house && c.house !== 'Unsorted' && points && (
         <section className="sheet-houses">
           <h2>House points</h2>
           <HouseBoard points={points} compact />
         </section>
       )}
-      {fam?.ability && <AbilityCard sid={sid} c={c} ability={fam.ability} />}
+      {fam?.ability && <AbilityCard sid={sid} c={c} ability={fam.ability} dawn={clk.dawn} />}
       {fam && (
         <details className="secret">
           <summary>Family secret (only you can see this)</summary>
@@ -272,7 +310,7 @@ export default function PlayerScreen() {
   return (
     <div className="phone">
       <main className="phone-body">
-        {tab === 'sheet' && <Sheet sid={sid} c={me} currency={currency} data={data} points={session.state?.housePoints ?? {}} />}
+        {tab === 'sheet' && <Sheet sid={sid} c={me} currency={currency} data={data} points={session.state?.housePoints ?? {}} clk={clockOf(session)} />}
         {tab === 'shop' && <Shop sid={sid} c={me} data={data} open={shopOpen} />}
         {tab === 'bag' && (
           <Bag c={me} sid={sid} others={others}

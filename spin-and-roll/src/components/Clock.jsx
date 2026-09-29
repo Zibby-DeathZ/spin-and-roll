@@ -1,0 +1,117 @@
+import { useState } from 'react';
+import {
+  clockInfo, holdClass, lessonName, moveClock, taughtKey, turnBackTime,
+} from '../lib/game';
+
+// ---------- GM: the clock, today's class, and the story beat ----------
+export function GMClock({ sid, data, session, clk, chars }) {
+  const info = clockInfo(data, clk);
+  const uids = session.playerUids.filter((u) => chars[u]);
+  const [present, setPresent] = useState(null); // null = everyone
+  const [busy, setBusy] = useState(false);
+  const attending = present ?? uids;
+  const lesson = info.slot?.lesson;
+  const taught = !!session.state?.taught?.[taughtKey(info)];
+  const beat = data.beats?.[info.key];
+  const turnerUsed = !!session.state?.timeTurnerUsed;
+
+  const go = async (fn) => { setBusy(true); try { await fn(); } finally { setBusy(false); } };
+  const toggle = (u) => setPresent(attending.includes(u) ? attending.filter((x) => x !== u) : [...attending, u]);
+
+  return (
+    <section className="gm-clock">
+      <div className="clock-row">
+        <div>
+          <p className="clock-label">{info.label}</p>
+          {info.cls && <p className="muted">{info.cls.icon} {info.cls.name} with {info.cls.professor}</p>}
+          {info.slot?.note && <p className="muted">{info.slot.note}</p>}
+        </div>
+        <div className="actions">
+          <button className="btn small ghost" disabled={busy} onClick={() => go(() => moveClock(sid, data, clk, -1))}>◀ Back</button>
+          <button className="btn small gold" disabled={busy || info.last} onClick={() => { setPresent(null); go(() => moveClock(sid, data, clk, 1)); }}>
+            Advance time ▶
+          </button>
+        </div>
+      </div>
+
+      {beat && <p className="beat"><strong>Story beat:</strong> {beat}</p>}
+      {info.last && (
+        <p className="beat danger">
+          This is the final block. If the party hasn’t stopped Vale, record the loss from the dashboard.
+        </p>
+      )}
+
+      {lesson && (
+        <div className="class-box">
+          <p>
+            Teaches <strong>{lessonName(data, lesson)}</strong> (+{data.clock.xpPerClass} XP).
+            Tick who attended and passed the minigame:
+          </p>
+          <div className="attend">
+            {uids.map((u) => (
+              <label key={u} className={attending.includes(u) ? 'on' : ''}>
+                <input type="checkbox" checked={attending.includes(u)} onChange={() => toggle(u)} />
+                {chars[u].firstName ?? chars[u].name}
+              </label>
+            ))}
+          </div>
+          <button className="btn small teal" disabled={busy || taught || !attending.length}
+            onClick={() => go(() => holdClass(sid, data, clk, attending))}>
+            {taught ? 'Lesson taught' : 'Teach the lesson'}
+          </button>
+        </div>
+      )}
+
+      <div className="turner">
+        <button className="btn small" disabled={busy || turnerUsed || clk.day === 0}
+          onClick={() => {
+            if (confirm('Use the Time-Turner? Everyone returns to Day 1 morning, keeping XP, spells and items. It can only happen once.')) {
+              go(() => turnBackTime(sid, clk));
+            }
+          }}>
+          ⌛ {turnerUsed ? 'Time-Turner broken' : 'Use the Time-Turner'}
+        </button>
+      </div>
+    </section>
+  );
+}
+
+// ---------- TV and phone: where we are in the week ----------
+export function ClockChip({ data, clk }) {
+  const info = clockInfo(data, clk);
+  if (!info) return null;
+  return (
+    <p className="clock-chip">
+      🕰️ {info.label}
+      {info.cls && <span>, {info.cls.icon} {info.cls.name}</span>}
+    </p>
+  );
+}
+
+export function Timetable({ data, clk }) {
+  const days = Array.from({ length: data.clock.days }, (_, i) => i + 1);
+  const cell = (slot) => {
+    if (!slot) return '—';
+    if (slot.note) return <span className="muted">{slot.note.split(':')[0]}</span>;
+    const cls = data.classes[slot.class];
+    return <>{cls.icon} {cls.name}</>;
+  };
+  return (
+    <details className="timetable">
+      <summary>This week’s timetable</summary>
+      <table>
+        <thead><tr><th>Day</th><th>Morning</th><th>Afternoon</th></tr></thead>
+        <tbody>
+          {days.map((d) => (
+            <tr key={d} className={d === clk.day ? 'today' : ''}>
+              <td>{d}</td>
+              <td>{cell(data.timetable[d]?.Morning)}</td>
+              <td>{cell(data.timetable[d]?.Afternoon)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p className="muted small">Miss a class and you miss what it teaches. Sleeping through the night restores HP and mana.</p>
+    </details>
+  );
+}
