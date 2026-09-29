@@ -54,7 +54,8 @@ Your site: `https://<username>.github.io/<repo-name>/`
   - [x] Six premade families (locked once picked), vaults, Diagon Alley shops, wands, equipment buffs, Defence
   - [x] Family abilities, Sorting Hat and Ollivander ceremonies, house points
   - [x] 7-day clock, prologue stages, timetable, classes that teach spells/items, resting, spells with mana, Time-Turner
-  - [ ] Wheels, class minigames, live map
+  - [x] Wheels (spun on the TV, effects applied on landing)
+  - [ ] Class minigames, live map
 - [x] 7. Win/loss history and trophies
 
 See `DATA_MODEL.md` for how the database is laid out.

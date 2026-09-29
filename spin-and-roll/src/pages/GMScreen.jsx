@@ -12,6 +12,7 @@ import StatusPill from '../components/StatusPill';
 import EventToasts from '../components/EventToasts';
 import { GMQuiz, HouseBoard } from '../components/Ceremony';
 import { GMClock } from '../components/Clock';
+import { GMSpin } from '../components/SpinWheel';
 
 function Buttons({ sid, uid, field, steps }) {
   return (
@@ -201,6 +202,7 @@ export default function GMScreen() {
         </span>
       </header>
       {data.clock && <GMClock sid={sid} data={data} session={session} clk={clockOf(session)} chars={chars} />}
+      {data.wheels && <GMSpin sid={sid} data={data} session={session} chars={chars} />}
       {data.quizzes && <HouseBoard points={session.state?.housePoints} compact />}
       {quizState && data.quizzes?.[quizState.id] && (
         <GMQuiz sid={sid} quizState={quizState} data={data} chars={chars} answers={answers} />

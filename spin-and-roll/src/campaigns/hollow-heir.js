@@ -6,7 +6,7 @@ const items = {
   pepperup: { name: 'Pepperup Potion', icon: '🧪', effect: { hp: 10 } },
   wiggenweld: { name: 'Wiggenweld Potion', icon: '💚', effect: { hp: 20 } },
   'focus-draught': { name: 'Focus Draught', icon: '🔮', effect: { mana: 10 } },
-  'bertie-botts': { name: "Bertie Bott's Beans", icon: '🫘', note: 'Spin the bean wheel' },
+  'bertie-botts': { name: "Bertie Bott's Beans", icon: '🫘', note: 'Spin the bean wheel', wheel: 'beans' },
   felix: { name: 'Felix Felicis', icon: '✨', note: 'One free re-spin' },
   remembrall: { name: 'Remembrall', icon: '🔴', note: 'Ask the DM to remind you of one clue' },
   'extendable-ears': { name: 'Extendable Ears', icon: '👂', note: 'Overhear one private NPC conversation' },
@@ -372,6 +372,110 @@ export const hollowHeir = {
     '5-Night': 'Professor Grimsby is caught standing over a third victim. (He was trying to help. Red herring.)',
     '6-Evening': 'Ashgrove’s eyes flicker with paint. The truth can come out tonight if the party is close.',
     '7-Night': 'The ritual. If Vale isn’t stopped before this block ends, he walks free and the game is lost.',
+  },
+
+  // ---------- Wheels ----------
+  // label: short text on the slice. text: what the TV announces. effect: applied to whoever spun.
+  // Slices are equally likely, so repeat a slice to make it more common.
+  wheels: {
+    beans: {
+      name: "Bertie Bott's Beans", icon: '🫘',
+      segments: [
+        { label: 'Chocolate', text: 'Chocolate! Delicious. +2 HP', effect: { hp: 2 } },
+        { label: 'Earwax', text: 'Earwax. Everyone watches you gag' },
+        { label: 'Toffee', text: 'Toffee! +2 HP', effect: { hp: 2 } },
+        { label: 'Vomit', text: 'Vomit flavour. −2 HP', effect: { hp: -2 } },
+        { label: 'Pepper', text: 'Pepper! You breathe smoke. +2 mana', effect: { mana: 2 } },
+        { label: 'Bogey', text: 'Bogey. You swallow it anyway' },
+        { label: 'Grass', text: 'Freshly cut grass. Oddly nice' },
+        { label: 'Cherry', text: 'Cherry! +2 HP', effect: { hp: 2 } },
+      ],
+    },
+    brewing: {
+      name: 'Potion brewing', icon: '⚗️',
+      segments: [
+        { label: 'Perfect!', text: 'A perfect brew! +10 XP', effect: { xp: 10 } },
+        { label: 'Good', text: 'A good, solid brew' },
+        { label: 'Good', text: 'A good, solid brew' },
+        { label: 'Bubbles', text: 'It bubbles over and burns your hand. −2 HP', effect: { hp: -2 } },
+        { label: 'BOOM', text: 'Small explosion! −3 HP and no eyebrows', effect: { hp: -3 } },
+        { label: 'Wrong colour', text: 'Wrong colour. Grimsby sighs. −5 points', effect: { points: -5 } },
+        { label: 'Good', text: 'A good, solid brew' },
+        { label: 'Inspired', text: 'Inspired brewing! +5 points', effect: { points: 5 } },
+      ],
+    },
+    curfew: {
+      name: 'Out after curfew', icon: '🌙',
+      segments: [
+        { label: 'Safe', text: 'Nobody saw a thing' },
+        { label: 'Mrs Norris', text: 'Mrs Norris spots you. −5 points', effect: { points: -5 } },
+        { label: 'Safe', text: 'Nobody saw a thing' },
+        { label: 'Filch!', text: 'Filch catches you! −10 points and detention', effect: { points: -10 } },
+        { label: 'Peeves', text: 'Peeves shrieks your name down the corridor. −5 points', effect: { points: -5 } },
+        { label: 'Prefect', text: 'A prefect sees you… and lets it slide' },
+        { label: 'Safe', text: 'Nobody saw a thing' },
+        { label: 'Secret!', text: 'You stumble on a secret passage. +10 XP', effect: { xp: 10 } },
+      ],
+    },
+    misfire: {
+      name: 'Wand misfire', icon: '🪄',
+      segments: [
+        { label: 'Sparks', text: 'A shower of harmless sparks' },
+        { label: 'Vase', text: 'A vase across the shop explodes' },
+        { label: 'Blue hair', text: 'Your hair turns bright blue' },
+        { label: 'Knocked', text: 'It knocks you flat. −1 HP', effect: { hp: -1 } },
+        { label: 'Eyebrows', text: 'Mr Ollivander’s eyebrows are singed' },
+        { label: 'Nothing', text: 'Nothing happens. Very awkward' },
+      ],
+    },
+    gossip: {
+      name: 'Portrait gossip', icon: '🖼️',
+      segments: [
+        { label: 'Quiet', text: 'The portrait keeps your secret' },
+        { label: 'Quiet', text: 'The portrait keeps your secret' },
+        { label: 'Teacher', text: 'It tells a teacher. −5 points', effect: { points: -5 } },
+        { label: 'Corridor', text: 'It tells the whole corridor. Everyone knows' },
+        { label: 'Favour', text: 'It keeps quiet… for a favour, later' },
+        { label: 'Quiet', text: 'The portrait keeps your secret' },
+      ],
+    },
+    parseltongue: {
+      name: 'They heard you hiss', icon: '🐍',
+      segments: [
+        { label: 'Terrified', text: 'They’re terrified and run' },
+        { label: 'Suspicious', text: 'They’ll be watching you now' },
+        { label: 'Impressed', text: 'They’re secretly impressed' },
+        { label: 'Tells all', text: 'By dinner, the whole school knows' },
+        { label: 'Missed it', text: 'They didn’t notice a thing' },
+        { label: 'Teacher', text: 'They report you to a teacher. −5 points', effect: { points: -5 } },
+      ],
+    },
+    forest: {
+      name: 'Forbidden Forest', icon: '🌲',
+      segments: [
+        { label: 'Bowtruckles', text: 'A family of Bowtruckles watches from a tree' },
+        { label: 'Acromantula', text: 'ACROMANTULA! Roll for initiative' },
+        { label: 'Centaur', text: 'A centaur blocks the path. It has questions' },
+        { label: 'Unicorn', text: 'A unicorn, silver in the dark. +10 XP', effect: { xp: 10 } },
+        { label: 'Thestral', text: 'Something invisible breathes nearby' },
+        { label: 'Fog', text: 'Only fog, and the feeling of being watched' },
+        { label: 'Hippogriff', text: 'A hippogriff… with a torn Thornbury tag' },
+        { label: 'Howling', text: 'A howl. Everyone roll WIS' },
+      ],
+    },
+    castle: {
+      name: 'Hogwarts surprises', icon: '🏰',
+      segments: [
+        { label: 'Staircase', text: 'The staircase swings away. You’re late for everything' },
+        { label: 'Peeves', text: 'Peeves ambush! −1 HP', effect: { hp: -1 } },
+        { label: 'Passage', text: 'You find a hidden passage. +10 XP', effect: { xp: 10 } },
+        { label: 'House-elf', text: 'A house-elf slips you a Chocolate Frog', effect: { item: 'chocolate-frog' } },
+        { label: 'Ghost', text: 'A ghost whispers a rumour about the painting' },
+        { label: 'Galleons', text: 'You find Galleons in an old suit of armour. +5', effect: { gold: 5 } },
+        { label: 'Calm', text: 'A quiet moment. Nothing happens' },
+        { label: 'Portrait', text: 'A portrait winks at you knowingly' },
+      ],
+    },
   },
 
   items,

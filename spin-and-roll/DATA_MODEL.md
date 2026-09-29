@@ -16,6 +16,7 @@ sessions/{sessionId}          one game night (or a two-day campaign)
     clock { day (0 = prologue), block, dawn }   dawn counts every new morning; drives once-per-day limits
     taught { "<day>-<block>": true }            lessons already taught this week
     timeTurnerUsed
+    spin { wheelId, uid, idx, id, at, applied, hidden }   the wheel currently on the TV
 
   answers/{quiz}_{uid}        a player's ceremony answers: uid, quiz, picks [option index…], wish
 

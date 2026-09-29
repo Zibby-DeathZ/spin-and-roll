@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { describe, useEvents } from '../lib/game';
 
 // Pops a toast for every new event. Used on the TV and GM screens.
-export default function EventToasts({ sid, nameOf, big = false }) {
+export default function EventToasts({ sid, nameOf, big = false, skip = [] }) {
   const events = useEvents(sid, 10);
   const seen = useRef(null);
   const [toasts, setToasts] = useState([]);
@@ -17,12 +17,13 @@ export default function EventToasts({ sid, nameOf, big = false }) {
     const fresh = ready.filter((e) => !seen.current.has(e.id)).reverse();
     fresh.forEach((e) => {
       seen.current.add(e.id);
+      if (skip.includes(e.type)) return;
       const d = describe(e, nameOf);
       if (!d) return;
       setToasts((t) => [...t, { ...d, id: e.id }]);
       setTimeout(() => setToasts((t) => t.filter((x) => x.id !== e.id)), d.big ? 7000 : 5000);
     });
-  }, [events, nameOf]);
+  }, [events, nameOf]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className={`toasts ${big ? 'toasts-big' : ''}`} aria-live="polite">

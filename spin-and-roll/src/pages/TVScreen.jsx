@@ -4,6 +4,7 @@ import { getCampaign, getCampaignData } from '../campaigns';
 import { useProfiles, useSession } from '../lib/sessions';
 import { answerKey, clockOf, levelFor, useAnswers, useCharacters } from '../lib/game';
 import { ClockChip } from '../components/Clock';
+import { TVSpin } from '../components/SpinWheel';
 import { HouseBoard, TVQuiz } from '../components/Ceremony';
 import { Splash } from '../components/Gate';
 import Bar from '../components/Bar';
@@ -25,6 +26,8 @@ export default function TVScreen() {
   const data = getCampaignData(session.campaignId);
   const q = session.state?.quiz;
   const quiz = q && data.quizzes?.[q.id];
+  const spin = session.state?.spin;
+  const showSpin = spin && !spin.hidden && data.wheels?.[spin.wheelId];
 
   if (session.status === 'lobby') {
     return (
@@ -51,6 +54,8 @@ export default function TVScreen() {
       <div className="tv-stage">
         {quiz ? (
           <TVQuiz quiz={quiz} answer={answers[answerKey(q.id, q.uid)]} name={nameOf(q.uid)} />
+        ) : showSpin ? (
+          <TVSpin data={data} spin={spin} name={spin.uid ? nameOf(spin.uid) : null} />
         ) : (
           /* The live map goes here in a later build step. */
           <div className="tv-idle"><Wheel size={180} spin={false} /></div>
@@ -73,7 +78,7 @@ export default function TVScreen() {
           );
         })}
       </ul>
-      <EventToasts sid={sid} nameOf={nameOf} big />
+      <EventToasts sid={sid} nameOf={nameOf} big skip={['wheel']} />
     </main>
   );
 }

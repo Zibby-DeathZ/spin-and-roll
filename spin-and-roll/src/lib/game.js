@@ -359,6 +359,46 @@ export async function holdClass(sid, data, clk, uids) {
 }
 export const taughtKey = (info) => info?.key?.replace(' ', '_');
 
+
+// ---------- Wheels ----------
+
+export const SPIN_MS = 5200; // how long the TV wheel spins before landing
+
+export async function startSpin(sid, data, wheelId, uid = null) {
+  const wheel = data.wheels?.[wheelId];
+  if (!wheel) return;
+  const idx = Math.floor(Math.random() * wheel.segments.length);
+  await updateDoc(doc(db, 'sessions', sid), {
+    'state.spin': { wheelId, uid, idx, id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, at: Date.now(), applied: false },
+  });
+}
+
+export const hideSpin = (sid) => updateDoc(doc(db, 'sessions', sid), { 'state.spin.hidden': true });
+
+// Called by the GM screen once the wheel has landed. Applies the effect exactly once.
+export async function applySpin(sid, data, spin) {
+  const sRef = doc(db, 'sessions', sid);
+  let claimed = false;
+  await runTransaction(db, async (tx) => {
+    const cur = (await tx.get(sRef)).data()?.state?.spin;
+    if (!cur || cur.id !== spin.id || cur.applied) return;
+    tx.update(sRef, { 'state.spin.applied': true });
+    claimed = true;
+  });
+  if (!claimed) return;
+  const wheel = data.wheels[spin.wheelId];
+  const seg = wheel.segments[spin.idx];
+  await logEvent(sid, { type: 'wheel', targetUid: spin.uid, payload: { wheel: wheel.name, icon: wheel.icon, text: seg.text } });
+  const fx = seg.effect ?? {};
+  if (!spin.uid) return;
+  for (const f of ['hp', 'mana', 'xp', 'gold']) if (fx[f]) await adjust(sid, spin.uid, f, fx[f]);
+  if (fx.item && data.items[fx.item]) await giveItem(sid, spin.uid, { id: fx.item, ...data.items[fx.item] }, 1);
+  if (fx.points) {
+    const c = (await getDocs(query(col(sid, 'characters')))).docs.find((d) => d.id === spin.uid)?.data();
+    if (c?.house) await awardPoints(sid, spin.uid, c.house, fx.points);
+  }
+}
+
 // ---------- Ceremonies: Sorting Hat and Ollivanders ----------
 
 export function useAnswers(sid) {
@@ -454,8 +494,9 @@ async function executeTrade(sid, tid) {
   if (outcome) await logEvent(sid, { type: outcome, actorUid: t.fromUid, targetUid: t.toUid });
 }
 
-async function applyItemUse(sid, eid) {
+async function applyItemUse(sid, eid, data) {
   const eRef = doc(db, 'sessions', sid, 'events', eid);
+  let wheel = null, actor = null;
   await runTransaction(db, async (tx) => {
     const eSnap = await tx.get(eRef);
     const e = eSnap.data();
@@ -478,7 +519,10 @@ async function applyItemUse(sid, eid) {
       processed: true,
       payload: { ...e.payload, name: item.name, icon: item.icon, effect: fx, note: item.note ?? null },
     });
+    wheel = item.wheel ?? null;
+    actor = e.actorUid;
   });
+  if (wheel && data?.wheels?.[wheel]) await startSpin(sid, data, wheel, actor);
 }
 
 function buildCharacter(data, fam, firstName) {
@@ -584,7 +628,7 @@ const HANDLERS = {
   purchase: (sid, id, data) => applyPurchase(sid, id, data),
   spell_cast: (sid, id) => applyCast(sid, id),
   ability_used: (sid, id) => applyAbility(sid, id),
-  item_used: (sid, id) => applyItemUse(sid, id),
+  item_used: (sid, id, data) => applyItemUse(sid, id, data),
 };
 
 export function useGameEngine(sid, data) {
@@ -638,6 +682,7 @@ export function describe(e, nameOf) {
     case 'time': return e.payload.cls
       ? { icon: '🕰️', text: `${e.payload.label}: ${e.payload.cls} with ${e.payload.prof}`, tone: 'gold', big: true }
       : { icon: e.payload.dawn ? '🌅' : '🕰️', text: e.payload.dawn ? `${e.payload.label}. Everyone wakes up rested.` : e.payload.label, tone: 'gold', big: true };
+    case 'wheel': return { icon: e.payload.icon, text: `${e.targetUid ? `${target}: ` : ''}${e.payload.text}`, tone: 'gold' };
     case 'time_turner': return { icon: '⌛', text: 'The Time-Turner spins… It’s Day 1 again. Then it cracks.', tone: 'violet', big: true };
     case 'class_held': return { icon: '🎓', text: `${e.payload.names.join(', ')} learned ${e.payload.lesson} in ${e.payload.cls}`, tone: 'teal' };
     case 'spell_cast': return e.failed ? null
