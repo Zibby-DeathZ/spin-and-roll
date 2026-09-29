@@ -73,7 +73,7 @@ export function TVSpin({ data, spin, name }) {
   const wheel = data.wheels[spin.wheelId];
   return (
     <div className="tv-spin">
-      <h2>{wheel.icon} {wheel.name}{name ? `: ${name}` : ''}</h2>
+      <h2>{wheel.icon} {wheel.name}{name && !wheel.secret ? `: ${name}` : ''}</h2>
       <WheelView wheel={wheel} idx={spin.idx} spinId={spin.id} size={Math.min(480, window.innerHeight * 0.55)} />
     </div>
   );

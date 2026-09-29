@@ -7,9 +7,10 @@ import {
 export function GMClock({ sid, data, session, clk, chars }) {
   const info = clockInfo(data, clk);
   const uids = session.playerUids.filter((u) => chars[u]);
+  const allowed = uids.filter((u) => !chars[u].expelled);
   const [present, setPresent] = useState(null); // null = everyone
   const [busy, setBusy] = useState(false);
-  const attending = present ?? uids;
+  const attending = present ?? allowed;
   const lesson = info.slot?.lesson;
   const taught = !!session.state?.taught?.[taughtKey(info)];
   const beat = data.beats?.[info.key];
@@ -90,6 +91,7 @@ export function ClockChip({ data, clk }) {
 
 export function Timetable({ data, clk }) {
   const days = Array.from({ length: data.clock.days }, (_, i) => i + 1);
+  const cols = data.clock.blocks.filter((b) => days.some((d) => data.timetable[d]?.[b]));
   const cell = (slot) => {
     if (!slot) return '—';
     if (slot.note) return <span className="muted">{slot.note.split(':')[0]}</span>;
@@ -100,18 +102,17 @@ export function Timetable({ data, clk }) {
     <details className="timetable">
       <summary>This week’s timetable</summary>
       <table>
-        <thead><tr><th>Day</th><th>Morning</th><th>Afternoon</th></tr></thead>
+        <thead><tr><th>Day</th>{cols.map((b) => <th key={b}>{b}</th>)}</tr></thead>
         <tbody>
           {days.map((d) => (
             <tr key={d} className={d === clk.day ? 'today' : ''}>
               <td>{d}</td>
-              <td>{cell(data.timetable[d]?.Morning)}</td>
-              <td>{cell(data.timetable[d]?.Afternoon)}</td>
+              {cols.map((b) => <td key={b}>{cell(data.timetable[d]?.[b])}</td>)}
             </tr>
           ))}
         </tbody>
       </table>
-      <p className="muted small">Miss a class and you miss what it teaches. Sleeping through the night restores HP and mana.</p>
+      <p className="muted small">Miss a class and you miss what it teaches. Lunch, free time and curfew are yours to explore. A new morning restores HP and mana.</p>
     </details>
   );
 }

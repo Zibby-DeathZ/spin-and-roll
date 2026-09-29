@@ -44,6 +44,10 @@ Your site: `https://<username>.github.io/<repo-name>/`
 4. DM: **Start game**. At the end, **Record win** or **Record loss** — it's written to
    every player's history, and a win drops the campaign trophy into their cabinet.
 
+## Map images
+Put one image per location in `public/maps/`, named after the location id (see the
+README in that folder), e.g. `public/maps/great-hall.jpg`. Commit and push, and it shows up.
+
 ## Build status
 - [x] 1. Accounts, DM/player roles, dashboards
 - [x] 2. Campaign library and game creation (engine data files come with step 6)
@@ -55,7 +59,10 @@ Your site: `https://<username>.github.io/<repo-name>/`
   - [x] Family abilities, Sorting Hat and Ollivander ceremonies, house points
   - [x] 7-day clock, prologue stages, timetable, classes that teach spells/items, resting, spells with mana, Time-Turner
   - [x] Wheels (spun on the TV, effects applied on landing)
-  - [ ] Class minigames, live map
+  - [x] Live map with locations, tokens and monsters (images go in public/maps)
+  - [x] Dice tab, spells rolled with their own dice, fights with initiative and Defence, duels
+  - [x] Hidden Killing Curse (one learner, secret wheel, expulsion)
+  - [ ] Class minigames
 - [x] 7. Win/loss history and trophies
 
 See `DATA_MODEL.md` for how the database is laid out.

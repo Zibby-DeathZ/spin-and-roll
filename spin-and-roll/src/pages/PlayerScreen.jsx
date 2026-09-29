@@ -5,10 +5,11 @@ import { getCampaign, getCampaignData } from '../campaigns';
 import { useSession } from '../lib/sessions';
 import {
   bonuses, bonusText, cancelTrade, consumeItem, defenceOf, fmtMod, levelFor, mod, nextLevelAt,
-  answerKey, castSpell, clockOf, offerTrade, respondTrade, statOf, STATS, useAbility, useAnswers, useCharacters, useClaims, useTrades,
+  answerKey, clockOf, offerTrade, respondTrade, statOf, STATS, useAbility, useAnswers, useCharacters, useClaims, useTrades,
 } from '../lib/game';
 import FamilyPicker from './FamilyPicker';
 import Shop from './Shop';
+import DiceTab from './DiceTab';
 import { HouseBoard, PlayerQuiz } from '../components/Ceremony';
 import { ClockChip, Timetable } from '../components/Clock';
 import { Splash } from '../components/Gate';
@@ -38,40 +39,7 @@ function AbilityCard({ sid, c, ability, dawn }) {
   );
 }
 
-function Spells({ sid, c }) {
-  const [cast, setCast] = useState(null);
-  const go = async (sp) => {
-    setCast(sp.id);
-    try { await castSpell(sid, c.uid, sp.id); } finally { setTimeout(() => setCast(null), 1500); }
-  };
-  return (
-    <section className="spells">
-      <h2>Spells</h2>
-      {!(c.spells ?? []).length && <p className="muted">Go to class to learn spells.</p>}
-      <ul className="rows">
-        {(c.spells ?? []).map((sp) => (
-          <li key={sp.id} className="item-row">
-            <span className="item-name">
-              <span className="item-icon">{sp.icon}</span>
-              <span>
-                <strong>{sp.name}</strong> <span className="muted small">{sp.mana} mana{sp.damage ? `, ${sp.damage} dmg` : ''}</span>
-                <br /><span className="muted small">{sp.desc}</span>
-              </span>
-            </span>
-            <button className="btn small gold" disabled={c.mana < sp.mana || cast === sp.id} onClick={() => go(sp)}>
-              {cast === sp.id ? 'Cast!' : 'Cast'}
-            </button>
-          </li>
-        ))}
-      </ul>
-      {(c.perks ?? []).length > 0 && (
-        <p className="perks">{c.perks.map((p) => <span key={p} className="tag">{p}</span>)}</p>
-      )}
-    </section>
-  );
-}
-
-function Sheet({ sid, c, currency, data, points, clk }) {
+function Sheet({ sid, c, currency, data, points, clk, loc, discovered }) {
   const lvl = levelFor(c.xp);
   const next = nextLevelAt(c.xp);
   const b = bonuses(c);
@@ -79,6 +47,7 @@ function Sheet({ sid, c, currency, data, points, clk }) {
   return (
     <>
       {data.clock && <ClockChip data={data} clk={clk} />}
+      {loc && <p className="loc-chip">📍 {loc.name}</p>}
       <div className="char-head">
         <h1>{c.name}</h1>
         <p className="muted">{c.house ? `${c.house}, ` : ''}level {lvl}{fam ? `, ${fam.blood.toLowerCase()}` : ''}</p>
@@ -105,8 +74,20 @@ function Sheet({ sid, c, currency, data, points, clk }) {
         })}
       </div>
       <p className="muted small">Roll a d20 and add the bonus of the stat the DM asks for. To hit you, enemies must roll your Defence or higher.</p>
-      {data.spells && <Spells sid={sid} c={c} />}
+      {(c.perks ?? []).length > 0 && (
+        <p className="perks">{c.perks.map((p) => <span key={p} className="tag">{p}</span>)}</p>
+      )}
       {data.clock && <Timetable data={data} clk={clk} />}
+      {data.locations && (
+        <details className="timetable">
+          <summary>Places you’ve found ({discovered.length})</summary>
+          <ul className="places">
+            {data.locations.filter((l) => discovered.includes(l.id)).map((l) => (
+              <li key={l.id}><strong>{l.icon} {l.name}</strong> <span className="muted small">{l.desc}</span></li>
+            ))}
+          </ul>
+        </details>
+      )}
       {c.house && c.house !== 'Unsorted' && points && (
         <section className="sheet-houses">
           <h2>House points</h2>
@@ -304,13 +285,24 @@ export default function PlayerScreen() {
 
   const others = Object.values(chars).filter((c) => c.uid !== user.uid);
   const pending = trades.filter((t) => t.status === 'pending' && t.toUid === user.uid).length;
-  const tabs = [['sheet', 'Character'], ['bag', 'Bag'],
+  const tabs = [['sheet', 'Sheet'], ['dice', 'Dice'], ['bag', 'Bag'],
     ...(data.shops ? [['shop', 'Shop']] : []), ['party', 'Party'], ['trades', 'Trades']];
+  const enc = session.state?.encounter;
+  const turnOf = enc?.order?.[enc.turn];
 
   return (
     <div className="phone">
+      {me.expelled && <div className="banner bad">📜 You have been expelled from Hogwarts.</div>}
+      {enc && (
+        <div className={`banner ${turnOf?.id === me.uid ? 'mine' : ''}`}>
+          ⚔️ {turnOf?.id === me.uid ? 'Your turn! Open Dice to attack or cast.' : `Fight! ${turnOf?.name}’s turn.`}
+        </div>
+      )}
       <main className="phone-body">
-        {tab === 'sheet' && <Sheet sid={sid} c={me} currency={currency} data={data} points={session.state?.housePoints ?? {}} clk={clockOf(session)} />}
+        {tab === 'sheet' && <Sheet sid={sid} c={me} currency={currency} data={data} points={session.state?.housePoints ?? {}} clk={clockOf(session)}
+          loc={data.locations?.find((l) => l.id === session.state?.map?.loc)}
+          discovered={session.state?.map?.discovered ?? []} />}
+        {tab === 'dice' && <DiceTab sid={sid} c={me} data={data} session={session} chars={chars} />}
         {tab === 'shop' && <Shop sid={sid} c={me} data={data} open={shopOpen} />}
         {tab === 'bag' && (
           <Bag c={me} sid={sid} others={others}

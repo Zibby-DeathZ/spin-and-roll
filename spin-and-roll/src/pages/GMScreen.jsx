@@ -13,6 +13,8 @@ import EventToasts from '../components/EventToasts';
 import { GMQuiz, HouseBoard } from '../components/Ceremony';
 import { GMClock } from '../components/Clock';
 import { GMSpin } from '../components/SpinWheel';
+import GMMap from '../components/GMMap';
+import { setExpelled, teachForbidden } from '../lib/combat';
 
 function Buttons({ sid, uid, field, steps }) {
   return (
@@ -66,7 +68,7 @@ function Ollivander({ sid, c, data }) {
   );
 }
 
-function CharacterControls({ sid, c, data, playerName, quizBusy }) {
+function CharacterControls({ sid, c, data, playerName, quizBusy, forbiddenLearner }) {
   const [open, setOpen] = useState(false);
   const [itemId, setItemId] = useState(Object.keys(data.items)[0] ?? '');
   const give = () => {
@@ -80,6 +82,9 @@ function CharacterControls({ sid, c, data, playerName, quizBusy }) {
         <div>
           <strong className="gm-name">{c.name}</strong>
           <span className="muted small"> {playerName}, level {levelFor(c.xp)}, Defence {defenceOf(c)}</span>
+          {c.hp <= 0 && <span className="tag tag-warn">Knocked out</span>}
+          {c.expelled && <span className="tag tag-warn">Expelled</span>}
+          {forbiddenLearner === c.uid && <span className="tag tag-green">Knows the Killing Curse</span>}
         </div>
         {data.houses.length > 0 && (
           <select value={c.house} onChange={(e) => setField(sid, c.uid, 'house', e.target.value)} aria-label="House">
@@ -137,6 +142,18 @@ function CharacterControls({ sid, c, data, playerName, quizBusy }) {
       <button className="linkish" onClick={() => setOpen(!open)} aria-expanded={open}>
         {open ? 'Hide stats and limits' : 'Edit stats and limits'}
       </button>
+      {open && data.spells?.['avada-kedavra'] && (
+        <div className="actions secret-actions">
+          {!forbiddenLearner && (
+            <button className="btn small" onClick={() => {
+              if (confirm(`Teach ${c.name} the Killing Curse? Only one character can ever learn it. Nothing is shown on the TV.`)) teachForbidden(sid, data, c.uid);
+            }}>💚 Teach the Killing Curse (secret)</button>
+          )}
+          <button className="btn small ghost" onClick={() => setExpelled(sid, c.uid, !c.expelled)}>
+            {c.expelled ? 'Reinstate at Hogwarts' : 'Expel'}
+          </button>
+        </div>
+      )}
       {open && (
         <div className="gm-stats">
           {STATS.map(([k, label]) => (
@@ -202,6 +219,7 @@ export default function GMScreen() {
         </span>
       </header>
       {data.clock && <GMClock sid={sid} data={data} session={session} clk={clockOf(session)} chars={chars} />}
+      {data.locations && <GMMap sid={sid} data={data} session={session} chars={chars} />}
       {data.wheels && <GMSpin sid={sid} data={data} session={session} chars={chars} />}
       {data.quizzes && <HouseBoard points={session.state?.housePoints} compact />}
       {quizState && data.quizzes?.[quizState.id] && (
@@ -210,7 +228,7 @@ export default function GMScreen() {
       <div className="gm-grid">
         <section className="gm-players">
           {session.playerUids.map((u) => chars[u]
-            ? <CharacterControls key={u} sid={sid} c={chars[u]} data={data} playerName={profiles[u]?.displayName} quizBusy={!!quizState} />
+            ? <CharacterControls key={u} sid={sid} c={chars[u]} data={data} playerName={profiles[u]?.displayName} quizBusy={!!quizState} forbiddenLearner={session.state?.forbiddenLearner} />
             : <NewCharacter key={u} sid={sid} uid={u} profile={profiles[u]} data={data} />)}
           {!session.playerUids.length && <p className="muted">Players appear here once they join with the code.</p>}
         </section>

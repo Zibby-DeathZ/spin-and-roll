@@ -17,6 +17,10 @@ sessions/{sessionId}          one game night (or a two-day campaign)
     taught { "<day>-<block>": true }            lessons already taught this week
     timeTurnerUsed
     spin { wheelId, uid, idx, id, at, applied, hidden }   the wheel currently on the TV
+    map { loc, discovered [] }                             where the party is, and places found
+    tokens { id: { kind, name, icon, loc, x, y, npc, hp, maxHp, defence, boss, disarmed } }
+    encounter { order [{ kind: 'pc'|'mon', id, name, init }], turn, round, loc, monsters [] }
+    forbiddenLearner                                       the one character who knows the Killing Curse
 
   answers/{quiz}_{uid}        a player's ceremony answers: uid, quiz, picks [option index…], wish
 

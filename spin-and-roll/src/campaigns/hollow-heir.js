@@ -306,20 +306,85 @@ export const hollowHeir = {
   clock: {
     days: 7,
     prologue: ['Letters arrive', 'Gringotts and Diagon Alley', 'The Hogwarts Express', 'The Welcome Feast'],
-    blocks: ['Morning', 'Afternoon', 'Free time', 'Evening', 'Night'],
+    blocks: ['Morning class', 'Lunch', 'Afternoon class', 'Free time', 'Curfew'],
     xpPerClass: 10,
   },
 
   // Spells a character can learn. damage gets the character's spell damage bonus added.
   spells: {
-    stupefy: { name: 'Stupefy', icon: '💥', mana: 4, damage: 5, desc: 'Stunning spell. Knocks a target down.' },
+    // hit: stat added to a d20 roll that must reach the target's Defence.
+    // dice: the spell's own die. damage spells add the caster's spell damage bonus.
     lumos: { name: 'Lumos', icon: '💡', mana: 1, desc: 'Light in the dark. Reveals invisible ink.' },
-    expelliarmus: { name: 'Expelliarmus', icon: '🪄', mana: 3, desc: 'Disarms an opponent. Their next attack misses.' },
-    avifors: { name: 'Avifors', icon: '🐦', mana: 2, desc: 'Turns a small object into a flock of birds. A great distraction.' },
-    alohomora: { name: 'Alohomora', icon: '🔓', mana: 2, desc: 'Unlocks simple locks. Needed for more than one secret.' },
-    protego: { name: 'Protego', icon: '🛡️', mana: 3, desc: 'Shield charm. Blocks the next spell or attack against you or an ally.' },
-    incendio: { name: 'Incendio', icon: '🔥', mana: 4, damage: 6, desc: 'Conjures fire. Burns through vines and cobwebs.' },
+    avifors: { name: 'Avifors', icon: '🐦', mana: 2, dice: { count: 1, die: 4 }, effectLabel: 'rounds of distraction', desc: 'Turns a small object into a flock of birds.' },
+    alohomora: { name: 'Alohomora', icon: '🔓', mana: 2, check: 'int', desc: 'Unlocks a lock if your roll beats its difficulty.' },
+    protego: { name: 'Protego', icon: '🛡️', mana: 3, dice: { count: 1, die: 6 }, effectLabel: 'damage blocked', desc: 'Shield charm. Blocks damage from the next attack on you or an ally.' },
+    expelliarmus: { name: 'Expelliarmus', icon: '🪄', mana: 3, hit: 'dex', attack: true, desc: 'Disarms the target. On a hit, their next attack misses.' },
+    stupefy: { name: 'Stupefy', icon: '💥', mana: 4, hit: 'int', attack: true, dice: { count: 1, die: 8 }, damage: true, desc: 'Stunning spell.' },
+    incendio: { name: 'Incendio', icon: '🔥', mana: 5, hit: 'int', attack: true, dice: { count: 1, die: 10 }, damage: true, desc: 'Conjures fire. Painted creatures burn.' },
+    'avada-kedavra': {
+      name: 'Avada Kedavra', icon: '💚', mana: 10, hit: 'cha', attack: true, kill: true, forbidden: true,
+      desc: 'The Killing Curse. Kills any creature outright; bosses take 20. If anyone sees, you are expelled.',
+    },
   },
+
+  // Monsters and people you can place on the map. Monsters can be fought.
+  bestiary: {
+    'cornish-pixie': { name: 'Cornish Pixie', icon: '🧚', hp: 4, defence: 12, atk: 3, dmg: { count: 1, die: 4 }, init: 3, xp: 5 },
+    'devils-snare': { name: 'Devil’s Snare', icon: '🌿', hp: 14, defence: 10, atk: 4, dmg: { count: 1, die: 6 }, init: 0, xp: 15, note: 'Hates light and fire' },
+    boggart: { name: 'Boggart', icon: '👤', hp: 10, defence: 12, atk: 3, dmg: { count: 1, die: 6 }, init: 2, xp: 20, note: 'Laughter hurts it' },
+    'rival-duelist': { name: 'Dueling Club rival', icon: '🧑‍🎓', hp: 14, defence: 12, atk: 3, dmg: { count: 1, die: 6 }, init: 2, xp: 15 },
+    'paint-wraith': { name: 'Paint Wraith', icon: '🎨', hp: 12, defence: 13, atk: 4, dmg: { count: 1, die: 6 }, init: 3, xp: 25, note: 'Vale’s servant. Fire burns it' },
+    acromantula: { name: 'Acromantula', icon: '🕷️', hp: 22, defence: 13, atk: 5, dmg: { count: 1, die: 8 }, init: 2, xp: 40 },
+    troll: { name: 'Mountain Troll', icon: '👹', hp: 30, defence: 11, atk: 6, dmg: { count: 1, die: 10 }, init: -1, xp: 50 },
+    'ashgrove-possessed': { name: 'Ashgrove (possessed)', icon: '🧙', hp: 45, defence: 14, atk: 5, dmg: { count: 1, die: 8, bonus: 2 }, init: 3, xp: 100, boss: true },
+    'corvin-vale': { name: 'Corvin Vale', icon: '🖼️', hp: 60, defence: 15, atk: 6, dmg: { count: 1, die: 10, bonus: 2 }, init: 4, xp: 200, boss: true },
+    // People (no stats)
+    ashgrove: { name: 'Professor Ashgrove', icon: '🧙', npc: true },
+    grimsby: { name: 'Professor Grimsby', icon: '⚗️', npc: true },
+    longbottom: { name: 'Professor Longbottom', icon: '🌱', npc: true },
+    scamander: { name: 'Professor Scamander', icon: '🐾', npc: true },
+    flitwick: { name: 'Professor Flitwick', icon: '✨', npc: true },
+    filch: { name: 'Filch', icon: '🔦', npc: true },
+    peeves: { name: 'Peeves', icon: '🤡', npc: true },
+    ghost: { name: 'A ghost', icon: '👻', npc: true },
+    'house-elf': { name: 'House-elf', icon: '🧦', npc: true },
+    centaur: { name: 'Centaur', icon: '🏹', npc: true },
+    'sinclair-prefect': { name: 'Prefect Sinclair', icon: '🎖️', npc: true },
+    painting: { name: 'The covered painting', icon: '🖼️', npc: true },
+  },
+
+  // Places on the map. Drop an image at public/maps/<id>.jpg and it shows automatically.
+  locations: [
+    { id: 'home', area: 'Prologue', name: 'Home', icon: '🏠', desc: 'An owl taps at the window.' },
+    { id: 'gringotts', area: 'Prologue', name: 'Gringotts Wizarding Bank', icon: '🏦', desc: 'Goblins, marble halls, and the rattle of mine carts below.' },
+    { id: 'diagon-alley', area: 'Prologue', name: 'Diagon Alley', icon: '🛍️', desc: 'Crooked shops, owls, and a hundred smells at once.' },
+    { id: 'ollivanders', area: 'Prologue', name: 'Ollivanders', icon: '🪄', desc: 'Dusty boxes stacked to the ceiling. Something hums.' },
+    { id: 'platform', area: 'Prologue', name: 'Platform Nine and Three-Quarters', icon: '🚂', desc: 'Steam, trunks, and a scarlet engine.' },
+    { id: 'express', area: 'Prologue', name: 'The Hogwarts Express', icon: '🚃', desc: 'Compartments, the trolley witch, and a covered painting in the luggage car.' },
+    { id: 'great-hall', area: 'Castle', name: 'The Great Hall', icon: '🕯️', desc: 'Floating candles under an enchanted sky.' },
+    { id: 'entrance-hall', area: 'Castle', name: 'Entrance Hall', icon: '🚪', desc: 'The house point hourglasses glitter by the doors.' },
+    { id: 'grand-staircase', area: 'Castle', name: 'Grand Staircase', icon: '🪜', desc: 'Stairs that change their minds. Portraits everywhere.' },
+    { id: 'common-room', area: 'Castle', name: 'Common room', icon: '🛋️', desc: 'A fire, armchairs, and house secrets.' },
+    { id: 'library', area: 'Castle', name: 'The Library', icon: '📚', desc: 'Silent shelves and a librarian who hears everything.' },
+    { id: 'restricted-section', area: 'Castle', name: 'Restricted Section', icon: '⛓️', desc: 'Chained books that whisper when you pass.' },
+    { id: 'dungeons', area: 'Castle', name: 'The Dungeons', icon: '⚗️', desc: 'Cold stone, green light, and the Potions classroom.' },
+    { id: 'defence-classroom', area: 'Castle', name: 'Defence classroom', icon: '🛡️', desc: 'Ashgrove’s room. Too many paintings for comfort.' },
+    { id: 'trophy-room', area: 'Castle', name: 'Trophy Room', icon: '🏆', desc: 'Old awards, including a certain Quidditch Cup.' },
+    { id: 'owlery', area: 'Castle', name: 'The Owlery', icon: '🦉', desc: 'Freezing, windy, and full of owls.' },
+    { id: 'astronomy-tower', area: 'Castle', name: 'Astronomy Tower', icon: '🔭', desc: 'The highest point in the castle.' },
+    { id: 'hospital-wing', area: 'Castle', name: 'Hospital Wing', icon: '🏥', desc: 'Where the drained students lie, still and grey.' },
+    { id: 'room-of-requirement', area: 'Castle', name: 'Room of Requirement', icon: '✨', desc: 'It becomes whatever you need.' },
+    { id: 'undercroft', area: 'Castle', name: 'The Undercroft', icon: '🕳️', desc: 'Beneath the castle. A door with a serpent carved in it.' },
+    { id: 'courtyard', area: 'Grounds', name: 'The Courtyard', icon: '⛲', desc: 'Stone arches and gossiping students.' },
+    { id: 'greenhouses', area: 'Grounds', name: 'Greenhouses', icon: '🌱', desc: 'Warm, damp, and something is screaming in a pot.' },
+    { id: 'quidditch-pitch', area: 'Grounds', name: 'Quidditch Pitch', icon: '🧹', desc: 'Towering hoops and wind.' },
+    { id: 'black-lake', area: 'Grounds', name: 'The Black Lake', icon: '🌊', desc: 'Dark water. Something large moves beneath.' },
+    { id: 'hagrids-hut', area: 'Grounds', name: 'The old gamekeeper’s hut', icon: '🛖', desc: 'A giant-sized door, and pumpkins.' },
+    { id: 'forbidden-forest', area: 'Grounds', name: 'Forbidden Forest', icon: '🌲', desc: 'Out of bounds. For good reason.' },
+    { id: 'hogsmeade', area: 'Hogsmeade', name: 'Hogsmeade Village', icon: '🏘️', desc: 'Snowy rooftops and sweet shops.' },
+    { id: 'three-broomsticks', area: 'Hogsmeade', name: 'The Three Broomsticks', icon: '🍺', desc: 'Butterbeer and loose tongues.' },
+    { id: 'shrieking-shack', area: 'Hogsmeade', name: 'The Shrieking Shack', icon: '🏚️', desc: 'The most haunted building in Britain. Supposedly.' },
+  ],
 
   classes: {
     charms: { name: 'Charms', icon: '✨', professor: 'Professor Flitwick' },
@@ -334,44 +399,44 @@ export const hollowHeir = {
   // What each class teaches the students who show up (and pass the minigame).
   timetable: {
     1: {
-      Morning: { class: 'charms', lesson: { type: 'spell', spell: 'lumos' } },
-      Afternoon: { class: 'potions', lesson: { type: 'item', item: 'pepperup', qty: 2, name: 'Pepperup Potion' } },
+      'Morning class': { class: 'charms', lesson: { type: 'spell', spell: 'lumos' } },
+      'Afternoon class': { class: 'potions', lesson: { type: 'item', item: 'pepperup', qty: 2, name: 'Pepperup Potion' } },
     },
     2: {
-      Morning: { class: 'herbology', lesson: { type: 'item', item: 'mandrake-leaf', qty: 1, name: 'Mandrake care' } },
-      Afternoon: { class: 'defence', lesson: { type: 'spell', spell: 'expelliarmus' } },
+      'Morning class': { class: 'herbology', lesson: { type: 'item', item: 'mandrake-leaf', qty: 1, name: 'Mandrake care' } },
+      'Afternoon class': { class: 'defence', lesson: { type: 'spell', spell: 'expelliarmus' } },
     },
     3: {
-      Morning: { class: 'transfiguration', lesson: { type: 'spell', spell: 'avifors' } },
-      Afternoon: { class: 'creatures', lesson: { type: 'item', item: 'creature-treats', qty: 2, name: 'Handling magical creatures' } },
+      'Morning class': { class: 'transfiguration', lesson: { type: 'spell', spell: 'avifors' } },
+      'Afternoon class': { class: 'creatures', lesson: { type: 'item', item: 'creature-treats', qty: 2, name: 'Handling magical creatures' } },
     },
     4: {
-      Morning: { class: 'potions', lesson: { type: 'item', item: 'wiggenweld', qty: 2, name: 'Wiggenweld Potion' } },
-      Afternoon: { class: 'flying', lesson: { type: 'perk', perk: 'Can fly a broom', name: 'Broom flying' } },
+      'Morning class': { class: 'potions', lesson: { type: 'item', item: 'wiggenweld', qty: 2, name: 'Wiggenweld Potion' } },
+      'Afternoon class': { class: 'flying', lesson: { type: 'perk', perk: 'Can fly a broom', name: 'Broom flying' } },
     },
     5: {
-      Morning: { class: 'charms', lesson: { type: 'spell', spell: 'alohomora' } },
-      Afternoon: { class: 'defence', lesson: { type: 'spell', spell: 'protego' } },
+      'Morning class': { class: 'charms', lesson: { type: 'spell', spell: 'alohomora' } },
+      'Afternoon class': { class: 'defence', lesson: { type: 'spell', spell: 'protego' } },
     },
     6: {
-      Morning: { note: 'Hogsmeade visit: no classes. Open the shops if you like.' },
-      Afternoon: { note: 'Hogsmeade visit: no classes.' },
+      'Morning class': { note: 'Hogsmeade visit: no classes. Open the shops if you like.' },
+      'Afternoon class': { note: 'Hogsmeade visit: no classes.' },
     },
     7: {
-      Morning: { class: 'transfiguration', lesson: { type: 'spell', spell: 'incendio' } },
-      Afternoon: { note: 'Classes cancelled. The castle is on lockdown.' },
+      'Morning class': { class: 'transfiguration', lesson: { type: 'spell', spell: 'incendio' } },
+      'Afternoon class': { note: 'Classes cancelled. The castle is on lockdown.' },
     },
   },
 
   // Story beats, visible only on the GM screen, at the moment they happen.
   beats: {
-    '1-Night': 'A covered painting is hung in the Undercroft corridor. A Quill feels its eyes.',
-    '2-Night': 'The Sinclair prefect is found drained outside the Ravenclaw tower. Cliffhanger for day one of play.',
-    '3-Evening': 'A second student is drained near the library. Portraits in that corridor are strangely silent.',
+    '1-Curfew': 'A covered painting is hung in the Undercroft corridor. A Quill feels its eyes.',
+    '2-Curfew': 'The Sinclair prefect is found drained outside the Ravenclaw tower. Cliffhanger for day one of play.',
+    '3-Lunch': 'A second student is drained near the library. Portraits in that corridor are strangely silent.',
     '4-Free time': 'The only book page about Corvin Vale vanishes from the Restricted Section.',
-    '5-Night': 'Professor Grimsby is caught standing over a third victim. (He was trying to help. Red herring.)',
-    '6-Evening': 'Ashgrove’s eyes flicker with paint. The truth can come out tonight if the party is close.',
-    '7-Night': 'The ritual. If Vale isn’t stopped before this block ends, he walks free and the game is lost.',
+    '5-Curfew': 'Professor Grimsby is caught standing over a third victim. (He was trying to help. Red herring.)',
+    '6-Free time': 'Ashgrove’s eyes flicker with paint. The truth can come out tonight if the party is close.',
+    '7-Curfew': 'The ritual. If Vale isn’t stopped before this block ends, he walks free and the game is lost.',
   },
 
   // ---------- Wheels ----------
@@ -461,6 +526,19 @@ export const hollowHeir = {
         { label: 'Fog', text: 'Only fog, and the feeling of being watched' },
         { label: 'Hippogriff', text: 'A hippogriff… with a torn Thornbury tag' },
         { label: 'Howling', text: 'A howl. Everyone roll WIS' },
+      ],
+    },
+    unforgivable: {
+      name: 'Did anyone see?', icon: '💚', secret: true,
+      segments: [
+        { label: 'Unseen', text: 'Nobody saw. This time.' },
+        { label: 'Teacher!', text: 'A teacher saw the green light.', effect: { expel: true } },
+        { label: 'Unseen', text: 'Nobody saw. This time.' },
+        { label: 'Portrait', text: 'A portrait saw everything. It may talk…' },
+        { label: 'Unseen', text: 'Nobody saw. This time.' },
+        { label: 'Ghost', text: 'A ghost drifts away without a word.' },
+        { label: 'Unseen', text: 'Nobody saw. This time.' },
+        { label: 'Headmaster', text: 'The Headmaster was watching.', effect: { expel: true } },
       ],
     },
     castle: {

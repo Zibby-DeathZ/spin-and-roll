@@ -4,6 +4,7 @@ import {
 } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { db } from '../firebase';
+import { applyAttack } from './combat';
 
 // ---------- Rules of the game ----------
 
@@ -219,8 +220,8 @@ export const claimFamily = (sid, uid, familyId, firstName) =>
 export const useAbility = (sid, uid, ability) =>
   logEvent(sid, { type: 'ability_used', actorUid: uid, processed: false, payload: { name: ability.name, icon: ability.icon } });
 
-export const castSpell = (sid, uid, spellId) =>
-  logEvent(sid, { type: 'spell_cast', actorUid: uid, processed: false, payload: { spellId } });
+export const castSpell = (sid, uid, spellId, extra = {}) =>
+  logEvent(sid, { type: 'spell_cast', actorUid: uid, processed: false, payload: { spellId, ...extra } });
 
 export const buy = (sid, uid, itemId) =>
   logEvent(sid, { type: 'purchase', actorUid: uid, processed: false, payload: { itemId } });
@@ -392,6 +393,10 @@ export async function applySpin(sid, data, spin) {
   const fx = seg.effect ?? {};
   if (!spin.uid) return;
   for (const f of ['hp', 'mana', 'xp', 'gold']) if (fx[f]) await adjust(sid, spin.uid, f, fx[f]);
+  if (fx.expel) {
+    await updateDoc(charRef(sid, spin.uid), { expelled: true });
+    await logEvent(sid, { type: 'expelled', targetUid: spin.uid });
+  }
   if (fx.item && data.items[fx.item]) await giveItem(sid, spin.uid, { id: fx.item, ...data.items[fx.item] }, 1);
   if (fx.points) {
     const c = (await getDocs(query(col(sid, 'characters')))).docs.find((d) => d.id === spin.uid)?.data();
@@ -589,21 +594,21 @@ async function applyPurchase(sid, eid, data) {
   });
 }
 
-async function applyCast(sid, eid) {
+async function applyCast(sid, eid, data) {
   const eRef = doc(db, 'sessions', sid, 'events', eid);
   await runTransaction(db, async (tx) => {
     const e = (await tx.get(eRef)).data();
     if (!e || e.processed) return;
     const cSnap = await tx.get(charRef(sid, e.actorUid));
     const c = cSnap.data();
-    const spell = c?.spells?.find((x) => x.id === e.payload.spellId);
+    const own = c?.spells?.find((x) => x.id === e.payload.spellId);
+    const spell = own ? { ...own, ...(data?.spells?.[own.id] ?? {}) } : null;
     if (!spell || c.mana < spell.mana) {
       tx.update(eRef, { processed: true, failed: true });
       return;
     }
-    const damage = spell.damage ? spell.damage + bonuses(c).spellPower : null;
     tx.update(cSnap.ref, { mana: c.mana - spell.mana });
-    tx.update(eRef, { processed: true, payload: { ...e.payload, name: spell.name, icon: spell.icon, damage } });
+    tx.update(eRef, { processed: true, payload: { ...e.payload, name: spell.name, icon: spell.icon } });
   });
 }
 
@@ -626,9 +631,10 @@ async function applyAbility(sid, eid) {
 
 const HANDLERS = {
   purchase: (sid, id, data) => applyPurchase(sid, id, data),
-  spell_cast: (sid, id) => applyCast(sid, id),
+  spell_cast: (sid, id, data) => applyCast(sid, id, data),
   ability_used: (sid, id) => applyAbility(sid, id),
   item_used: (sid, id, data) => applyItemUse(sid, id, data),
+  attack: (sid, id, data) => applyAttack(sid, id, data),
 };
 
 export function useGameEngine(sid, data) {
@@ -686,7 +692,38 @@ export function describe(e, nameOf) {
     case 'time_turner': return { icon: '⌛', text: 'The Time-Turner spins… It’s Day 1 again. Then it cracks.', tone: 'violet', big: true };
     case 'class_held': return { icon: '🎓', text: `${e.payload.names.join(', ')} learned ${e.payload.lesson} in ${e.payload.cls}`, tone: 'teal' };
     case 'spell_cast': return e.failed ? null
-      : { icon: e.payload.icon, text: `${actor} casts ${e.payload.name}!${e.payload.damage ? ` (${e.payload.damage} damage)` : ''}`, tone: 'violet', big: true };
+      : { icon: e.payload.icon, text: `${actor} casts ${e.payload.name}!${e.payload.rolled != null ? ` Rolled ${e.payload.rolled} ${e.payload.rollLabel ?? ''}` : ''}`, tone: 'violet', big: true };
+    case 'attack': {
+      if (e.failed) return null;
+      const p = e.payload;
+      if (p.forbidden) {
+        return { icon: '💚', text: `A flash of green light…${p.hit ? ` ${p.targetName} falls.` : ' It misses.'}`, tone: 'house-slytherin', big: true };
+      }
+      const crit = p.nat === 20 ? ' Natural 20!' : p.nat === 1 ? ' Natural 1!' : '';
+      return {
+        icon: p.icon,
+        text: `${actor} → ${p.targetName}: ${p.name}, ${p.hitTotal} vs Defence ${p.defence}.${crit} ${p.hit ? (p.dmg ? `Hit for ${p.dmg}!` : 'Hit!') : 'Miss.'}${p.defeated ? ` ${p.targetName} is down!` : ''}`,
+        tone: p.hit ? 'gold' : 'muted', big: true,
+      };
+    }
+    case 'monster_attack': {
+      const p = e.payload;
+      if (p.disarmed) return { icon: p.icon, text: `${p.name} reaches for its weapon… it’s been disarmed! Miss.`, tone: 'muted', big: true };
+      return {
+        icon: p.icon,
+        text: `${p.name} → ${target}: ${p.total} vs Defence ${p.defence}. ${p.hit ? `Hit for ${p.dmg}!` : 'Miss.'}${p.ko ? ` ${target} is knocked out!` : ''}`,
+        tone: p.hit ? 'ember' : 'muted', big: true,
+      };
+    }
+    case 'roll': {
+      const p = e.payload;
+      const detail = `${p.rolls.join(p.mode === 'normal' ? ' + ' : ' / ')}${p.mod ? ` ${p.mod > 0 ? '+' : '−'} ${Math.abs(p.mod)}` : ''}`;
+      return { icon: '🎲', text: `${actor} rolled ${p.label}: ${p.total} (${detail})`, tone: 'gold' };
+    }
+    case 'travel': return { icon: '📍', text: e.payload.name, tone: 'gold', big: true };
+    case 'fight_start': return { icon: '⚔️', text: `Roll for initiative! ${e.payload.order.join(', ')}`, tone: 'ember', big: true };
+    case 'fight_end': return { icon: '🏁', text: `The fight is over.${e.payload.xp ? ` Everyone gains ${e.payload.xp} XP.` : ''}`, tone: 'gold', big: true };
+    case 'expelled': return { icon: '📜', text: `${target} has been EXPELLED from Hogwarts!`, tone: 'ember', big: true };
     case 'ability_used': return e.failed ? null : { icon: e.payload.icon, text: `${actor} uses ${e.payload.name}!`, tone: 'violet', big: true };
     case 'quiz_started': return e.payload.quiz === 'sorting'
       ? { icon: '🎩', text: `${target}, step forward. The Sorting Hat awaits`, tone: 'gold' }

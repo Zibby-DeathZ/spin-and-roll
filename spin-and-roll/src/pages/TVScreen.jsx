@@ -5,6 +5,7 @@ import { useProfiles, useSession } from '../lib/sessions';
 import { answerKey, clockOf, levelFor, useAnswers, useCharacters } from '../lib/game';
 import { ClockChip } from '../components/Clock';
 import { TVSpin } from '../components/SpinWheel';
+import MapView from '../components/MapView';
 import { HouseBoard, TVQuiz } from '../components/Ceremony';
 import { Splash } from '../components/Gate';
 import Bar from '../components/Bar';
@@ -28,6 +29,8 @@ export default function TVScreen() {
   const quiz = q && data.quizzes?.[q.id];
   const spin = session.state?.spin;
   const showSpin = spin && !spin.hidden && data.wheels?.[spin.wheelId];
+  const loc = data.locations?.find((l) => l.id === session.state?.map?.loc);
+  const enc = session.state?.encounter;
 
   if (session.status === 'lobby') {
     return (
@@ -56,9 +59,20 @@ export default function TVScreen() {
           <TVQuiz quiz={quiz} answer={answers[answerKey(q.id, q.uid)]} name={nameOf(q.uid)} />
         ) : showSpin ? (
           <TVSpin data={data} spin={spin} name={spin.uid ? nameOf(spin.uid) : null} />
+        ) : loc ? (
+          <MapView loc={loc} tokens={session.state?.tokens} encounter={enc} big />
         ) : (
-          /* The live map goes here in a later build step. */
           <div className="tv-idle"><Wheel size={180} spin={false} /></div>
+        )}
+        {enc && !quiz && !showSpin && (
+          <ol className="tv-turns">
+            <li className="tv-round">Round {enc.round}</li>
+            {enc.order.map((o, i) => (
+              <li key={o.id} className={`${i === enc.turn ? 'on' : ''} ${o.kind === 'mon' ? 'mon' : ''} ${o.kind === 'mon' && (session.state?.tokens?.[o.id]?.hp ?? 0) <= 0 ? 'out' : ''}`}>
+                {o.name}
+              </li>
+            ))}
+          </ol>
         )}
       </div>
       <ul className="tv-party">
@@ -69,6 +83,7 @@ export default function TVScreen() {
               <strong>{c?.name ?? profiles[u]?.displayName}</strong>
               {c ? (
                 <>
+                  {c.hp <= 0 && <span className="tag tag-warn">Knocked out</span>}
                   <span className="muted">{c.house ? `${c.house}, ` : ''}level {levelFor(c.xp)}</span>
                   <Bar label="HP" value={c.hp} max={c.maxHp} tone="ember" />
                   <Bar label="Mana" value={c.mana} max={c.maxMana} tone="violet" />
