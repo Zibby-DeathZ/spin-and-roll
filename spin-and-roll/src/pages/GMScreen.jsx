@@ -11,9 +11,10 @@ import Bar from '../components/Bar';
 import StatusPill from '../components/StatusPill';
 import EventToasts from '../components/EventToasts';
 import { GMQuiz, HouseBoard } from '../components/Ceremony';
-import { GMClock } from '../components/Clock';
+import { ClockChip, GMClock } from '../components/Clock';
 import { GMSpin } from '../components/SpinWheel';
-import GMMap from '../components/GMMap';
+import GMTable from '../components/GMTable';
+import Portrait from '../components/Portrait';
 import GMQuests from '../components/GMQuests';
 import { useLessonEngine } from '../lib/lessons';
 import { setExpelled, teachForbidden } from '../lib/combat';
@@ -82,6 +83,7 @@ function CharacterControls({ sid, c, data, playerName, quizBusy, forbiddenLearne
     <div className="gm-card">
       <div className="party-head">
         <div>
+          <Portrait family={c.family} name={c.name} className="card-portrait" />
           <strong className="gm-name">{c.name}</strong>
           <span className="muted small"> {playerName}, level {levelFor(c.xp)}, Defence {defenceOf(c)}</span>
           {c.hp <= 0 && <span className="tag tag-warn">Knocked out</span>}
@@ -190,6 +192,10 @@ function Feed({ sid, nameOf }) {
   );
 }
 
+const TABS = [
+  ['table', '🗺️ Table'], ['day', '🕰️ Day & class'], ['quests', '📜 Quests'], ['players', '🧑‍🎓 Players'], ['wheels', '🎡 Wheels'],
+];
+
 export default function GMScreen() {
   const { sid } = useParams();
   const session = useSession(sid);
@@ -199,6 +205,8 @@ export default function GMScreen() {
   const data = session ? getCampaignData(session.campaignId) : null;
   useGameEngine(sid, data); // carries out claims, purchases, trades and item uses while open
   const lessonResults = useLessonEngine(sid, data, session?.state?.lesson);
+  const [tab, setTab] = useState('table');
+  const [feedOpen, setFeedOpen] = useState(false);
   const nameOf = useCallback(
     (u) => chars?.[u]?.name ?? profiles[u]?.displayName ?? 'Someone', [chars, profiles]);
 
@@ -207,41 +215,68 @@ export default function GMScreen() {
 
   const shopOpen = !!session.state?.shopOpen;
   const quizState = session.state?.quiz;
+  const enc = session.state?.encounter;
+  const lesson = session.state?.lesson;
+  const tabs = TABS.filter(([id]) => (id === 'day' ? data.clock : id === 'quests' ? data.quests : id === 'wheels' ? data.wheels : id === 'table' ? data.locations : true));
+  const active = tabs.some(([id]) => id === tab) ? tab : tabs[0][0];
 
   return (
     <div className="gm">
       <header className="gm-top">
-        <h1>{getCampaign(session.campaignId)?.title}</h1>
-        <span className="gm-top-right">
+        <div className="gm-title">
+          <h1>{getCampaign(session.campaignId)?.title}</h1>
+          {data.clock && <ClockChip data={data} clk={clockOf(session)} />}
+        </div>
+        <div className="gm-top-right">
+          {data.quizzes && <HouseBoard points={session.state?.housePoints} compact />}
           {data.shops && (
-            <button className={`btn small ${shopOpen ? 'ember' : 'teal'}`} onClick={() => setShopOpen(sid, !shopOpen)}>
-              {shopOpen ? 'Close the shops' : 'Open Diagon Alley'}
+            <button className={`btn small ${shopOpen ? 'ember' : ''}`} onClick={() => setShopOpen(sid, !shopOpen)}>
+              {shopOpen ? '🛍️ Close shops' : '🛍️ Open shops'}
             </button>
           )}
-          <StatusPill status={session.status} /> <strong className="code">{session.code}</strong>
-        </span>
+          <StatusPill status={session.status} />
+          <strong className="code">{session.code}</strong>
+          <button className="btn small ghost" onClick={() => setFeedOpen(!feedOpen)} aria-expanded={feedOpen}>📰 Feed</button>
+        </div>
       </header>
-      {data.clock && <GMClock sid={sid} data={data} session={session} clk={clockOf(session)} chars={chars} lessonResults={lessonResults} />}
-      {data.locations && <GMMap sid={sid} data={data} session={session} chars={chars} />}
-      {data.quests && <GMQuests sid={sid} data={data} session={session} chars={chars} />}
-      {data.wheels && <GMSpin sid={sid} data={data} session={session} chars={chars} />}
-      {data.quizzes && <HouseBoard points={session.state?.housePoints} compact />}
+
+      <nav className="gm-tabs" aria-label="GM sections">
+        {tabs.map(([id, label]) => (
+          <button key={id} className={active === id ? 'on' : ''} onClick={() => setTab(id)}>
+            {label}
+            {id === 'table' && enc && <span className="gm-dot ember" aria-label="fight in progress" />}
+            {id === 'day' && lesson && <span className="gm-dot gold" aria-label="class in progress" />}
+          </button>
+        ))}
+      </nav>
+
       {quizState && data.quizzes?.[quizState.id] && (
         <GMQuiz sid={sid} quizState={quizState} data={data} chars={chars} answers={answers} />
       )}
-      <div className="gm-grid">
-        <section className="gm-players">
-          {session.playerUids.map((u) => chars[u]
-            ? <CharacterControls key={u} sid={sid} c={chars[u]} data={data} playerName={profiles[u]?.displayName} quizBusy={!!quizState} forbiddenLearner={session.state?.forbiddenLearner} />
-            : <NewCharacter key={u} sid={sid} uid={u} profile={profiles[u]} data={data} />)}
-          {!session.playerUids.length && <p className="muted">Players appear here once they join with the code.</p>}
-        </section>
-        <aside className="gm-feed">
-          <h2>Table feed</h2>
-          <Feed sid={sid} nameOf={nameOf} />
-          <p className="muted small">Keep this screen open during play. It carries out trades and item uses.</p>
-        </aside>
+
+      <div className={`gm-body ${feedOpen ? 'with-feed' : ''}`}>
+        <main className="gm-main">
+          {active === 'table' && <GMTable sid={sid} data={data} session={session} chars={chars} />}
+          {active === 'day' && <GMClock sid={sid} data={data} session={session} clk={clockOf(session)} chars={chars} lessonResults={lessonResults} />}
+          {active === 'quests' && <GMQuests sid={sid} data={data} session={session} chars={chars} />}
+          {active === 'wheels' && <GMSpin sid={sid} data={data} session={session} chars={chars} />}
+          {active === 'players' && (
+            <section className="gm-players">
+              {session.playerUids.map((u) => chars[u]
+                ? <CharacterControls key={u} sid={sid} c={chars[u]} data={data} playerName={profiles[u]?.displayName} quizBusy={!!quizState} forbiddenLearner={session.state?.forbiddenLearner} />
+                : <NewCharacter key={u} sid={sid} uid={u} profile={profiles[u]} data={data} />)}
+              {!session.playerUids.length && <p className="muted">Players appear here once they join with the code.</p>}
+            </section>
+          )}
+        </main>
+        {feedOpen && (
+          <aside className="gm-feed">
+            <h2>Table feed</h2>
+            <Feed sid={sid} nameOf={nameOf} />
+          </aside>
+        )}
       </div>
+      <p className="gm-foot muted small">Keep this screen open during play. It carries out trades, purchases and attacks.</p>
       <EventToasts sid={sid} nameOf={nameOf} />
     </div>
   );

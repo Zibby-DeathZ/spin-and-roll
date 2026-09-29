@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
+import Portrait from './Portrait';
 
 const EXTS = ['jpg', 'png', 'webp'];
 export const isMonster = (t) => !t.npc && t.kind !== 'chest' && t.kind !== 'item';
 
 // A location with its tokens and characters.
 // Images: public/maps/<location id>.jpg (or .png / .webp).
-export default function MapView({ loc, tokens = {}, pcs = [], encounter, selected, onSelect, onMove, big = false, small = false }) {
+export default function MapView({ loc, tokens = {}, pcs = [], encounter, selected, onSelect, onMove, big = false, small = false, caption = true }) {
   const [ext, setExt] = useState(0);
   useEffect(() => setExt(0), [loc?.id]);
   if (!loc) {
@@ -48,14 +49,14 @@ export default function MapView({ loc, tokens = {}, pcs = [], encounter, selecte
           <button key={id} type="button"
             className={`token pc house-${(p.house ?? 'unsorted').toLowerCase()} ${p.hp <= 0 ? 'down' : ''} ${selected === id ? 'sel' : ''} ${current?.id === p.uid ? 'turn' : ''}`}
             style={{ left: `${p.x}%`, top: `${p.y}%` }} onClick={pick(id)} aria-label={p.name} tabIndex={onSelect ? 0 : -1}>
-            <span className="token-icon">{p.name.slice(0, 1).toUpperCase()}</span>
+            <Portrait family={p.family} name={p.name} className="token-icon" />
             {!small && <span className="token-name">{p.name}</span>}
             <span className="token-hp pc-hp"><span style={{ width: `${Math.max(0, (p.hp / p.maxHp) * 100)}%` }} /></span>
           </button>
         );
       })}
 
-      {!small && (
+      {!small && caption && (
         <div className="map-caption">
           <strong>{loc.icon} {loc.name}</strong>
           <span>{loc.desc}</span>

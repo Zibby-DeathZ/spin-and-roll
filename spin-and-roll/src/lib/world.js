@@ -15,7 +15,39 @@ export function pcsAt(session, chars, loc) {
   const pos = session?.state?.pcPos ?? {};
   return Object.entries(pos)
     .filter(([uid, p]) => p.loc === loc && chars?.[uid])
-    .map(([uid, p]) => ({ uid, x: p.x, y: p.y, name: chars[uid].firstName ?? chars[uid].name, house: chars[uid].house, hp: chars[uid].hp, maxHp: chars[uid].maxHp }));
+    .map(([uid, p]) => ({ uid, x: p.x, y: p.y, name: chars[uid].firstName ?? chars[uid].name, family: chars[uid].family, house: chars[uid].house, hp: chars[uid].hp, maxHp: chars[uid].maxHp }));
+}
+
+// Places you can walk to from here. Paths go both ways; secret places stay
+// hidden until the party has discovered them.
+export function exitsOf(data, locId, discovered = []) {
+  const ids = new Set();
+  for (const l of data.locations ?? []) {
+    if (l.id === locId) (l.exits ?? []).forEach((x) => ids.add(x));
+    if ((l.exits ?? []).includes(locId)) ids.add(l.id);
+  }
+  return [...ids]
+    .map((id) => data.locations.find((l) => l.id === id))
+    .filter((l) => l && (!l.secret || discovered.includes(l.id)));
+}
+
+// Everything the players could choose to do at a location, for the TV and phones.
+export function actionsAt(data, session, locId) {
+  const loc = data.locations?.find((l) => l.id === locId);
+  if (!loc) return { paths: [], things: [], extras: [] };
+  const tokens = Object.values(session?.state?.tokens ?? {}).filter((t) => t.loc === locId);
+  const things = [];
+  for (const t of tokens) {
+    if (t.kind === 'chest') { if (!t.opened) things.push({ icon: t.icon, text: `Open the ${t.name.toLowerCase()}` }); }
+    else if (t.kind === 'item') things.push({ icon: t.icon, text: `Pick up the ${t.name}` });
+    else if (t.npc) things.push({ icon: t.icon, text: `Talk to ${t.name}` });
+    else if (t.hp > 0) things.push({ icon: '⚔️', text: `Fight the ${t.name}`, danger: true });
+  }
+  return {
+    paths: exitsOf(data, locId, session?.state?.map?.discovered ?? []),
+    things,
+    extras: (loc.actions ?? []).map((a) => ({ icon: '✦', text: a })),
+  };
 }
 
 export async function showOnTV(sid, data, locId) {

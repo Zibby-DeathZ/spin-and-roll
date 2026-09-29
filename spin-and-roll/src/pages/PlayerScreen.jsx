@@ -12,6 +12,7 @@ import Shop from './Shop';
 import DiceTab from './DiceTab';
 import HereTab from './HereTab';
 import { locOf } from '../lib/world';
+import Portrait from '../components/Portrait';
 import { LessonScreen } from '../minigames';
 import { useLessonResults } from '../lib/lessons';
 import { HouseBoard, PlayerQuiz } from '../components/Ceremony';
@@ -53,6 +54,7 @@ function Sheet({ sid, c, currency, data, points, clk, loc, discovered }) {
       {data.clock && <ClockChip data={data} clk={clk} />}
       {loc && <p className="loc-chip">📍 {loc.name}</p>}
       <div className="char-head">
+        <Portrait family={c.family} name={c.name} className="sheet-portrait" />
         <h1>{c.name}</h1>
         <p className="muted">{c.house ? `${c.house}, ` : ''}level {lvl}{fam ? `, ${fam.blood.toLowerCase()}` : ''}</p>
       </div>

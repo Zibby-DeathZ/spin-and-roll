@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { claimFamily, fmtMod, mod, STATS } from '../lib/game';
 import Wheel from '../components/Wheel';
+import Portrait from '../components/Portrait';
 
 // Each family can be claimed by one player; the rest see it as taken.
 export default function FamilyPicker({ sid, uid, data, claims, title }) {
@@ -47,6 +48,7 @@ export default function FamilyPicker({ sid, uid, data, claims, title }) {
             <li key={f.id} className={`family ${taken ? 'taken' : ''} ${isChosen ? 'chosen' : ''}`}>
               <button className="family-btn" disabled={!!taken} onClick={() => setChosen(f)} aria-pressed={isChosen}>
                 <span className="family-top">
+                  <Portrait family={f.id} name={f.name} className="picker-portrait" />
                   <strong>{f.name}</strong>
                   <span className="muted small">{taken ? `Taken by ${taken.firstName}` : `${f.blood}, ${f.wealth.toLowerCase()}`}</span>
                 </span>

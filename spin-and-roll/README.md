@@ -48,6 +48,10 @@ Your site: `https://<username>.github.io/<repo-name>/`
 Put one image per location in `public/maps/`, named after the location id (see the
 README in that folder), e.g. `public/maps/great-hall.jpg`. Commit and push, and it shows up.
 
+## Portraits
+Put one square image per family in `public/portraits/` (blackwood, sinclair, fenwick,
+thornbury, quill, marlowe). They become map tokens and show on the picker and sheet.
+
 ## Build status
 - [x] 1. Accounts, DM/player roles, dashboards
 - [x] 2. Campaign library and game creation (engine data files come with step 6)

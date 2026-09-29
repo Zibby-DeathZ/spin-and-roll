@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import MapView, { isMonster } from '../components/MapView';
+import { isMonster } from '../components/MapView';
 import { fmtMod, mod, statOf } from '../lib/game';
 import { rollD20 } from '../lib/dice';
-import { locOf, pcsAt, rewardText, sendOpenChest, sendPickup } from '../lib/world';
+import { exitsOf, locOf, pcsAt, rewardText, sendOpenChest, sendPickup } from '../lib/world';
 
 function ChestRoll({ sid, c, id, t, onClose }) {
   const knowsAlohomora = (c.spells ?? []).some((s) => s.id === 'alohomora');
@@ -48,6 +48,7 @@ export default function HereTab({ sid, c, data, session, chars }) {
   const tokens = session.state?.tokens ?? {};
   const nearby = Object.entries(tokens).filter(([, t]) => t.loc === here);
   const others = pcsAt(session, chars, here).filter((p) => p.uid !== c.uid);
+  const paths = exitsOf(data, here, session.state?.map?.discovered ?? []);
   const qs = session.state?.quests ?? {};
   const mine = (data.quests ?? []).filter((q) => qs[q.id]?.uids?.includes(c.uid));
   const active = mine.filter((q) => qs[q.id].status === 'active');
@@ -57,9 +58,15 @@ export default function HereTab({ sid, c, data, session, chars }) {
     <>
       {loc ? (
         <>
+          <p className="muted small here-kicker">You are in</p>
           <h1 className="here-title">{loc.icon} {loc.name}</h1>
           <p className="muted">{loc.desc}</p>
-          <MapView loc={loc} tokens={tokens} pcs={pcsAt(session, chars, here)} small />
+          {(loc.actions ?? []).length > 0 && (
+            <p className="here-ideas">{loc.actions.map((a) => <span key={a} className="tag">{a}</span>)}</p>
+          )}
+          {paths.length > 0 && (
+            <p className="muted small">Paths from here: {paths.map((l) => `${l.icon} ${l.name}`).join(', ')}</p>
+          )}
         </>
       ) : (
         <p className="notice">The DM hasn’t placed you on the map yet.</p>
