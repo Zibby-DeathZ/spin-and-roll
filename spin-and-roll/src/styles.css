@@ -1,0 +1,155 @@
+/* Spin & Roll — night-table palette, candle gold, wheel colors */
+:root {
+  --ink: #17142a;
+  --panel: #221e3a;
+  --line: #3a3458;
+  --bone: #ece4d3;
+  --muted: #a69fbe;
+  --gold: #e3b04b;
+  --teal: #4fb3a9;
+  --ember: #d0543f;
+  --violet: #8e7cc3;
+  --display: 'Grenze', Georgia, serif;
+  --body: 'Figtree', system-ui, sans-serif;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+*, *::before, *::after { box-sizing: inherit; }
+html, body { height: 100%; margin: 0; }
+body {
+  background: var(--ink);
+  color: var(--bone);
+  font: 400 1rem/1.55 var(--body);
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3 { font-family: var(--display); font-weight: 700; line-height: 1.15; margin: 0 0 .5rem; }
+h1 { font-size: clamp(2.2rem, 7vw, 3.4rem); }
+h2 { font-size: 1.6rem; color: var(--gold); }
+h3 { font-size: 1.3rem; font-weight: 500; }
+p { margin: 0 0 .75rem; }
+a { color: inherit; }
+.muted { color: var(--muted); }
+.error { color: var(--ember); font-weight: 500; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+
+/* Wheel */
+.wheel-spin { transform-origin: 50px 50px; animation: spin 1.8s cubic-bezier(.15,.6,.2,1) 1; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(1080deg); } }
+@media (prefers-reduced-motion: reduce) { .wheel-spin, .arrive { animation: none !important; } }
+
+/* Buttons */
+.btn {
+  font: 500 .95rem var(--body);
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 44px; padding: .55rem 1.1rem;
+  border-radius: 999px; border: 1.5px solid var(--line);
+  background: var(--panel); color: var(--bone);
+  text-decoration: none; cursor: pointer;
+}
+.btn:hover:not(:disabled) { border-color: var(--bone); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn.gold { background: var(--gold); border-color: var(--gold); color: var(--ink); font-weight: 700; }
+.btn.teal { background: var(--teal); border-color: var(--teal); color: var(--ink); font-weight: 700; }
+.btn.ember { background: var(--ember); border-color: var(--ember); color: var(--bone); font-weight: 700; }
+.btn.ghost { background: transparent; }
+.btn.small { min-height: 36px; padding: .3rem .85rem; font-size: .85rem; }
+.btn.big { min-height: 54px; padding: .7rem 2rem; font-size: 1.1rem; }
+
+/* Pills */
+.pill {
+  display: inline-block; padding: .15rem .7rem; border-radius: 999px;
+  font-size: .8rem; font-weight: 700; white-space: nowrap;
+  border: 1.5px solid currentColor;
+}
+.pill-lobby { color: var(--violet); }
+.pill-active { color: var(--gold); }
+.pill-won { color: var(--teal); }
+.pill-lost { color: var(--ember); }
+
+/* Login, splash, player waiting */
+.splash, .login {
+  min-height: 100%; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center;
+  gap: .75rem; padding: 2rem 1.25rem;
+}
+.login h1 { margin-top: .5rem; }
+.login p { max-width: 32ch; }
+
+/* Top bar */
+.topbar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+  padding: .7rem 1.25rem; background: var(--ink); border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; align-items: center; gap: .6rem; text-decoration: none; font: 700 1.35rem var(--display); }
+.topbar-right { display: flex; align-items: center; gap: .75rem; }
+.who { font-size: .9rem; color: var(--muted); }
+.role-tag { margin-left: .4rem; color: var(--gold); font-weight: 700; }
+
+/* Pages */
+.page { max-width: 880px; margin: 0 auto; padding: 1.75rem 1.25rem 4rem; }
+.page section { margin-bottom: 2.5rem; }
+.library, .sessions, .history, .cabinet, .tv-players { list-style: none; padding: 0; margin: 0; }
+
+.campaign {
+  display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+  padding: 1.1rem 0; border-bottom: 1px solid var(--line);
+}
+.campaign-soon { opacity: .55; }
+.campaign p { margin: 0; }
+.trophy-line { margin-top: .3rem !important; font-size: .9rem; color: var(--gold); }
+
+.session {
+  background: var(--panel); border-left: 4px solid var(--gold);
+  border-radius: 6px 14px 14px 6px; padding: 1rem 1.15rem; margin-bottom: .9rem;
+}
+.session-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+.session-head p { margin: 0; }
+.players { color: var(--muted); font-size: .95rem; }
+.actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.code { font-family: var(--display); font-size: 1.3em; letter-spacing: .12em; color: var(--gold); }
+
+.hello .record { display: flex; gap: 1.5rem; color: var(--muted); }
+.record strong { font: 700 1.8rem var(--display); color: var(--bone); margin-right: .25rem; }
+
+.join { display: flex; gap: .6rem; margin-bottom: .75rem; }
+.join input {
+  flex: 1; min-width: 0; min-height: 48px; padding: 0 1rem;
+  background: var(--panel); border: 1.5px solid var(--line); border-radius: 12px;
+  color: var(--bone); font: 700 1.3rem var(--display); letter-spacing: .15em; text-transform: uppercase;
+}
+.join input::placeholder { font: 400 1rem var(--body); letter-spacing: 0; text-transform: none; color: var(--muted); }
+
+.cabinet { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: .8rem; }
+.trophy {
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: .3rem;
+  padding: 1rem .6rem; border: 1.5px solid var(--gold); border-radius: 14px; font-size: .9rem;
+}
+.trophy-icon { font-size: 2.4rem; }
+
+.history li {
+  display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+  padding: .7rem 0; border-bottom: 1px solid var(--line);
+}
+
+/* TV */
+.tv {
+  min-height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 1.25rem; text-align: center; padding: 3rem 2rem;
+}
+.tv h1 { font-size: clamp(3rem, 8vw, 6rem); }
+.tv-code { font-size: 1.6rem; color: var(--muted); }
+.tv-code strong { font: 700 3.5rem var(--display); letter-spacing: .2em; color: var(--gold); margin-left: .5rem; }
+.tv-players { display: flex; flex-wrap: wrap; justify-content: center; gap: .8rem; }
+.tv-players li {
+  font: 500 1.6rem var(--display); padding: .4rem 1.4rem;
+  border: 1.5px solid var(--teal); border-radius: 999px;
+}
+.arrive { animation: arrive .5s ease-out; }
+@keyframes arrive { from { transform: scale(.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+@media (max-width: 560px) {
+  .campaign { flex-direction: column; align-items: stretch; }
+  .who { display: none; }
+}

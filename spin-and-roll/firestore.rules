@@ -1,0 +1,63 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{db}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isDM() {
+      return signedIn()
+        && get(/databases/$(db)/documents/users/$(request.auth.uid)).data.role == 'dm';
+    }
+    function inSession(sid) {
+      return signedIn()
+        && request.auth.uid in get(/databases/$(db)/documents/sessions/$(sid)).data.playerUids;
+    }
+
+    // Accounts. New accounts can only ever create themselves as players.
+    // Promote yourself to DM once, by hand, in the Firebase console.
+    match /users/{uid} {
+      allow read: if signedIn();
+      allow create: if request.auth.uid == uid && request.resource.data.role == 'player';
+      allow update: if isDM()
+        || (request.auth.uid == uid && request.resource.data.role == resource.data.role);
+
+      // Campaign results and trophies are only ever written by the DM.
+      match /history/{sid}  { allow read: if signedIn(); allow write: if isDM(); }
+      match /trophies/{sid} { allow read: if signedIn(); allow write: if isDM(); }
+    }
+
+    match /sessions/{sid} {
+      allow read: if signedIn();
+      allow create, delete: if isDM();
+      // DM can change anything. A player can only add themselves to an open game.
+      allow update: if isDM() || (
+        signedIn()
+        && resource.data.status in ['lobby', 'active']
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['playerUids'])
+        && request.resource.data.playerUids.toSet()
+             == resource.data.playerUids.toSet().union([request.auth.uid].toSet())
+      );
+
+      // Character sheets: DM writes for now. Step 4 opens safe player actions.
+      match /characters/{uid} {
+        allow read: if signedIn();
+        allow write: if isDM();
+      }
+
+      // Action feed that the GM screen and TV animate from.
+      match /events/{eid} {
+        allow read: if signedIn();
+        allow create: if isDM()
+          || (inSession(sid) && request.resource.data.actorUid == request.auth.uid);
+        allow update, delete: if isDM();
+      }
+
+      // Trade offers between players.
+      match /trades/{tid} {
+        allow read: if signedIn();
+        allow create: if inSession(sid) && request.resource.data.fromUid == request.auth.uid;
+        allow update: if isDM()
+          || (signedIn() && request.auth.uid in [resource.data.fromUid, resource.data.toUid]);
+      }
+    }
+  }
+}
