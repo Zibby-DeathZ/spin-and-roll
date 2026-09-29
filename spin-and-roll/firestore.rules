@@ -80,6 +80,25 @@ service cloud.firestore {
         allow delete: if isDM();
       }
 
+      // Class minigame results. A player writes only their own, two attempts at most,
+      // and can't touch the fields the GM screen uses to hand out rewards.
+      match /lessons/{resultId} {
+        allow read: if signedIn();
+        allow create: if inSession(sid)
+          && request.resource.data.uid == request.auth.uid
+          && resultId == request.resource.data.lessonId + '_' + request.auth.uid
+          && request.resource.data.keys().hasOnly(['uid', 'lessonId', 'attempts', 'passed', 'score', 'updatedAt'])
+          && request.resource.data.attempts is int
+          && request.resource.data.attempts >= 1 && request.resource.data.attempts <= 2;
+        allow update: if isDM() || (
+          resource.data.uid == request.auth.uid
+          && resource.data.passed == false
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['attempts', 'passed', 'score', 'updatedAt'])
+          && request.resource.data.attempts == resource.data.attempts + 1
+          && request.resource.data.attempts <= 2
+        );
+      }
+
       // Trade offers. Only the receiver can accept or decline,
       // only the sender can cancel, and only while pending.
       match /trades/{tid} {

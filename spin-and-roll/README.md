@@ -62,7 +62,7 @@ README in that folder), e.g. `public/maps/great-hall.jpg`. Commit and push, and 
   - [x] Live map with locations, tokens and monsters (images go in public/maps)
   - [x] Dice tab, spells rolled with their own dice, fights with initiative and Defence, duels
   - [x] Hidden Killing Curse (one learner, secret wheel, expulsion)
-  - [ ] Class minigames
+  - [x] Class minigames: 7 games, 2 attempts, harder as the week goes on, pass to learn
 - [x] 7. Win/loss history and trophies
 
 See `DATA_MODEL.md` for how the database is laid out.

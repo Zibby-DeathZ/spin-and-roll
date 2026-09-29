@@ -14,6 +14,7 @@ import { GMQuiz, HouseBoard } from '../components/Ceremony';
 import { GMClock } from '../components/Clock';
 import { GMSpin } from '../components/SpinWheel';
 import GMMap from '../components/GMMap';
+import { useLessonEngine } from '../lib/lessons';
 import { setExpelled, teachForbidden } from '../lib/combat';
 
 function Buttons({ sid, uid, field, steps }) {
@@ -196,6 +197,7 @@ export default function GMScreen() {
   const answers = useAnswers(sid);
   const data = session ? getCampaignData(session.campaignId) : null;
   useGameEngine(sid, data); // carries out claims, purchases, trades and item uses while open
+  const lessonResults = useLessonEngine(sid, data, session?.state?.lesson);
   const nameOf = useCallback(
     (u) => chars?.[u]?.name ?? profiles[u]?.displayName ?? 'Someone', [chars, profiles]);
 
@@ -218,7 +220,7 @@ export default function GMScreen() {
           <StatusPill status={session.status} /> <strong className="code">{session.code}</strong>
         </span>
       </header>
-      {data.clock && <GMClock sid={sid} data={data} session={session} clk={clockOf(session)} chars={chars} />}
+      {data.clock && <GMClock sid={sid} data={data} session={session} clk={clockOf(session)} chars={chars} lessonResults={lessonResults} />}
       {data.locations && <GMMap sid={sid} data={data} session={session} chars={chars} />}
       {data.wheels && <GMSpin sid={sid} data={data} session={session} chars={chars} />}
       {data.quizzes && <HouseBoard points={session.state?.housePoints} compact />}

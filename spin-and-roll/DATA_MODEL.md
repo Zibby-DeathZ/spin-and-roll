@@ -21,6 +21,9 @@ sessions/{sessionId}          one game night (or a two-day campaign)
     tokens { id: { kind, name, icon, loc, x, y, npc, hp, maxHp, defence, boss, disarmed } }
     encounter { order [{ kind: 'pc'|'mon', id, name, init }], turn, round, loc, monsters [] }
     forbiddenLearner                                       the one character who knows the Killing Curse
+    lesson { id, key, cls, game, diff, uids [], lesson, lessonName }   the class minigame in progress
+
+  lessons/{lessonId}_{uid}    a student's minigame result: attempts (max 2), passed, score, announced
 
   answers/{quiz}_{uid}        a player's ceremony answers: uid, quiz, picks [option index…], wish
 

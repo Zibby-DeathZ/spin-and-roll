@@ -10,6 +10,8 @@ import {
 import FamilyPicker from './FamilyPicker';
 import Shop from './Shop';
 import DiceTab from './DiceTab';
+import { LessonScreen } from '../minigames';
+import { useLessonResults } from '../lib/lessons';
 import { HouseBoard, PlayerQuiz } from '../components/Ceremony';
 import { ClockChip, Timetable } from '../components/Clock';
 import { Splash } from '../components/Gate';
@@ -238,6 +240,8 @@ export default function PlayerScreen() {
   const trades = useTrades(sid);
   const claims = useClaims(sid);
   const answers = useAnswers(sid);
+  const lessonResults = useLessonResults(sid, session?.state?.lesson?.id);
+  const [leftLesson, setLeftLesson] = useState(null);
   const [tab, setTab] = useState('sheet');
   const [composer, setComposer] = useState(null);
 
@@ -280,6 +284,14 @@ export default function PlayerScreen() {
     return (
       <PlayerQuiz sid={sid} uid={user.uid} quizId={q.id} quiz={data.quizzes[q.id]}
         answer={answers[answerKey(q.id, user.uid)]} />
+    );
+  }
+
+  const lesson = session.state?.lesson;
+  if (lesson && lesson.uids.includes(user.uid) && leftLesson !== lesson.id && data.classes?.[lesson.cls]) {
+    return (
+      <LessonScreen sid={sid} uid={user.uid} lesson={lesson} cls={data.classes[lesson.cls]}
+        result={lessonResults[user.uid]} onLeave={() => setLeftLesson(lesson.id)} />
     );
   }
 

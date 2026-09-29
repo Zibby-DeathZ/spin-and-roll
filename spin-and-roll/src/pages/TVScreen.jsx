@@ -6,6 +6,8 @@ import { answerKey, clockOf, levelFor, useAnswers, useCharacters } from '../lib/
 import { ClockChip } from '../components/Clock';
 import { TVSpin } from '../components/SpinWheel';
 import MapView from '../components/MapView';
+import { LessonBoard } from '../minigames';
+import { useLessonResults } from '../lib/lessons';
 import { HouseBoard, TVQuiz } from '../components/Ceremony';
 import { Splash } from '../components/Gate';
 import Bar from '../components/Bar';
@@ -18,6 +20,7 @@ export default function TVScreen() {
   const chars = useCharacters(sid);
   const profiles = useProfiles(session?.playerUids ?? []);
   const answers = useAnswers(sid);
+  const lessonResults = useLessonResults(sid, session?.state?.lesson?.id);
   const nameOf = useCallback(
     (u) => chars?.[u]?.name ?? profiles[u]?.displayName ?? 'Someone', [chars, profiles]);
 
@@ -59,6 +62,9 @@ export default function TVScreen() {
           <TVQuiz quiz={quiz} answer={answers[answerKey(q.id, q.uid)]} name={nameOf(q.uid)} />
         ) : showSpin ? (
           <TVSpin data={data} spin={spin} name={spin.uid ? nameOf(spin.uid) : null} />
+        ) : session.state?.lesson ? (
+          <LessonBoard lesson={session.state.lesson} cls={data.classes[session.state.lesson.cls]}
+            results={lessonResults} nameOf={nameOf} big />
         ) : loc ? (
           <MapView loc={loc} tokens={session.state?.tokens} encounter={enc} big />
         ) : (

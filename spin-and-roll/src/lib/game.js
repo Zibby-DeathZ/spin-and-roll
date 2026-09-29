@@ -321,41 +321,48 @@ export async function turnBackTime(sid, clk) {
   await logEvent(sid, { type: 'time_turner' });
 }
 
-// Teaches the current lesson to the students who attended.
+// Gives one student what a lesson teaches, plus class XP.
+export async function teachLesson(sid, data, uid, lesson) {
+  const xpGain = data.clock?.xpPerClass ?? 10;
+  let before = 0, after = 0, name = null;
+  await runTransaction(db, async (tx) => {
+    const snap = await tx.get(charRef(sid, uid));
+    const c = snap.data();
+    if (!c) return;
+    name = c.firstName ?? c.name;
+    before = c.xp; after = c.xp + xpGain;
+    const upd = { xp: after };
+    if (lesson.type === 'spell' && !(c.spells ?? []).some((x) => x.id === lesson.spell)) {
+      upd.spells = [...(c.spells ?? []), { id: lesson.spell, ...data.spells[lesson.spell] }];
+    }
+    if (lesson.type === 'item') {
+      upd.inventory = addItems(c.inventory, { id: lesson.item, ...data.items[lesson.item] }, lesson.qty ?? 1);
+    }
+    if (lesson.type === 'perk' && !(c.perks ?? []).includes(lesson.perk)) {
+      upd.perks = [...(c.perks ?? []), lesson.perk];
+    }
+    tx.update(snap.ref, upd);
+  });
+  if (levelFor(after) > levelFor(before)) {
+    await logEvent(sid, { type: 'level_up', targetUid: uid, payload: { level: levelFor(after) } });
+  }
+  return name;
+}
+
+// Teaches the current lesson to everyone ticked, without a minigame.
 export async function holdClass(sid, data, clk, uids) {
   const info = clockInfo(data, clk);
   const lesson = info?.slot?.lesson;
   if (!lesson) return;
-  const xpGain = data.clock.xpPerClass ?? 10;
   const names = [];
   for (const uid of uids) {
-    let before = 0, after = 0;
-    await runTransaction(db, async (tx) => {
-      const snap = await tx.get(charRef(sid, uid));
-      const c = snap.data();
-      if (!c) return;
-      names.push(c.firstName ?? c.name);
-      before = c.xp; after = c.xp + xpGain;
-      const upd = { xp: after };
-      if (lesson.type === 'spell' && !(c.spells ?? []).some((x) => x.id === lesson.spell)) {
-        upd.spells = [...(c.spells ?? []), { id: lesson.spell, ...data.spells[lesson.spell] }];
-      }
-      if (lesson.type === 'item') {
-        upd.inventory = addItems(c.inventory, { id: lesson.item, ...data.items[lesson.item] }, lesson.qty ?? 1);
-      }
-      if (lesson.type === 'perk' && !(c.perks ?? []).includes(lesson.perk)) {
-        upd.perks = [...(c.perks ?? []), lesson.perk];
-      }
-      tx.update(snap.ref, upd);
-    });
-    if (levelFor(after) > levelFor(before)) {
-      await logEvent(sid, { type: 'level_up', targetUid: uid, payload: { level: levelFor(after) } });
-    }
+    const n = await teachLesson(sid, data, uid, lesson);
+    if (n) names.push(n);
   }
-  await updateDoc(doc(db, 'sessions', sid), { [`state.taught.${info.key.replace(' ', '_')}`]: true });
+  await updateDoc(doc(db, 'sessions', sid), { [`state.taught.${taughtKey(info)}`]: true });
   await logEvent(sid, {
     type: 'class_held',
-    payload: { names, cls: info.cls.name, lesson: lessonName(data, lesson), xp: xpGain },
+    payload: { names, cls: info.cls.name, lesson: lessonName(data, lesson), xp: data.clock.xpPerClass ?? 10 },
   });
 }
 export const taughtKey = (info) => info?.key?.replace(' ', '_');
@@ -688,6 +695,9 @@ export function describe(e, nameOf) {
     case 'time': return e.payload.cls
       ? { icon: '🕰️', text: `${e.payload.label}: ${e.payload.cls} with ${e.payload.prof}`, tone: 'gold', big: true }
       : { icon: e.payload.dawn ? '🌅' : '🕰️', text: e.payload.dawn ? `${e.payload.label}. Everyone wakes up rested.` : e.payload.label, tone: 'gold', big: true };
+    case 'lesson_start': return { icon: '🔔', text: `Class begins: ${e.payload.cls} with ${e.payload.prof}. Today: ${e.payload.lesson}`, tone: 'gold', big: true };
+    case 'lesson_passed': return { icon: '🎓', text: `${target} mastered ${e.payload.lesson}!`, tone: 'teal', big: true };
+    case 'lesson_failed': return { icon: '😬', text: `${target} couldn’t get ${e.payload.lesson} right today`, tone: 'ember' };
     case 'wheel': return { icon: e.payload.icon, text: `${e.targetUid ? `${target}: ` : ''}${e.payload.text}`, tone: 'gold' };
     case 'time_turner': return { icon: '⌛', text: 'The Time-Turner spins… It’s Day 1 again. Then it cracks.', tone: 'violet', big: true };
     case 'class_held': return { icon: '🎓', text: `${e.payload.names.join(', ')} learned ${e.payload.lesson} in ${e.payload.cls}`, tone: 'teal' };

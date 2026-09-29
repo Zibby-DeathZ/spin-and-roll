@@ -387,13 +387,13 @@ export const hollowHeir = {
   ],
 
   classes: {
-    charms: { name: 'Charms', icon: '✨', professor: 'Professor Flitwick' },
-    potions: { name: 'Potions', icon: '⚗️', professor: 'Professor Grimsby' },
-    herbology: { name: 'Herbology', icon: '🌱', professor: 'Professor Longbottom' },
-    defence: { name: 'Defence Against the Dark Arts', icon: '🛡️', professor: 'Professor Ashgrove' },
-    transfiguration: { name: 'Transfiguration', icon: '🔄', professor: 'Professor Vance' },
-    creatures: { name: 'Care of Magical Creatures', icon: '🐾', professor: 'Professor Scamander' },
-    flying: { name: 'Flying Lessons', icon: '🧹', professor: 'Madam Hooch' },
+    charms: { name: 'Charms', icon: '✨', professor: 'Professor Flitwick', game: 'charms' },
+    potions: { name: 'Potions', icon: '⚗️', professor: 'Professor Grimsby', game: 'potions' },
+    herbology: { name: 'Herbology', icon: '🌱', professor: 'Professor Longbottom', game: 'herbology' },
+    defence: { name: 'Defence Against the Dark Arts', icon: '🛡️', professor: 'Professor Ashgrove', game: 'defence' },
+    transfiguration: { name: 'Transfiguration', icon: '🔄', professor: 'Professor Vance', game: 'transfiguration' },
+    creatures: { name: 'Care of Magical Creatures', icon: '🐾', professor: 'Professor Scamander', game: 'creatures' },
+    flying: { name: 'Flying Lessons', icon: '🧹', professor: 'Madam Hooch', game: 'flying' },
   },
 
   // What each class teaches the students who show up (and pass the minigame).

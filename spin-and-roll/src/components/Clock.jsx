@@ -2,9 +2,11 @@ import { useState } from 'react';
 import {
   clockInfo, holdClass, lessonName, moveClock, taughtKey, turnBackTime,
 } from '../lib/game';
+import { endLesson, startLesson } from '../lib/lessons';
+import { LessonBoard } from '../minigames';
 
 // ---------- GM: the clock, today's class, and the story beat ----------
-export function GMClock({ sid, data, session, clk, chars }) {
+export function GMClock({ sid, data, session, clk, chars, lessonResults }) {
   const info = clockInfo(data, clk);
   const uids = session.playerUids.filter((u) => chars[u]);
   const allowed = uids.filter((u) => !chars[u].expelled);
@@ -15,6 +17,8 @@ export function GMClock({ sid, data, session, clk, chars }) {
   const taught = !!session.state?.taught?.[taughtKey(info)];
   const beat = data.beats?.[info.key];
   const turnerUsed = !!session.state?.timeTurnerUsed;
+  const active = session.state?.lesson;
+  const nameOf = (u) => chars[u]?.firstName ?? chars[u]?.name ?? 'Someone';
 
   const go = async (fn) => { setBusy(true); try { await fn(); } finally { setBusy(false); } };
   const toggle = (u) => setPresent(attending.includes(u) ? attending.filter((x) => x !== u) : [...attending, u]);
@@ -42,11 +46,18 @@ export function GMClock({ sid, data, session, clk, chars }) {
         </p>
       )}
 
-      {lesson && (
+      {active && (
+        <div className="class-box">
+          <LessonBoard lesson={active} cls={data.classes[active.cls]} results={lessonResults} nameOf={nameOf} />
+          <button className="btn small gold" onClick={() => go(() => endLesson(sid, active))}>End class</button>
+        </div>
+      )}
+
+      {lesson && !active && (
         <div className="class-box">
           <p>
             Teaches <strong>{lessonName(data, lesson)}</strong> (+{data.clock.xpPerClass} XP).
-            Tick who attended and passed the minigame:
+            Tick who’s in class:
           </p>
           <div className="attend">
             {uids.map((u) => (
@@ -56,10 +67,18 @@ export function GMClock({ sid, data, session, clk, chars }) {
               </label>
             ))}
           </div>
-          <button className="btn small teal" disabled={busy || taught || !attending.length}
-            onClick={() => go(() => holdClass(sid, data, clk, attending))}>
-            {taught ? 'Lesson taught' : 'Teach the lesson'}
-          </button>
+          <div className="actions">
+            <button className="btn small gold" disabled={busy || taught || !attending.length || !info.cls?.game}
+              onClick={() => go(() => startLesson(sid, data, clk, attending))}>
+              {taught ? 'Class finished' : '🎮 Start class minigame'}
+            </button>
+            {!taught && (
+              <button className="btn small ghost" disabled={busy || !attending.length}
+                onClick={() => go(() => holdClass(sid, data, clk, attending))}>
+                Teach without a minigame
+              </button>
+            )}
+          </div>
         </div>
       )}
 
