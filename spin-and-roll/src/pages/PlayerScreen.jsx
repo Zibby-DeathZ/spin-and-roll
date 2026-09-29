@@ -5,10 +5,11 @@ import { getCampaign, getCampaignData } from '../campaigns';
 import { useSession } from '../lib/sessions';
 import {
   bonuses, bonusText, cancelTrade, consumeItem, defenceOf, fmtMod, levelFor, mod, nextLevelAt,
-  offerTrade, respondTrade, statOf, STATS, useAbility, useCharacters, useClaims, useTrades,
+  answerKey, offerTrade, respondTrade, statOf, STATS, useAbility, useAnswers, useCharacters, useClaims, useTrades,
 } from '../lib/game';
 import FamilyPicker from './FamilyPicker';
 import Shop from './Shop';
+import { HouseBoard, PlayerQuiz } from '../components/Ceremony';
 import { Splash } from '../components/Gate';
 import Bar from '../components/Bar';
 import Wheel from '../components/Wheel';
@@ -35,7 +36,7 @@ function AbilityCard({ sid, c, ability }) {
   );
 }
 
-function Sheet({ sid, c, currency, data }) {
+function Sheet({ sid, c, currency, data, points }) {
   const lvl = levelFor(c.xp);
   const next = nextLevelAt(c.xp);
   const b = bonuses(c);
@@ -68,6 +69,12 @@ function Sheet({ sid, c, currency, data }) {
         })}
       </div>
       <p className="muted small">Roll a d20 and add the bonus of the stat the DM asks for. To hit you, enemies must roll your Defence or higher.</p>
+      {c.house && c.house !== 'Unsorted' && points && (
+        <section className="sheet-houses">
+          <h2>House points</h2>
+          <HouseBoard points={points} compact />
+        </section>
+      )}
       {fam?.ability && <AbilityCard sid={sid} c={c} ability={fam.ability} />}
       {fam && (
         <details className="secret">
@@ -211,6 +218,7 @@ export default function PlayerScreen() {
   const chars = useCharacters(sid);
   const trades = useTrades(sid);
   const claims = useClaims(sid);
+  const answers = useAnswers(sid);
   const [tab, setTab] = useState('sheet');
   const [composer, setComposer] = useState(null);
 
@@ -248,6 +256,14 @@ export default function PlayerScreen() {
     );
   }
 
+  const q = session.state?.quiz;
+  if (q?.uid === user.uid && data.quizzes?.[q.id]) {
+    return (
+      <PlayerQuiz sid={sid} uid={user.uid} quizId={q.id} quiz={data.quizzes[q.id]}
+        answer={answers[answerKey(q.id, user.uid)]} />
+    );
+  }
+
   const others = Object.values(chars).filter((c) => c.uid !== user.uid);
   const pending = trades.filter((t) => t.status === 'pending' && t.toUid === user.uid).length;
   const tabs = [['sheet', 'Character'], ['bag', 'Bag'],
@@ -256,7 +272,7 @@ export default function PlayerScreen() {
   return (
     <div className="phone">
       <main className="phone-body">
-        {tab === 'sheet' && <Sheet sid={sid} c={me} currency={currency} data={data} />}
+        {tab === 'sheet' && <Sheet sid={sid} c={me} currency={currency} data={data} points={session.state?.housePoints ?? {}} />}
         {tab === 'shop' && <Shop sid={sid} c={me} data={data} open={shopOpen} />}
         {tab === 'bag' && (
           <Bag c={me} sid={sid} others={others}

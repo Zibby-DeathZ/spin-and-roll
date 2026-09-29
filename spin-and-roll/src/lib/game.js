@@ -1,5 +1,5 @@
 import {
-  addDoc, collection, deleteDoc, doc, limit, onSnapshot, orderBy, query,
+  addDoc, collection, deleteDoc, deleteField, doc, increment, limit, onSnapshot, orderBy, query,
   runTransaction, serverTimestamp, setDoc, updateDoc, where,
 } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
@@ -244,6 +244,68 @@ export async function respondTrade(sid, trade, accept) {
 export const cancelTrade = (sid, trade) =>
   updateDoc(doc(db, 'sessions', sid, 'trades', trade.id), { status: 'cancelled', respondedAt: serverTimestamp() });
 
+// ---------- Ceremonies: Sorting Hat and Ollivanders ----------
+
+export function useAnswers(sid) {
+  const [answers, setAnswers] = useState({});
+  useEffect(() => onSnapshot(col(sid, 'answers'), (snap) =>
+    setAnswers(Object.fromEntries(snap.docs.map((d) => [d.id, d.data()])))), [sid]);
+  return answers;
+}
+export const answerKey = (quizId, uid) => `${quizId}_${uid}`;
+
+// Player saves their answers so far (one per question, in order).
+export const saveAnswers = (sid, uid, quizId, picks, wish = null) =>
+  setDoc(doc(db, 'sessions', sid, 'answers', answerKey(quizId, uid)),
+    { uid, quiz: quizId, picks, wish, updatedAt: serverTimestamp() });
+
+// Tallies answers into scores, e.g. { Gryffindor: 3, Ravenclaw: 2 }.
+export function scoreQuiz(quiz, picks = []) {
+  const s = { house: {}, wood: {}, core: {} };
+  picks.forEach((optIdx, qIdx) => {
+    const opt = quiz.questions[qIdx]?.options[optIdx];
+    for (const k of ['house', 'wood', 'core']) if (opt?.[k]) s[k][opt[k]] = (s[k][opt[k]] ?? 0) + 1;
+  });
+  return s;
+}
+const top = (scores) => Object.entries(scores).sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+
+// The Hat's verdict: best score, unless the wish is within one point.
+export function hatVerdict(quiz, answer) {
+  const { house } = scoreQuiz(quiz, answer?.picks);
+  const best = top(house);
+  const wish = answer?.wish;
+  if (wish && quiz.wish.options.slice(0, 4).includes(wish) && (house[wish] ?? 0) >= (house[best] ?? 0) - 1) {
+    return { house: wish, listened: wish !== best, scores: house };
+  }
+  return { house: best, listened: false, scores: house };
+}
+export function wandVerdict(quiz, answer) {
+  const s = scoreQuiz(quiz, answer?.picks);
+  return { wood: top(s.wood), core: top(s.core), scores: s };
+}
+
+export async function startQuiz(sid, quizId, uid) {
+  await deleteDoc(doc(db, 'sessions', sid, 'answers', answerKey(quizId, uid))).catch(() => {});
+  await updateDoc(doc(db, 'sessions', sid), { 'state.quiz': { id: quizId, uid } });
+  await logEvent(sid, { type: 'quiz_started', targetUid: uid, payload: { quiz: quizId } });
+}
+export const endQuiz = (sid) => updateDoc(doc(db, 'sessions', sid), { 'state.quiz': deleteField() });
+
+export async function sortInto(sid, uid, house) {
+  await updateDoc(charRef(sid, uid), { house });
+  await endQuiz(sid);
+  await logEvent(sid, { type: 'sorted', targetUid: uid, payload: { house } });
+}
+
+// ---------- House points ----------
+
+export async function awardPoints(sid, uid, house, delta) {
+  if (!house || house === 'Unsorted') return;
+  await updateDoc(doc(db, 'sessions', sid), { [`state.housePoints.${house}`]: increment(delta) });
+  await logEvent(sid, { type: 'points', targetUid: uid, payload: { house, delta } });
+}
+
 // ---------- GM screen engine ----------
 // While the GM screen is open it carries out accepted trades and item uses.
 
@@ -413,6 +475,13 @@ export function describe(e, nameOf) {
     case 'wand_chosen': return { icon: '🪄', text: `The wand chooses ${target}: ${e.payload.name}`, tone: 'gold', big: true };
     case 'purchase': return e.failed ? null : { icon: e.payload.icon, text: `${actor} bought ${e.payload.name}`, tone: 'teal' };
     case 'ability_used': return { icon: e.payload.icon, text: `${actor} uses ${e.payload.name}!`, tone: 'violet', big: true };
+    case 'quiz_started': return e.payload.quiz === 'sorting'
+      ? { icon: '🎩', text: `${target}, step forward. The Sorting Hat awaits`, tone: 'gold' }
+      : { icon: '🪄', text: `Mr Ollivander studies ${target} carefully…`, tone: 'gold' };
+    case 'sorted': return { icon: '🎩', text: `${target}… ${e.payload.house.toUpperCase()}!`, tone: `house-${e.payload.house.toLowerCase()}`, big: true };
+    case 'points': return e.payload.delta > 0
+      ? { icon: '⏳', text: `${e.payload.delta} points to ${e.payload.house}! (${target})`, tone: `house-${e.payload.house.toLowerCase()}`, big: true }
+      : { icon: '⏳', text: `${-e.payload.delta} points from ${e.payload.house} (${target})`, tone: 'ember' };
     case 'shop_open': return { icon: '🛍️', text: 'Diagon Alley is open for shopping', tone: 'gold', big: true };
     case 'shop_closed': return { icon: '🔒', text: 'The shops are closed', tone: 'muted' };
     default: return null;

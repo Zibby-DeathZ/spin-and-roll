@@ -189,5 +189,116 @@ export const hollowHeir = {
     },
   ],
 
+  // Ceremonies. Each option adds a point to a house, a wand wood or a wand core.
+  quizzes: {
+    sorting: {
+      title: 'The Sorting Hat',
+      icon: '🎩',
+      thinking: 'Hmm… difficult. Very difficult…',
+      questions: [
+        {
+          q: 'An older student is picking on a first-year in the corridor. What do you do?',
+          options: [
+            { text: 'Step in front of them, whatever it costs me', house: 'Gryffindor' },
+            { text: 'Stay with the first-year afterwards and make sure they’re okay', house: 'Hufflepuff' },
+            { text: 'Find a clever way to distract the bully', house: 'Ravenclaw' },
+            { text: 'Remember their face. They’ll regret it later', house: 'Slytherin' },
+          ],
+        },
+        {
+          q: 'You find a door nobody has opened in a hundred years.',
+          options: [
+            { text: 'Open it. Right now', house: 'Gryffindor' },
+            { text: 'Fetch my friends. Nobody goes in alone', house: 'Hufflepuff' },
+            { text: 'Learn the door’s history before I touch it', house: 'Ravenclaw' },
+            { text: 'Work out how whatever’s inside could be useful to me', house: 'Slytherin' },
+          ],
+        },
+        {
+          q: 'Which would hurt most to be called?',
+          options: [
+            { text: 'Coward', house: 'Gryffindor' },
+            { text: 'Selfish', house: 'Hufflepuff' },
+            { text: 'Ignorant', house: 'Ravenclaw' },
+            { text: 'Ordinary', house: 'Slytherin' },
+          ],
+        },
+        {
+          q: 'Four boxes sit in front of you. You may open only one.',
+          options: [
+            { text: 'The one that is ticking', house: 'Gryffindor' },
+            { text: 'The plain wooden one, warm to the touch', house: 'Hufflepuff' },
+            { text: 'The one covered in runes you can almost read', house: 'Ravenclaw' },
+            { text: 'The gold one, stamped with an old family crest', house: 'Slytherin' },
+          ],
+        },
+        {
+          q: 'Long after you’re gone, what should people remember about you?',
+          options: [
+            { text: 'That I was brave when it mattered', house: 'Gryffindor' },
+            { text: 'That I never let a friend down', house: 'Hufflepuff' },
+            { text: 'That I understood what others couldn’t', house: 'Ravenclaw' },
+            { text: 'That I became someone great', house: 'Slytherin' },
+          ],
+        },
+      ],
+      // Asked last. If the wish is close to the top score, the Hat listens.
+      wish: {
+        q: 'The Hat pauses. “Is there a house you would ask me for?”',
+        options: ['Gryffindor', 'Hufflepuff', 'Ravenclaw', 'Slytherin', 'Let the Hat decide'],
+      },
+    },
+    wand: {
+      title: 'Ollivanders',
+      icon: '🪄',
+      thinking: '“Curious… very curious…”',
+      questions: [
+        {
+          q: 'When trouble comes, what do you reach for first?',
+          options: [
+            { text: 'A plan', wood: 'vine' },
+            { text: 'My courage, and my fists if needed', wood: 'oak' },
+            { text: 'The quickest way out', wood: 'hawthorn' },
+            { text: 'The people beside me', wood: 'ash' },
+          ],
+        },
+        {
+          q: 'What would you hate to lose the most?',
+          options: [
+            { text: 'The people I love', wood: 'holly' },
+            { text: 'My freedom', wood: 'hawthorn' },
+            { text: 'My pride', wood: 'yew' },
+            { text: 'The truth', wood: 'vine' },
+          ],
+        },
+        {
+          q: 'The people who know you best would call you…',
+          options: [
+            { text: 'Stubborn', wood: 'yew' },
+            { text: 'Dependable', wood: 'ash' },
+            { text: 'Strong', wood: 'oak' },
+            { text: 'Watchful', wood: 'holly' },
+          ],
+        },
+        {
+          q: 'Three things glow on Mr Ollivander’s counter. Which draws your hand?',
+          options: [
+            { text: 'A flame that rises from its own ashes', core: 'phoenix' },
+            { text: 'A heart that beats fierce and hot', core: 'dragon' },
+            { text: 'A silver thread that never breaks', core: 'unicorn' },
+          ],
+        },
+        {
+          q: 'What kind of magic do you want to do?',
+          options: [
+            { text: 'Rare magic nobody else can do', core: 'phoenix' },
+            { text: 'Powerful magic that wins fights', core: 'dragon' },
+            { text: 'Steady magic I can always rely on', core: 'unicorn' },
+          ],
+        },
+      ],
+    },
+  },
+
   items,
 };

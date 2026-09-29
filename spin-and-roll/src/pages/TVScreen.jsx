@@ -1,8 +1,9 @@
 import { useCallback } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { getCampaign } from '../campaigns';
+import { getCampaign, getCampaignData } from '../campaigns';
 import { useProfiles, useSession } from '../lib/sessions';
-import { levelFor, useCharacters } from '../lib/game';
+import { answerKey, levelFor, useAnswers, useCharacters } from '../lib/game';
+import { HouseBoard, TVQuiz } from '../components/Ceremony';
 import { Splash } from '../components/Gate';
 import Bar from '../components/Bar';
 import Wheel from '../components/Wheel';
@@ -13,12 +14,16 @@ export default function TVScreen() {
   const session = useSession(sid);
   const chars = useCharacters(sid);
   const profiles = useProfiles(session?.playerUids ?? []);
+  const answers = useAnswers(sid);
   const nameOf = useCallback(
     (u) => chars?.[u]?.name ?? profiles[u]?.displayName ?? 'Someone', [chars, profiles]);
 
   if (session === undefined || chars === null) return <Splash />;
   if (!session) return <main className="login"><h1>Game not found</h1><Link className="btn" to="/">Back</Link></main>;
   const title = getCampaign(session.campaignId)?.title;
+  const data = getCampaignData(session.campaignId);
+  const q = session.state?.quiz;
+  const quiz = q && data.quizzes?.[q.id];
 
   if (session.status === 'lobby') {
     return (
@@ -35,10 +40,17 @@ export default function TVScreen() {
 
   return (
     <main className="tv tv-live">
-      <h1 className="tv-title">{title}</h1>
+      <div className="tv-topline">
+        <h1 className="tv-title">{title}</h1>
+        {data.quizzes && <HouseBoard points={session.state?.housePoints} compact />}
+      </div>
       <div className="tv-stage">
-        {/* The live map goes here in the next build step. */}
-        <Wheel size={180} spin={false} />
+        {quiz ? (
+          <TVQuiz quiz={quiz} answer={answers[answerKey(q.id, q.uid)]} name={nameOf(q.uid)} />
+        ) : (
+          /* The live map goes here in a later build step. */
+          <div className="tv-idle"><Wheel size={180} spin={false} /></div>
+        )}
       </div>
       <ul className="tv-party">
         {session.playerUids.map((u) => {

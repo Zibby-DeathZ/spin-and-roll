@@ -68,6 +68,18 @@ service cloud.firestore {
         allow update, delete: if isDM();
       }
 
+      // Sorting Hat / Ollivander answers. A player can only write their own,
+      // stored as "<quiz>_<their uid>".
+      match /answers/{answerId} {
+        allow read: if signedIn();
+        allow create, update: if inSession(sid)
+          && request.resource.data.uid == request.auth.uid
+          && answerId == request.resource.data.quiz + '_' + request.auth.uid
+          && request.resource.data.picks is list
+          && request.resource.data.picks.size() <= 10;
+        allow delete: if isDM();
+      }
+
       // Trade offers. Only the receiver can accept or decline,
       // only the sender can cancel, and only while pending.
       match /trades/{tid} {

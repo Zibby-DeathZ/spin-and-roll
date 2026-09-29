@@ -9,8 +9,13 @@ users/{uid}
 sessions/{sessionId}          one game night (or a two-day campaign)
   campaignId, dmUid, code, status: 'lobby'|'active'|'won'|'lost'
   playerUids[], createdAt, startedAt, endedAt
-  state { ... }               campaign-wide live state, e.g. for Hollow Heir:
-                              day, timeBlock, housePoints{}, timeTurnerUsed, mapLocation
+  state                       campaign-wide live state (DM writes)
+    shopOpen                  Diagon Alley shops open on phones
+    quiz { id, uid }          the ceremony in progress ('sorting' | 'wand') and who's in it
+    housePoints { Gryffindor, Hufflepuff, Ravenclaw, Slytherin }
+    (coming: day, timeBlock, timeTurnerUsed, mapLocation)
+
+  answers/{quiz}_{uid}        a player's ceremony answers: uid, quiz, picks [option index…], wish
 
   claims/{familyId}           a player's pick of premade family; doc id = family, so it locks
     uid, firstName, status ('ok' once the GM screen builds the character)

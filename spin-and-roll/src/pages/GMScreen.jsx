@@ -3,13 +3,14 @@ import { Link, useParams } from 'react-router-dom';
 import { getCampaign, getCampaignData } from '../campaigns';
 import { useProfiles, useSession } from '../lib/sessions';
 import {
-  adjust, assignWand, createCharacter, defenceOf, describe, giveItem, levelFor, openVault,
-  setField, setShopOpen, setStat, STATS, useCharacters, useEvents, useGameEngine,
+  adjust, assignWand, awardPoints, createCharacter, defenceOf, describe, giveItem, levelFor, openVault,
+  setField, setShopOpen, setStat, startQuiz, STATS, useAnswers, useCharacters, useEvents, useGameEngine,
 } from '../lib/game';
 import { Splash } from '../components/Gate';
 import Bar from '../components/Bar';
 import StatusPill from '../components/StatusPill';
 import EventToasts from '../components/EventToasts';
+import { GMQuiz, HouseBoard } from '../components/Ceremony';
 
 function Buttons({ sid, uid, field, steps }) {
   return (
@@ -63,7 +64,7 @@ function Ollivander({ sid, c, data }) {
   );
 }
 
-function CharacterControls({ sid, c, data, playerName }) {
+function CharacterControls({ sid, c, data, playerName, quizBusy }) {
   const [open, setOpen] = useState(false);
   const [itemId, setItemId] = useState(Object.keys(data.items)[0] ?? '');
   const give = () => {
@@ -90,6 +91,28 @@ function CharacterControls({ sid, c, data, playerName }) {
       <div className="gm-row"><span className="gm-label">XP {c.xp}</span><Buttons sid={sid} uid={c.uid} field="xp" steps={[10, 25, 50]} /></div>
       <div className="gm-row"><span className="gm-label">{data.currency.icon} {c.gold}</span><Buttons sid={sid} uid={c.uid} field="gold" steps={[-5, 5, 10, 50]} /></div>
 
+      {data.quizzes && (
+        <div className="actions ceremony-btns">
+          <button className="btn small" disabled={quizBusy} onClick={() => startQuiz(sid, 'sorting', c.uid)}>
+            🎩 {c.house === 'Unsorted' ? 'Sorting Hat' : 'Re-sort'}
+          </button>
+          <button className="btn small" disabled={quizBusy} onClick={() => startQuiz(sid, 'wand', c.uid)}>
+            🪄 Wand questions
+          </button>
+        </div>
+      )}
+      {data.quizzes && c.house && c.house !== 'Unsorted' && (
+        <div className="gm-row">
+          <span className="gm-label">⏳ {c.house}</span>
+          <span className="nudges">
+            {[-10, -5, 5, 10].map((n) => (
+              <button key={n} className={`nudge ${n < 0 ? 'neg' : 'pos'}`} onClick={() => awardPoints(sid, c.uid, c.house, n)}>
+                {n > 0 ? `+${n}` : n}
+              </button>
+            ))}
+          </span>
+        </div>
+      )}
       {data.families && !c.vaultOpened && (
         <button className="btn small gold vault-btn" onClick={() => openVault(sid, c.uid, data)}>
           🏦 Open the {c.familyName} vault
@@ -151,6 +174,7 @@ export default function GMScreen() {
   const session = useSession(sid);
   const chars = useCharacters(sid);
   const profiles = useProfiles(session?.playerUids ?? []);
+  const answers = useAnswers(sid);
   const data = session ? getCampaignData(session.campaignId) : null;
   useGameEngine(sid, data); // carries out claims, purchases, trades and item uses while open
   const nameOf = useCallback(
@@ -160,6 +184,7 @@ export default function GMScreen() {
   if (!session) return <main className="login"><h1>Game not found</h1><Link className="btn" to="/">Back</Link></main>;
 
   const shopOpen = !!session.state?.shopOpen;
+  const quizState = session.state?.quiz;
 
   return (
     <div className="gm">
@@ -174,10 +199,14 @@ export default function GMScreen() {
           <StatusPill status={session.status} /> <strong className="code">{session.code}</strong>
         </span>
       </header>
+      {data.quizzes && <HouseBoard points={session.state?.housePoints} compact />}
+      {quizState && data.quizzes?.[quizState.id] && (
+        <GMQuiz sid={sid} quizState={quizState} data={data} chars={chars} answers={answers} />
+      )}
       <div className="gm-grid">
         <section className="gm-players">
           {session.playerUids.map((u) => chars[u]
-            ? <CharacterControls key={u} sid={sid} c={chars[u]} data={data} playerName={profiles[u]?.displayName} />
+            ? <CharacterControls key={u} sid={sid} c={chars[u]} data={data} playerName={profiles[u]?.displayName} quizBusy={!!quizState} />
             : <NewCharacter key={u} sid={sid} uid={u} profile={profiles[u]} data={data} />)}
           {!session.playerUids.length && <p className="muted">Players appear here once they join with the code.</p>}
         </section>

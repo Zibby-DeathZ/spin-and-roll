@@ -52,7 +52,8 @@ Your site: `https://<username>.github.io/<repo-name>/`
 - [~] 5. Event feed with toasts on GM + TV (bigger animations to come)
 - [~] 6. Hollow Heir content
   - [x] Six premade families (locked once picked), vaults, Diagon Alley shops, wands, equipment buffs, Defence
-  - [ ] Sorting Hat and wand questions, 7-day clock, house points, wheels, minigames
+  - [x] Family abilities, Sorting Hat and Ollivander ceremonies, house points
+  - [ ] 7-day clock and timetable, wheels, Time-Turner, class minigames, live map
 - [x] 7. Win/loss history and trophies
 
 See `DATA_MODEL.md` for how the database is laid out.
