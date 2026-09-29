@@ -50,7 +50,9 @@ Your site: `https://<username>.github.io/<repo-name>/`
 - [x] 3. Live sync between GM, TV and phones (live map comes with step 6)
 - [x] 4. Player phone character sheet and trading
 - [~] 5. Event feed with toasts on GM + TV (bigger animations to come)
-- [ ] 6. Hollow Heir content (characters, wheels, clock, house points, minigames)
+- [~] 6. Hollow Heir content
+  - [x] Six premade families (locked once picked), vaults, Diagon Alley shops, wands, equipment buffs, Defence
+  - [ ] Sorting Hat and wand questions, 7-day clock, house points, wheels, minigames
 - [x] 7. Win/loss history and trophies
 
 See `DATA_MODEL.md` for how the database is laid out.

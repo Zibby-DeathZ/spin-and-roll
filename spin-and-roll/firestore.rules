@@ -50,8 +50,21 @@ service cloud.firestore {
         allow create: if isDM() || (
           inSession(sid)
           && request.resource.data.actorUid == request.auth.uid
-          && request.resource.data.type in ['item_used', 'trade_offered', 'gift_offered', 'trade_declined']
+          && request.resource.data.type in ['item_used', 'purchase', 'trade_offered', 'gift_offered', 'trade_declined']
         );
+        allow update, delete: if isDM();
+      }
+
+      // Family claims. The doc id is the family, so each family can only be
+      // claimed once. Players can't change or delete a claim after making it.
+      match /claims/{familyId} {
+        allow read: if signedIn();
+        allow create: if inSession(sid)
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.keys().hasOnly(['uid', 'firstName', 'createdAt'])
+          && request.resource.data.firstName is string
+          && request.resource.data.firstName.size() > 0
+          && request.resource.data.firstName.size() <= 20;
         allow update, delete: if isDM();
       }
 

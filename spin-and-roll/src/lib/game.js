@@ -1,5 +1,5 @@
 import {
-  addDoc, collection, doc, limit, onSnapshot, orderBy, query,
+  addDoc, collection, deleteDoc, doc, limit, onSnapshot, orderBy, query,
   runTransaction, serverTimestamp, setDoc, updateDoc, where,
 } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
@@ -16,6 +16,54 @@ export const levelFor = (xp = 0) => XP_LEVELS.filter((t) => xp >= t).length;
 export const nextLevelAt = (xp = 0) => XP_LEVELS.find((t) => t > xp) ?? null;
 export const mod = (score) => Math.floor((score - 10) / 2);
 export const fmtMod = (m) => (m >= 0 ? `+${m}` : `${m}`);
+
+// Bonuses from everything equipped (wand, robes, familiar, books…).
+export function bonuses(c) {
+  const t = { stats: {}, defence: 0, spellPower: 0 };
+  for (const eq of Object.values(c?.equipment ?? {})) {
+    const b = eq?.bonus ?? {};
+    for (const [k, v] of Object.entries(b.stats ?? {})) t.stats[k] = (t.stats[k] ?? 0) + v;
+    t.defence += b.defence ?? 0;
+    t.spellPower += b.spellPower ?? 0;
+  }
+  return t;
+}
+export const statOf = (c, k) => (c.stats?.[k] ?? 10) + (bonuses(c).stats[k] ?? 0);
+export const defenceOf = (c) => 10 + mod(statOf(c, 'dex')) + bonuses(c).defence;
+
+export function bonusText(b = {}) {
+  const parts = Object.entries(b.stats ?? {}).map(([k, v]) => `+${v} ${k.toUpperCase()}`);
+  if (b.defence) parts.push(`+${b.defence} Defence`);
+  if (b.maxHp) parts.push(`+${b.maxHp} max HP`);
+  if (b.maxMana) parts.push(`+${b.maxMana} max mana`);
+  if (b.spellPower) parts.push(`+${b.spellPower} spell damage`);
+  return parts.join(', ');
+}
+
+// Resolves a shop entry into something displayable/buyable.
+export function shopEntry(data, id) {
+  for (const shop of data.shops ?? []) {
+    const e = shop.stock.find((x) => x.id === id);
+    if (!e) continue;
+    if (e.item) return { ...data.items[e.item], ...e, shop: shop.name };
+    return { ...e, shop: shop.name };
+  }
+  return null;
+}
+
+// Puts an item in a slot, adjusting max HP / mana for the swap.
+function equip(c, slot, item) {
+  const old = c.equipment?.[slot];
+  const dHp = (item.bonus?.maxHp ?? 0) - (old?.bonus?.maxHp ?? 0);
+  const dMana = (item.bonus?.maxMana ?? 0) - (old?.bonus?.maxMana ?? 0);
+  const maxHp = c.maxHp + dHp;
+  const maxMana = c.maxMana + dMana;
+  return {
+    equipment: { ...(c.equipment ?? {}), [slot]: item },
+    maxHp, hp: clamp(c.hp + Math.max(dHp, 0), 0, maxHp),
+    maxMana, mana: clamp(c.mana + Math.max(dMana, 0), 0, maxMana),
+  };
+}
 
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 const charRef = (sid, uid) => doc(db, 'sessions', sid, 'characters', uid);
@@ -36,6 +84,13 @@ export function useTrades(sid) {
     setTrades(snap.docs.map((d) => ({ id: d.id, ...d.data() }))
       .sort((a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0)))), [sid]);
   return trades;
+}
+
+export function useClaims(sid) {
+  const [claims, setClaims] = useState({});
+  useEffect(() => onSnapshot(col(sid, 'claims'), (snap) =>
+    setClaims(Object.fromEntries(snap.docs.map((d) => [d.id, d.data()])))), [sid]);
+  return claims;
 }
 
 export function useEvents(sid, max = 15) {
@@ -115,7 +170,54 @@ export async function giveItem(sid, uid, item, qty = 1) {
   await logEvent(sid, { type: 'item_given', targetUid: uid, payload: { name: item.name, icon: item.icon, qty } });
 }
 
+export async function openVault(sid, uid, data) {
+  let fam, amount;
+  await runTransaction(db, async (tx) => {
+    const snap = await tx.get(charRef(sid, uid));
+    const c = snap.data();
+    if (!c || c.vaultOpened) return;
+    fam = data.families?.find((f) => f.id === c.family);
+    amount = fam?.vault ?? 0;
+    tx.update(snap.ref, { gold: c.gold + amount, vaultOpened: true });
+  });
+  if (fam) await logEvent(sid, { type: 'vault', targetUid: uid, payload: { family: fam.name, amount } });
+}
+
+export async function assignWand(sid, uid, data, woodId, coreId) {
+  const wood = data.wandWoods.find((w) => w.id === woodId);
+  const core = data.wandCores.find((w) => w.id === coreId);
+  const statsB = { ...(wood.bonus.stats ?? {}) };
+  const wand = {
+    id: `${wood.id}-${core.id}`,
+    name: `${wood.name} wand, ${core.name} core`,
+    icon: '🪄',
+    bonus: { ...core.bonus, stats: statsB },
+    desc: `${wood.desc}. ${core.desc}.`,
+  };
+  await runTransaction(db, async (tx) => {
+    const snap = await tx.get(charRef(sid, uid));
+    const c = snap.data();
+    const upd = equip(c, 'wand', wand);
+    const firstWand = !c.equipment?.wand;
+    tx.update(snap.ref, { ...upd, gold: firstWand ? Math.max(0, c.gold - data.wandPrice) : c.gold });
+  });
+  await logEvent(sid, { type: 'wand_chosen', targetUid: uid, payload: { name: wand.name } });
+}
+
+export async function setShopOpen(sid, open) {
+  await updateDoc(doc(db, 'sessions', sid), { 'state.shopOpen': open });
+  await logEvent(sid, { type: open ? 'shop_open' : 'shop_closed' });
+}
+
 // ---------- Player actions ----------
+
+// Claiming a family locks it: the doc id is the family id, so only one
+// claim can exist. The GM screen then builds the character.
+export const claimFamily = (sid, uid, familyId, firstName) =>
+  setDoc(doc(db, 'sessions', sid, 'claims', familyId), { uid, firstName, createdAt: serverTimestamp() });
+
+export const buy = (sid, uid, itemId) =>
+  logEvent(sid, { type: 'purchase', actorUid: uid, processed: false, payload: { itemId } });
 
 // The GM screen applies the effect, so players can't edit their own HP.
 export const consumeItem = (sid, uid, itemId) =>
@@ -199,8 +301,71 @@ async function applyItemUse(sid, eid) {
   });
 }
 
-export function useGameEngine(sid) {
+function buildCharacter(data, fam, firstName) {
+  const d = structuredClone(data.defaults);
+  const maxHp = d.maxHp + mod(fam.stats.con) * 2;
+  const maxMana = d.maxMana + mod(fam.stats.int) * 2;
+  return {
+    ...d,
+    stats: { ...fam.stats },
+    hp: maxHp, maxHp, mana: maxMana, maxMana,
+    family: fam.id, familyName: fam.name, firstName,
+    name: `${firstName} ${fam.name}`,
+    vaultOpened: false,
+    inventory: [],
+    createdAt: serverTimestamp(),
+  };
+}
+
+async function processClaim(sid, familyId, data) {
+  const cRef = doc(db, 'sessions', sid, 'claims', familyId);
+  let created = null;
+  let reject = false;
+  await runTransaction(db, async (tx) => {
+    const claim = await tx.get(cRef);
+    if (!claim.exists() || claim.data().status) return;
+    const { uid, firstName } = claim.data();
+    const existing = await tx.get(charRef(sid, uid));
+    const fam = data.families?.find((f) => f.id === familyId);
+    if (existing.exists() || !fam) { reject = true; return; }
+    tx.set(charRef(sid, uid), buildCharacter(data, fam, String(firstName).slice(0, 20)));
+    tx.update(cRef, { status: 'ok' });
+    created = uid;
+  });
+  if (reject) await deleteDoc(cRef); // frees the family again
+  if (created) await logEvent(sid, { type: 'character_created', targetUid: created });
+}
+
+async function applyPurchase(sid, eid, data) {
+  const eRef = doc(db, 'sessions', sid, 'events', eid);
+  await runTransaction(db, async (tx) => {
+    const eSnap = await tx.get(eRef);
+    const e = eSnap.data();
+    if (!e || e.processed) return;
+    const sSnap = await tx.get(doc(db, 'sessions', sid));
+    const cSnap = await tx.get(charRef(sid, e.actorUid));
+    const c = cSnap.data();
+    const entry = shopEntry(data, e.payload.itemId);
+    const fail = (reason) => tx.update(eRef, { processed: true, failed: true, payload: { ...e.payload, reason } });
+    if (!sSnap.data()?.state?.shopOpen) return fail('Shops are closed');
+    if (!c || !entry) return fail('Unknown item');
+    if (c.gold < entry.price) return fail('Not enough gold');
+    if (entry.slot && c.equipment?.[entry.slot]?.id === entry.id) return fail('Already owned');
+    let upd;
+    if (entry.slot) {
+      upd = equip(c, entry.slot, { id: entry.id, name: entry.name, icon: entry.icon, bonus: entry.bonus ?? {}, desc: entry.desc });
+    } else {
+      const base = data.items[entry.item];
+      upd = { inventory: addItems(c.inventory, { id: entry.item, ...base }, 1) };
+    }
+    tx.update(cSnap.ref, { ...upd, gold: c.gold - entry.price });
+    tx.update(eRef, { processed: true, payload: { ...e.payload, name: entry.name, icon: entry.icon, price: entry.price } });
+  });
+}
+
+export function useGameEngine(sid, data) {
   useEffect(() => {
+    if (!data) return undefined; // wait until we know which campaign this is
     const busy = new Set();
     const run = (id, fn) => {
       if (busy.has(id)) return;
@@ -210,9 +375,13 @@ export function useGameEngine(sid) {
     const stopTrades = onSnapshot(query(col(sid, 'trades'), where('status', '==', 'accepted')),
       (snap) => snap.docs.forEach((d) => run(d.id, () => executeTrade(sid, d.id))));
     const stopEvents = onSnapshot(query(col(sid, 'events'), where('processed', '==', false)),
-      (snap) => snap.docs.forEach((d) => run(d.id, () => applyItemUse(sid, d.id))));
-    return () => { stopTrades(); stopEvents(); };
-  }, [sid]);
+      (snap) => snap.docs.forEach((d) => run(d.id, () =>
+        d.data().type === 'purchase' ? applyPurchase(sid, d.id, data) : applyItemUse(sid, d.id))));
+    const stopClaims = onSnapshot(col(sid, 'claims'),
+      (snap) => snap.docs.filter((d) => !d.data().status)
+        .forEach((d) => run(`claim-${d.id}`, () => processClaim(sid, d.id, data))));
+    return () => { stopTrades(); stopEvents(); stopClaims(); };
+  }, [sid, data]);
 }
 
 // ---------- Describing events for the TV and GM feed ----------
@@ -236,6 +405,12 @@ export function describe(e, nameOf) {
     case 'trade_done': return { icon: '🤝', text: `${actor} and ${target} traded`, tone: 'teal' };
     case 'trade_declined': return { icon: '✋', text: `${actor} turned down ${target}'s trade`, tone: 'ember' };
     case 'trade_failed': return { icon: '⚠️', text: `Trade between ${actor} and ${target} fell through`, tone: 'ember' };
+    case 'character_created': return { icon: '📜', text: `${target} has entered the story`, tone: 'gold' };
+    case 'vault': return { icon: '🏦', text: `${target} opened the ${e.payload.family} vault: ${e.payload.amount} Galleons`, tone: 'gold', big: true };
+    case 'wand_chosen': return { icon: '🪄', text: `The wand chooses ${target}: ${e.payload.name}`, tone: 'gold', big: true };
+    case 'purchase': return e.failed ? null : { icon: e.payload.icon, text: `${actor} bought ${e.payload.name}`, tone: 'teal' };
+    case 'shop_open': return { icon: '🛍️', text: 'Diagon Alley is open for shopping', tone: 'gold', big: true };
+    case 'shop_closed': return { icon: '🔒', text: 'The shops are closed', tone: 'muted' };
     default: return null;
   }
 }

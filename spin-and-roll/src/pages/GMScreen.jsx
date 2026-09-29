@@ -3,8 +3,8 @@ import { Link, useParams } from 'react-router-dom';
 import { getCampaign, getCampaignData } from '../campaigns';
 import { useProfiles, useSession } from '../lib/sessions';
 import {
-  adjust, createCharacter, describe, giveItem, levelFor, setField, setStat,
-  STATS, useCharacters, useEvents, useGameEngine,
+  adjust, assignWand, createCharacter, defenceOf, describe, giveItem, levelFor, openVault,
+  setField, setShopOpen, setStat, STATS, useCharacters, useEvents, useGameEngine,
 } from '../lib/game';
 import { Splash } from '../components/Gate';
 import Bar from '../components/Bar';
@@ -25,6 +25,13 @@ function Buttons({ sid, uid, field, steps }) {
 
 function NewCharacter({ sid, uid, profile, data }) {
   const [name, setName] = useState(profile?.displayName ?? '');
+  if (data.families) {
+    return (
+      <div className="gm-card empty">
+        <p><strong>{profile?.displayName ?? 'Player'}</strong> is choosing a family on their phone.</p>
+      </div>
+    );
+  }
   return (
     <div className="gm-card empty">
       <p><strong>{profile?.displayName ?? 'Player'}</strong> has no character yet.</p>
@@ -34,6 +41,24 @@ function NewCharacter({ sid, uid, profile, data }) {
           Create
         </button>
       </div>
+    </div>
+  );
+}
+
+function Ollivander({ sid, c, data }) {
+  const [wood, setWood] = useState(data.wandWoods[0].id);
+  const [core, setCore] = useState(data.wandCores[0].id);
+  return (
+    <div className="gm-give">
+      <select value={wood} onChange={(e) => setWood(e.target.value)} aria-label="Wand wood">
+        {data.wandWoods.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
+      </select>
+      <select value={core} onChange={(e) => setCore(e.target.value)} aria-label="Wand core">
+        {data.wandCores.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
+      </select>
+      <button className="btn small gold" onClick={() => assignWand(sid, c.uid, data, wood, core)}>
+        {c.equipment?.wand ? 'Swap wand' : `Give wand (${data.wandPrice} 🪙)`}
+      </button>
     </div>
   );
 }
@@ -51,7 +76,7 @@ function CharacterControls({ sid, c, data, playerName }) {
       <div className="party-head">
         <div>
           <strong className="gm-name">{c.name}</strong>
-          <span className="muted small"> {playerName}, level {levelFor(c.xp)}</span>
+          <span className="muted small"> {playerName}, level {levelFor(c.xp)}, Defence {defenceOf(c)}</span>
         </div>
         {data.houses.length > 0 && (
           <select value={c.house} onChange={(e) => setField(sid, c.uid, 'house', e.target.value)} aria-label="House">
@@ -64,6 +89,18 @@ function CharacterControls({ sid, c, data, playerName }) {
       <div className="gm-row"><Bar label="Mana" value={c.mana} max={c.maxMana} tone="violet" /><Buttons sid={sid} uid={c.uid} field="mana" steps={[-3, -1, 1, 3]} /></div>
       <div className="gm-row"><span className="gm-label">XP {c.xp}</span><Buttons sid={sid} uid={c.uid} field="xp" steps={[10, 25, 50]} /></div>
       <div className="gm-row"><span className="gm-label">{data.currency.icon} {c.gold}</span><Buttons sid={sid} uid={c.uid} field="gold" steps={[-5, 5, 10, 50]} /></div>
+
+      {data.families && !c.vaultOpened && (
+        <button className="btn small gold vault-btn" onClick={() => openVault(sid, c.uid, data)}>
+          🏦 Open the {c.familyName} vault
+        </button>
+      )}
+      {data.wandWoods && <Ollivander sid={sid} c={c} data={data} />}
+      {c.equipment && Object.keys(c.equipment).length > 0 && (
+        <p className="muted small gm-eq">
+          {Object.values(c.equipment).map((e) => `${e.icon} ${e.name}`).join('   ')}
+        </p>
+      )}
 
       <div className="gm-give">
         <select value={itemId} onChange={(e) => setItemId(e.target.value)} aria-label="Item to give">
@@ -114,20 +151,28 @@ export default function GMScreen() {
   const session = useSession(sid);
   const chars = useCharacters(sid);
   const profiles = useProfiles(session?.playerUids ?? []);
-  useGameEngine(sid); // carries out trades and item uses while this screen is open
+  const data = session ? getCampaignData(session.campaignId) : null;
+  useGameEngine(sid, data); // carries out claims, purchases, trades and item uses while open
   const nameOf = useCallback(
     (u) => chars?.[u]?.name ?? profiles[u]?.displayName ?? 'Someone', [chars, profiles]);
 
   if (session === undefined || chars === null) return <Splash />;
   if (!session) return <main className="login"><h1>Game not found</h1><Link className="btn" to="/">Back</Link></main>;
 
-  const data = getCampaignData(session.campaignId);
+  const shopOpen = !!session.state?.shopOpen;
 
   return (
     <div className="gm">
       <header className="gm-top">
         <h1>{getCampaign(session.campaignId)?.title}</h1>
-        <span><StatusPill status={session.status} /> <strong className="code">{session.code}</strong></span>
+        <span className="gm-top-right">
+          {data.shops && (
+            <button className={`btn small ${shopOpen ? 'ember' : 'teal'}`} onClick={() => setShopOpen(sid, !shopOpen)}>
+              {shopOpen ? 'Close the shops' : 'Open Diagon Alley'}
+            </button>
+          )}
+          <StatusPill status={session.status} /> <strong className="code">{session.code}</strong>
+        </span>
       </header>
       <div className="gm-grid">
         <section className="gm-players">

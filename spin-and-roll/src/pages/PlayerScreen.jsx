@@ -4,37 +4,55 @@ import { useAuth } from '../auth/AuthProvider';
 import { getCampaign, getCampaignData } from '../campaigns';
 import { useSession } from '../lib/sessions';
 import {
-  cancelTrade, consumeItem, fmtMod, levelFor, mod, nextLevelAt, offerTrade,
-  respondTrade, STATS, useCharacters, useTrades,
+  bonuses, bonusText, cancelTrade, consumeItem, defenceOf, fmtMod, levelFor, mod, nextLevelAt,
+  offerTrade, respondTrade, statOf, STATS, useCharacters, useClaims, useTrades,
 } from '../lib/game';
+import FamilyPicker from './FamilyPicker';
+import Shop from './Shop';
 import { Splash } from '../components/Gate';
 import Bar from '../components/Bar';
 import Wheel from '../components/Wheel';
 import TradeComposer from '../components/TradeComposer';
 
-function Sheet({ c, currency }) {
+function Sheet({ c, currency, data }) {
   const lvl = levelFor(c.xp);
   const next = nextLevelAt(c.xp);
+  const b = bonuses(c);
+  const fam = data.families?.find((f) => f.id === c.family);
   return (
     <>
       <div className="char-head">
         <h1>{c.name}</h1>
-        <p className="muted">{c.house ? `${c.house}, ` : ''}level {lvl}</p>
+        <p className="muted">{c.house ? `${c.house}, ` : ''}level {lvl}{fam ? `, ${fam.blood.toLowerCase()}` : ''}</p>
       </div>
       <Bar label="HP" value={c.hp} max={c.maxHp} tone="ember" />
       <Bar label="Mana" value={c.mana} max={c.maxMana} tone="violet" />
       <Bar label={next ? `XP to level ${lvl + 1}` : 'XP (max level)'} value={c.xp} max={next ?? c.xp} tone="gold" />
-      <p className="gold-line">{currency.icon} {c.gold} {currency.name}</p>
-      <div className="stats">
-        {STATS.map(([k, label]) => (
-          <div key={k} className="stat">
-            <span className="stat-mod">{fmtMod(mod(c.stats[k]))}</span>
-            <span className="stat-score">{c.stats[k]}</span>
-            <span className="stat-name">{label}</span>
-          </div>
-        ))}
+      <div className="vitals">
+        <span><b>{defenceOf(c)}</b> Defence</span>
+        {b.spellPower > 0 && <span><b>+{b.spellPower}</b> Spell damage</span>}
+        <span><b>{c.gold}</b> {currency.icon} {currency.name}</span>
       </div>
-      <p className="muted small">Roll a d20 and add the bonus of the stat the DM asks for.</p>
+      <div className="stats">
+        {STATS.map(([k, label]) => {
+          const v = statOf(c, k);
+          const extra = b.stats[k] ?? 0;
+          return (
+            <div key={k} className={`stat ${extra ? 'buffed' : ''}`}>
+              <span className="stat-mod">{fmtMod(mod(v))}</span>
+              <span className="stat-score">{v}{extra ? ` (+${extra})` : ''}</span>
+              <span className="stat-name">{label}</span>
+            </div>
+          );
+        })}
+      </div>
+      <p className="muted small">Roll a d20 and add the bonus of the stat the DM asks for. To hit you, enemies must roll your Defence or higher.</p>
+      {fam && (
+        <details className="secret">
+          <summary>Family secret (only you can see this)</summary>
+          <p>{fam.secret}</p>
+        </details>
+      )}
     </>
   );
 }
@@ -53,7 +71,13 @@ function Bag({ c, sid, others, onGive }) {
           <h2>Equipped</h2>
           <ul className="rows">
             {eq.map(([slot, val]) => (
-              <li key={slot}><span className="muted cap">{slot}</span><span>{val}</span></li>
+              <li key={slot} className="item-row">
+                <span className="item-name">
+                  <span className="item-icon">{val.icon}</span>
+                  <span>{val.name}<br /><span className="muted small">{bonusText(val.bonus) || val.desc}</span></span>
+                </span>
+                <span className="muted small cap">{slot}</span>
+              </li>
             ))}
           </ul>
         </>
@@ -164,6 +188,7 @@ export default function PlayerScreen() {
   const session = useSession(sid);
   const chars = useCharacters(sid);
   const trades = useTrades(sid);
+  const claims = useClaims(sid);
   const [tab, setTab] = useState('sheet');
   const [composer, setComposer] = useState(null);
 
@@ -178,8 +203,14 @@ export default function PlayerScreen() {
   }
 
   const campaign = getCampaign(session.campaignId);
-  const { currency } = getCampaignData(session.campaignId);
+  const data = getCampaignData(session.campaignId);
+  const { currency } = data;
   const me = chars[user.uid];
+  const shopOpen = !!session.state?.shopOpen;
+
+  if (!me && data.families && session.status !== 'won' && session.status !== 'lost') {
+    return <FamilyPicker sid={sid} uid={user.uid} data={data} claims={claims} title={campaign?.title} />;
+  }
 
   if (!me || session.status === 'lobby') {
     return (
@@ -197,12 +228,14 @@ export default function PlayerScreen() {
 
   const others = Object.values(chars).filter((c) => c.uid !== user.uid);
   const pending = trades.filter((t) => t.status === 'pending' && t.toUid === user.uid).length;
-  const tabs = [['sheet', 'Character'], ['bag', 'Bag'], ['party', 'Party'], ['trades', 'Trades']];
+  const tabs = [['sheet', 'Character'], ['bag', 'Bag'],
+    ...(data.shops ? [['shop', 'Shop']] : []), ['party', 'Party'], ['trades', 'Trades']];
 
   return (
     <div className="phone">
       <main className="phone-body">
-        {tab === 'sheet' && <Sheet c={me} currency={currency} />}
+        {tab === 'sheet' && <Sheet c={me} currency={currency} data={data} />}
+        {tab === 'shop' && <Shop sid={sid} c={me} data={data} open={shopOpen} />}
         {tab === 'bag' && (
           <Bag c={me} sid={sid} others={others}
             onGive={() => setTab('party')} />
@@ -215,11 +248,12 @@ export default function PlayerScreen() {
         {tab === 'trades' && <Trades sid={sid} me={me} chars={chars} trades={trades} currency={currency} />}
       </main>
 
-      <nav className="tabbar">
+      <nav className="tabbar" style={{ gridTemplateColumns: `repeat(${tabs.length}, 1fr)` }}>
         {tabs.map(([id, label]) => (
           <button key={id} className={tab === id ? 'on' : ''} onClick={() => setTab(id)}>
             {label}
             {id === 'trades' && pending > 0 && <span className="badge">{pending}</span>}
+            {id === 'shop' && shopOpen && <span className="dot" aria-label="open" />}
           </button>
         ))}
       </nav>
