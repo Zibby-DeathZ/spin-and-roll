@@ -2,6 +2,8 @@ import { useRef, useState } from 'react';
 import { castSpell, defenceOf, fmtMod, mod, statOf, STATS } from '../lib/game';
 import { damageBonus, sendAttack, sendRoll, spellDef, STRIKE } from '../lib/combat';
 import { DICE, diceLabel, rollD20, rollDice, rollDie } from '../lib/dice';
+import { locOf } from '../lib/world';
+import { isMonster } from '../components/MapView';
 
 // Shows a number that tumbles for a moment before landing.
 function useTumble() {
@@ -205,13 +207,14 @@ function CastFlow({ sid, c, sp, targets, onClose }) {
 
 export default function DiceTab({ sid, c, data, session, chars }) {
   const [casting, setCasting] = useState(null);
-  const loc = session.state?.map?.loc;
+  const placed = Object.keys(session.state?.pcPos ?? {}).length > 0;
+  const loc = locOf(session, c.uid) ?? session.state?.map?.loc;
   const tokens = session.state?.tokens ?? {};
   const targets = [
     ...Object.entries(tokens)
-      .filter(([, t]) => t.loc === loc && !t.npc && t.hp > 0)
+      .filter(([, t]) => t.loc === loc && isMonster(t) && t.hp > 0)
       .map(([id, t]) => ({ kind: 'mon', id, name: t.name, icon: t.icon, defence: t.defence, hp: t.hp })),
-    ...Object.values(chars).filter((o) => o.uid !== c.uid)
+    ...Object.values(chars).filter((o) => o.uid !== c.uid && (!placed || locOf(session, o.uid) === loc))
       .map((o) => ({ kind: 'pc', id: o.uid, name: o.name, icon: '🧑‍🎓', defence: defenceOf(o) })),
   ];
   const spells = [STRIKE, ...(c.spells ?? []).map((sp) => spellDef(data, sp))];

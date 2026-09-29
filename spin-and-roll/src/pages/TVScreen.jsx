@@ -8,6 +8,7 @@ import { TVSpin } from '../components/SpinWheel';
 import MapView from '../components/MapView';
 import { LessonBoard } from '../minigames';
 import { useLessonResults } from '../lib/lessons';
+import { pcsAt } from '../lib/world';
 import { HouseBoard, TVQuiz } from '../components/Ceremony';
 import { Splash } from '../components/Gate';
 import Bar from '../components/Bar';
@@ -66,7 +67,7 @@ export default function TVScreen() {
           <LessonBoard lesson={session.state.lesson} cls={data.classes[session.state.lesson.cls]}
             results={lessonResults} nameOf={nameOf} big />
         ) : loc ? (
-          <MapView loc={loc} tokens={session.state?.tokens} encounter={enc} big />
+          <MapView loc={loc} tokens={session.state?.tokens} pcs={pcsAt(session, chars, loc.id)} encounter={enc} big />
         ) : (
           <div className="tv-idle"><Wheel size={180} spin={false} /></div>
         )}

@@ -5,6 +5,7 @@ import {
 import { useEffect, useState } from 'react';
 import { db } from '../firebase';
 import { applyAttack } from './combat';
+import { applyOpenChest, applyPickup } from './world';
 
 // ---------- Rules of the game ----------
 
@@ -550,7 +551,7 @@ function buildCharacter(data, fam, firstName) {
     vaultOpened: false,
     spells: (fam.startSpells ?? []).filter((id) => data.spells?.[id]).map((id) => ({ id, ...data.spells[id] })),
     perks: [],
-    inventory: [],
+    inventory: (fam.startItems ?? []).filter((id) => data.items[id]).map((id) => ({ id, ...data.items[id], qty: 1 })),
     createdAt: serverTimestamp(),
   };
 }
@@ -642,6 +643,8 @@ const HANDLERS = {
   ability_used: (sid, id) => applyAbility(sid, id),
   item_used: (sid, id, data) => applyItemUse(sid, id, data),
   attack: (sid, id, data) => applyAttack(sid, id, data),
+  open_chest: (sid, id, data) => applyOpenChest(sid, id, data),
+  pickup: (sid, id, data) => applyPickup(sid, id, data),
 };
 
 export function useGameEngine(sid, data) {
@@ -730,6 +733,19 @@ export function describe(e, nameOf) {
       const detail = `${p.rolls.join(p.mode === 'normal' ? ' + ' : ' / ')}${p.mod ? ` ${p.mod > 0 ? '+' : '−'} ${Math.abs(p.mod)}` : ''}`;
       return { icon: '🎲', text: `${actor} rolled ${p.label}: ${p.total} (${detail})`, tone: 'gold' };
     }
+    case 'moved': return { icon: e.payload.icon, text: `${e.payload.names.join(', ')} → ${e.payload.name}`, tone: 'gold' };
+    case 'open_chest': {
+      if (e.failed) return null;
+      const p = e.payload;
+      if (p.ok) {
+        const loot = [...(p.gold ? [`${p.gold} Galleons`] : []), ...p.items].join(', ');
+        return { icon: '🧰', text: `${actor} opened the ${p.name} (${p.total} vs ${p.dc}): ${loot || 'it was empty'}!`, tone: 'gold', big: true };
+      }
+      return { icon: '🔒', text: `${actor} couldn’t open the ${p.name} (${p.total} vs ${p.dc})${p.trap ? `. A curse bites for ${p.trap} damage!` : ''}`, tone: 'ember', big: true };
+    }
+    case 'pickup': return e.failed ? null : { icon: e.payload.icon, text: `${actor} picked up ${e.payload.name}`, tone: 'teal' };
+    case 'quest_new': return { icon: e.payload.icon, text: `New quest from ${e.payload.giver}: ${e.payload.title}`, tone: 'gold', big: true };
+    case 'quest_done': return { icon: '🏅', text: `Quest complete: ${e.payload.title}!`, tone: 'teal', big: true };
     case 'travel': return { icon: '📍', text: e.payload.name, tone: 'gold', big: true };
     case 'fight_start': return { icon: '⚔️', text: `Roll for initiative! ${e.payload.order.join(', ')}`, tone: 'ember', big: true };
     case 'fight_end': return { icon: '🏁', text: `The fight is over.${e.payload.xp ? ` Everyone gains ${e.payload.xp} XP.` : ''}`, tone: 'gold', big: true };

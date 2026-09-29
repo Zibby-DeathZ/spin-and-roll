@@ -14,6 +14,7 @@ import { GMQuiz, HouseBoard } from '../components/Ceremony';
 import { GMClock } from '../components/Clock';
 import { GMSpin } from '../components/SpinWheel';
 import GMMap from '../components/GMMap';
+import GMQuests from '../components/GMQuests';
 import { useLessonEngine } from '../lib/lessons';
 import { setExpelled, teachForbidden } from '../lib/combat';
 
@@ -222,6 +223,7 @@ export default function GMScreen() {
       </header>
       {data.clock && <GMClock sid={sid} data={data} session={session} clk={clockOf(session)} chars={chars} lessonResults={lessonResults} />}
       {data.locations && <GMMap sid={sid} data={data} session={session} chars={chars} />}
+      {data.quests && <GMQuests sid={sid} data={data} session={session} chars={chars} />}
       {data.wheels && <GMSpin sid={sid} data={data} session={session} chars={chars} />}
       {data.quizzes && <HouseBoard points={session.state?.housePoints} compact />}
       {quizState && data.quizzes?.[quizState.id] && (

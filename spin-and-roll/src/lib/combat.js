@@ -38,8 +38,17 @@ export async function addToken(sid, data, kind, loc, existing = {}) {
   await updateDoc(sessionRef(sid), { [`state.tokens.${id}`]: token });
   return id;
 }
-export const moveToken = (sid, id, x, y) =>
-  updateDoc(sessionRef(sid), { [`state.tokens.${id}.x`]: x, [`state.tokens.${id}.y`]: y });
+export const moveToken = (sid, id, x, y) => {
+  const base = id.startsWith('pc:') ? `state.pcPos.${id.slice(3)}` : `state.tokens.${id}`;
+  return updateDoc(sessionRef(sid), { [`${base}.x`]: x, [`${base}.y`]: y });
+};
+
+// Places a prepared token (chest or item) built by world.js.
+export async function placeToken(sid, token) {
+  const id = `${token.kind}-${Date.now().toString(36)}`;
+  await updateDoc(sessionRef(sid), { [`state.tokens.${id}`]: { x: 30 + Math.random() * 40, y: 30 + Math.random() * 30, ...token } });
+  return id;
+}
 export const removeToken = (sid, id) => updateDoc(sessionRef(sid), { [`state.tokens.${id}`]: deleteField() });
 export const setTokenHp = (sid, id, hp) => updateDoc(sessionRef(sid), { [`state.tokens.${id}.hp`]: hp });
 
@@ -48,9 +57,12 @@ export const setTokenHp = (sid, id, hp) => updateDoc(sessionRef(sid), { [`state.
 export async function startFight(sid, data, session, chars) {
   const loc = session.state?.map?.loc;
   const tokens = session.state?.tokens ?? {};
-  const mons = Object.entries(tokens).filter(([, t]) => t.loc === loc && !t.npc && t.hp > 0);
+  const mons = Object.entries(tokens).filter(([, t]) => t.loc === loc && t.hp > 0 && !t.npc && t.kind !== 'chest' && t.kind !== 'item');
+  const pos = session.state?.pcPos ?? {};
+  const anyPlaced = Object.keys(pos).length > 0;
+  const present = (u) => (anyPlaced ? pos[u]?.loc === loc : true);
   const order = [
-    ...session.playerUids.filter((u) => chars[u]).map((u) => ({
+    ...session.playerUids.filter((u) => chars[u] && present(u)).map((u) => ({
       kind: 'pc', id: u, name: chars[u].firstName ?? chars[u].name,
       init: rollD20().nat + mod(statOf(chars[u], 'dex')),
     })),

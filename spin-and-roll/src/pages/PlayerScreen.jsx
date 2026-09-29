@@ -10,6 +10,8 @@ import {
 import FamilyPicker from './FamilyPicker';
 import Shop from './Shop';
 import DiceTab from './DiceTab';
+import HereTab from './HereTab';
+import { locOf } from '../lib/world';
 import { LessonScreen } from '../minigames';
 import { useLessonResults } from '../lib/lessons';
 import { HouseBoard, PlayerQuiz } from '../components/Ceremony';
@@ -156,15 +158,17 @@ function Bag({ c, sid, others, onGive }) {
   );
 }
 
-function Party({ others, onTrade, onGift }) {
+function Party({ others, onTrade, onGift, placeOf }) {
   if (!others.length) return <p className="muted">No one else has a character yet.</p>;
   return (
+    <>
+    <h2>Party</h2>
     <ul className="party">
       {others.map((o) => (
         <li key={o.uid} className="party-card">
           <div className="party-head">
             <strong>{o.name}</strong>
-            <span className="muted small">{o.house ? `${o.house}, ` : ''}level {levelFor(o.xp)}</span>
+            <span className="muted small">{o.house ? `${o.house}, ` : ''}level {levelFor(o.xp)}{placeOf?.(o.uid) ? `. 📍 ${placeOf(o.uid)}` : ''}</span>
           </div>
           <Bar label="HP" value={o.hp} max={o.maxHp} tone="ember" />
           <div className="actions">
@@ -174,6 +178,7 @@ function Party({ others, onTrade, onGift }) {
         </li>
       ))}
     </ul>
+    </>
   );
 }
 
@@ -297,8 +302,8 @@ export default function PlayerScreen() {
 
   const others = Object.values(chars).filter((c) => c.uid !== user.uid);
   const pending = trades.filter((t) => t.status === 'pending' && t.toUid === user.uid).length;
-  const tabs = [['sheet', 'Sheet'], ['dice', 'Dice'], ['bag', 'Bag'],
-    ...(data.shops ? [['shop', 'Shop']] : []), ['party', 'Party'], ['trades', 'Trades']];
+  const tabs = [['sheet', 'Sheet'], ...(data.locations ? [['here', 'Here']] : []), ['dice', 'Dice'], ['bag', 'Bag'],
+    ...(data.shops ? [['shop', 'Shop']] : []), ['party', 'Party']];
   const enc = session.state?.encounter;
   const turnOf = enc?.order?.[enc.turn];
 
@@ -312,27 +317,29 @@ export default function PlayerScreen() {
       )}
       <main className="phone-body">
         {tab === 'sheet' && <Sheet sid={sid} c={me} currency={currency} data={data} points={session.state?.housePoints ?? {}} clk={clockOf(session)}
-          loc={data.locations?.find((l) => l.id === session.state?.map?.loc)}
+          loc={data.locations?.find((l) => l.id === locOf(session, user.uid))}
           discovered={session.state?.map?.discovered ?? []} />}
+        {tab === 'here' && <HereTab sid={sid} c={me} data={data} session={session} chars={chars} />}
         {tab === 'dice' && <DiceTab sid={sid} c={me} data={data} session={session} chars={chars} />}
         {tab === 'shop' && <Shop sid={sid} c={me} data={data} open={shopOpen} />}
         {tab === 'bag' && (
           <Bag c={me} sid={sid} others={others}
             onGive={() => setTab('party')} />
         )}
+        {tab === 'party' && pending > 0 && <Trades sid={sid} me={me} chars={chars} trades={trades} currency={currency} />}
         {tab === 'party' && (
-          <Party others={others}
+          <Party others={others} placeOf={(u) => data.locations?.find((l) => l.id === locOf(session, u))?.name}
             onTrade={(o) => setComposer({ them: o, mode: 'trade' })}
             onGift={(o) => setComposer({ them: o, mode: 'gift' })} />
         )}
-        {tab === 'trades' && <Trades sid={sid} me={me} chars={chars} trades={trades} currency={currency} />}
+        {tab === 'party' && pending === 0 && <Trades sid={sid} me={me} chars={chars} trades={trades} currency={currency} />}
       </main>
 
       <nav className="tabbar" style={{ gridTemplateColumns: `repeat(${tabs.length}, 1fr)` }}>
         {tabs.map(([id, label]) => (
           <button key={id} className={tab === id ? 'on' : ''} onClick={() => setTab(id)}>
             {label}
-            {id === 'trades' && pending > 0 && <span className="badge">{pending}</span>}
+            {id === 'party' && pending > 0 && <span className="badge">{pending}</span>}
             {id === 'shop' && shopOpen && <span className="dot" aria-label="open" />}
           </button>
         ))}

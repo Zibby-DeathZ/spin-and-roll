@@ -13,6 +13,12 @@ const items = {
   sneakoscope: { name: 'Pocket Sneakoscope', icon: '🌀', note: 'Spins when someone nearby lies' },
   'mandrake-leaf': { name: 'Mandrake leaf', icon: '🌱', note: 'Key ingredient in the draught that restores drained students' },
   'creature-treats': { name: 'Creature treats', icon: '🦴', note: 'Calms one magical creature instantly' },
+  'serpent-key': { name: 'Serpent key', icon: '🗝️', note: 'Opens the door beneath Hogwarts. Only a Parseltongue can turn it' },
+  'map-half': { name: 'Half of the Marauder’s Map', icon: '📜', note: 'Torn down the middle. Someone has the rest' },
+  'vale-page': { name: 'Torn page about Corvin Vale', icon: '📄', note: 'A painter who wanted to live forever' },
+  'restorative-draught': { name: 'Restorative Draught', icon: '⚗️', note: 'Wakes one drained student' },
+  'frog-card': { name: 'Rare Chocolate Frog card', icon: '🃏', note: 'A collector would love this' },
+  'stolen-jars': { name: 'Stolen ingredient jars', icon: '🫙', note: 'Labelled in Grimsby’s spiky handwriting' },
 };
 
 export const hollowHeir = {
@@ -57,7 +63,7 @@ export const hollowHeir = {
       secret: 'Your sister wrote home that the castle “feels wrong this year” and asked you to keep an eye out. You’re the only one she told.',
     },
     {
-      id: 'fenwick', name: 'Fenwick', blood: 'Half-blood', wealth: 'Healthy vault', vault: 220,
+      id: 'fenwick', name: 'Fenwick', startItems: ['map-half'], blood: 'Half-blood', wealth: 'Healthy vault', vault: 220,
       ability: {
         name: 'Marauder’s Legacy', icon: '🗺️',
         passive: 'Your great-uncle ran with the Marauders. You know the words: “I solemnly swear that I am up to no good.”',
@@ -93,7 +99,7 @@ export const hollowHeir = {
       secret: 'On the train, you’ll be the only one who sees the covered painting’s eyes follow you. It happens again every time you pass one of its kind.',
     },
     {
-      id: 'marlowe', name: 'Marlowe', blood: 'Pureblood', wealth: 'Nearly empty vault', vault: 25,
+      id: 'marlowe', name: 'Marlowe', startItems: ['serpent-key'], blood: 'Pureblood', wealth: 'Nearly empty vault', vault: 25,
       ability: {
         name: 'Parseltongue', icon: '🐍',
         passive: 'You can speak to and understand snakes. Doors sealed with a serpent open when you command them.',
@@ -555,6 +561,68 @@ export const hollowHeir = {
       ],
     },
   },
+
+  // ---------- Chests ----------
+  // Contents are rolled when the GM places the chest. dc = the d20 + stat roll needed to open it.
+  chests: {
+    'small-chest': { name: 'Small chest', icon: '📦', dc: 8, stat: 'dex', gold: [3, 10], loot: ['chocolate-frog', 'pumpkin-pasty', 'bertie-botts', 'pepperup'], picks: 1 },
+    'locked-chest': { name: 'Locked chest', icon: '🧰', dc: 13, stat: 'dex', gold: [10, 25], loot: ['pepperup', 'focus-draught', 'wiggenweld', 'remembrall', 'extendable-ears'], picks: 2 },
+    'ancient-chest': { name: 'Ancient chest', icon: '🗃️', dc: 16, stat: 'int', gold: [25, 60], loot: ['wiggenweld', 'felix', 'sneakoscope', 'focus-draught', 'frog-card'], picks: 2 },
+    'cursed-chest': { name: 'Cursed chest', icon: '⚰️', dc: 14, stat: 'dex', gold: [20, 40], loot: ['felix', 'wiggenweld', 'sneakoscope'], picks: 1, trap: 4 },
+  },
+
+  // ---------- Quests ----------
+  // reward: xp and gold go to each player on the quest; points go to each player's house.
+  quests: [
+    {
+      id: 'hollow-heir', main: true, title: 'The Hollow Heir', giver: 'The castle itself', icon: '🖼️',
+      desc: 'Students are being found drained of their magic. Something in Hogwarts is feeding.',
+      objectives: ['Find out what is draining the students', 'Learn the name of the painted man', 'Find the way into the Undercroft', 'Stop the ritual before the seventh night ends'],
+      reward: { xp: 150, points: 50 },
+    },
+    {
+      id: 'wake-sleepers', title: 'Wake the Sleepers', giver: 'Professor Longbottom', icon: '🌱',
+      desc: 'A Restorative Draught could wake the drained students, if someone can gather what it needs.',
+      objectives: ['Gather 3 Mandrake leaves', 'Brew the Restorative Draught', 'Bring it to the Hospital Wing'],
+      reward: { xp: 60, points: 20, items: ['wiggenweld'] },
+    },
+    {
+      id: 'bramble', title: 'Where is Bramble?', giver: 'Professor Scamander', icon: '🦅',
+      desc: 'A hippogriff with a torn Thornbury tag has been seen near the Forbidden Forest.',
+      objectives: ['Find Bramble’s tracks in the Forbidden Forest', 'Calm Bramble without hurting her', 'Bring her safely out of the forest'],
+      reward: { xp: 50, gold: 15, items: ['creature-treats'] },
+    },
+    {
+      id: 'other-half', title: 'The Other Half', giver: 'A note in the Fenwick map', icon: '📜',
+      desc: 'Someone at Hogwarts has the other half of the Marauder’s Map, and they know you have yours.',
+      objectives: ['Find out who has the other half', 'Win it back, by trade, trick or duel', 'Join the halves'],
+      reward: { xp: 50, items: ['frog-card'] },
+    },
+    {
+      id: 'stolen-ingredients', title: 'Stolen Ingredients', giver: 'Professor Grimsby', icon: '🫙',
+      desc: 'Someone has been raiding the Potions store cupboard. Grimsby is furious, and suspicious of everyone.',
+      objectives: ['Search the Dungeons for clues', 'Catch the thief', 'Return the jars to Grimsby'],
+      reward: { xp: 30, gold: 10, items: ['pepperup', 'pepperup'] },
+    },
+    {
+      id: 'dueling-champion', title: 'Dueling Club Champion', giver: 'Professor Flitwick', icon: '⚔️',
+      desc: 'The Dueling Club is looking for a first-year champion.',
+      objectives: ['Beat a Dueling Club rival', 'Beat two more rivals', 'Win the final against an older student'],
+      reward: { xp: 40, points: 15 },
+    },
+    {
+      id: 'card-collector', title: 'Card Collector', giver: 'A Ravenclaw collector', icon: '🃏',
+      desc: 'An older student will trade a secret for a rare Chocolate Frog card.',
+      objectives: ['Find a rare Chocolate Frog card', 'Trade it to the collector'],
+      reward: { xp: 25, items: ['felix'] },
+    },
+    {
+      id: 'keep-an-eye-out', title: 'Keep an Eye Out', giver: 'Prefect Sinclair', icon: '🎖️',
+      desc: 'The Sinclair prefect thinks something is wrong with the castle this year.',
+      objectives: ['Meet the prefect after dinner', 'Follow her patrol route', 'Find what she was afraid of'],
+      reward: { xp: 30, points: 10 },
+    },
+  ],
 
   items,
 };

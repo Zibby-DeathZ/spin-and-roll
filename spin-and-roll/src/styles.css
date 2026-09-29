@@ -604,3 +604,47 @@ h4 { font: 700 1rem var(--body); margin: 0 0 .4rem; color: var(--muted); }
 .class-box .lesson-board { align-items: flex-start; text-align: left; }
 .class-box .lesson-board ul { justify-content: flex-start; }
 .class-box .lesson-board .ceremony-icon { display: none; }
+
+/* ---------- Characters, chests and items on the map ---------- */
+.token.pc .token-icon { border-color: var(--bone); background: var(--ink); font: 700 1.2rem var(--display); color: var(--bone); }
+.token.pc.house-gryffindor .token-icon { border-color: var(--gryffindor); }
+.token.pc.house-hufflepuff .token-icon { border-color: var(--hufflepuff); }
+.token.pc.house-ravenclaw .token-icon { border-color: var(--ravenclaw); }
+.token.pc.house-slytherin .token-icon { border-color: var(--slytherin); }
+.token.pc .token-icon { box-shadow: 0 0 0 2px rgb(23 20 42 / .9), 0 0 10px rgb(236 228 211 / .35); }
+.pc-hp span { background: var(--teal); }
+.token.chest .token-icon { border-color: var(--gold); border-radius: 10px; }
+.token.chest.opened { opacity: .5; }
+.token.item .token-icon { width: 34px; height: 34px; font-size: 1.1rem; border-color: var(--gold); animation: glint 2s ease-in-out infinite; }
+@keyframes glint { 50% { box-shadow: 0 0 14px var(--gold); } }
+@media (prefers-reduced-motion: reduce) { .token.item .token-icon { animation: none; } }
+.mapview.big .token.pc .token-icon { font-size: 1.8rem; }
+.mapview.small { margin: .5rem 0 1rem; }
+.mapview.small .token-icon { width: 28px; height: 28px; font-size: .95rem; border-width: 2px; }
+.mapview.small .token-hp { width: 28px; height: 4px; }
+
+.movers { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; margin: .5rem 0; }
+.movers label {
+  display: inline-flex; align-items: center; gap: .3rem; padding: .25rem .7rem; border-radius: 999px;
+  border: 1.5px solid var(--line); cursor: pointer; font-size: .88rem;
+}
+.movers label.on { border-color: var(--teal); }
+.movers input { accent-color: var(--teal); }
+
+/* Quests */
+.gm-quests { background: var(--panel); border-radius: 14px; padding: 1rem 1.15rem; margin-bottom: 1rem; border-left: 4px solid var(--violet); }
+.gm-quests h2 { font-size: 1.4rem; }
+.quest-card { background: var(--ink); border-radius: 12px; padding: .8rem 1rem; margin-bottom: .7rem; border-left: 3px solid var(--violet); }
+.quest-card.main { border-left-color: var(--gold); }
+.quest-card.dim p { margin: .3rem 0 .4rem; }
+.quest-card p { margin: .2rem 0; }
+.objectives { list-style: none; padding: 0; margin: .5rem 0; }
+.objectives li { padding: .2rem 0; }
+.objectives li.done { color: var(--teal); text-decoration: line-through; }
+.objectives input { accent-color: var(--teal); margin-right: .3rem; }
+.reward { color: var(--gold); }
+.quests .quest-card { background: var(--panel); }
+
+/* Here tab */
+.here-title { font-size: 2rem; margin: 0; }
+.nearby .rows li .btn { flex-shrink: 0; }

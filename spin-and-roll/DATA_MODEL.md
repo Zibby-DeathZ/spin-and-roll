@@ -19,6 +19,10 @@ sessions/{sessionId}          one game night (or a two-day campaign)
     spin { wheelId, uid, idx, id, at, applied, hidden }   the wheel currently on the TV
     map { loc, discovered [] }                             where the party is, and places found
     tokens { id: { kind, name, icon, loc, x, y, npc, hp, maxHp, defence, boss, disarmed } }
+           chests: { kind: 'chest', chest, dc, stat, trap, contents { gold, items [] }, opened, tried [] }
+           items:  { kind: 'item', item }
+    pcPos { uid: { loc, x, y } }                           where each character is standing
+    quests { questId: { status: 'active'|'done'|'failed', uids [], done [objective index…] } }
     encounter { order [{ kind: 'pc'|'mon', id, name, init }], turn, round, loc, monsters [] }
     forbiddenLearner                                       the one character who knows the Killing Curse
     lesson { id, key, cls, game, diff, uids [], lesson, lessonName }   the class minigame in progress
