@@ -51,6 +51,12 @@ export default function FamilyPicker({ sid, uid, data, claims, title }) {
                   <span className="muted small">{taken ? `Taken by ${taken.firstName}` : `${f.blood}, ${f.wealth.toLowerCase()}`}</span>
                 </span>
                 <span className="family-story">{f.story}</span>
+                {f.ability && (
+                  <span className="family-ability">
+                    <strong>{f.ability.icon} {f.ability.name}</strong>
+                    <span>{f.ability.passive}</span>
+                  </span>
+                )}
                 <span className="family-stats">
                   {STATS.map(([k]) => (
                     <span key={k}><b>{k.toUpperCase()}</b> {f.stats[k]} <i>{fmtMod(mod(f.stats[k]))}</i></span>

@@ -326,3 +326,16 @@ h4 { font: 700 1rem var(--body); margin: 0 0 .4rem; color: var(--muted); }
 .vault-btn { margin: .4rem 0; }
 .gm-eq { margin: .3rem 0 0; }
 .gm-give select { min-width: 0; }
+
+/* Signature abilities */
+.family-ability { display: flex; flex-direction: column; gap: .1rem; font-size: .88rem; border-left: 3px solid var(--violet); padding-left: .6rem; }
+.family-ability strong { color: #b7a8e8; }
+.ability { margin-top: 1.25rem; background: var(--panel); border-radius: 14px; padding: 1rem; border-top: 3px solid var(--violet); }
+.ability h2 { color: #b7a8e8; font-size: 1.5rem; }
+.ability p { margin-bottom: .6rem; }
+.tag {
+  display: inline-block; margin-right: .5rem; padding: 0 .5rem; border-radius: 999px;
+  font-size: .72rem; font-weight: 700; letter-spacing: .03em; text-transform: uppercase;
+  background: var(--line); color: var(--bone); vertical-align: 1px;
+}
+.tag-warn { background: #5a2b28; color: #f3b3a8; }

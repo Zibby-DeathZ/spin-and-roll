@@ -216,6 +216,9 @@ export async function setShopOpen(sid, open) {
 export const claimFamily = (sid, uid, familyId, firstName) =>
   setDoc(doc(db, 'sessions', sid, 'claims', familyId), { uid, firstName, createdAt: serverTimestamp() });
 
+export const useAbility = (sid, uid, ability) =>
+  logEvent(sid, { type: 'ability_used', actorUid: uid, payload: { name: ability.name, icon: ability.icon } });
+
 export const buy = (sid, uid, itemId) =>
   logEvent(sid, { type: 'purchase', actorUid: uid, processed: false, payload: { itemId } });
 
@@ -409,6 +412,7 @@ export function describe(e, nameOf) {
     case 'vault': return { icon: '🏦', text: `${target} opened the ${e.payload.family} vault: ${e.payload.amount} Galleons`, tone: 'gold', big: true };
     case 'wand_chosen': return { icon: '🪄', text: `The wand chooses ${target}: ${e.payload.name}`, tone: 'gold', big: true };
     case 'purchase': return e.failed ? null : { icon: e.payload.icon, text: `${actor} bought ${e.payload.name}`, tone: 'teal' };
+    case 'ability_used': return { icon: e.payload.icon, text: `${actor} uses ${e.payload.name}!`, tone: 'violet', big: true };
     case 'shop_open': return { icon: '🛍️', text: 'Diagon Alley is open for shopping', tone: 'gold', big: true };
     case 'shop_closed': return { icon: '🔒', text: 'The shops are closed', tone: 'muted' };
     default: return null;

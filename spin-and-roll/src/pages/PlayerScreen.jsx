@@ -5,7 +5,7 @@ import { getCampaign, getCampaignData } from '../campaigns';
 import { useSession } from '../lib/sessions';
 import {
   bonuses, bonusText, cancelTrade, consumeItem, defenceOf, fmtMod, levelFor, mod, nextLevelAt,
-  offerTrade, respondTrade, statOf, STATS, useCharacters, useClaims, useTrades,
+  offerTrade, respondTrade, statOf, STATS, useAbility, useCharacters, useClaims, useTrades,
 } from '../lib/game';
 import FamilyPicker from './FamilyPicker';
 import Shop from './Shop';
@@ -14,7 +14,28 @@ import Bar from '../components/Bar';
 import Wheel from '../components/Wheel';
 import TradeComposer from '../components/TradeComposer';
 
-function Sheet({ c, currency, data }) {
+function AbilityCard({ sid, c, ability }) {
+  const [used, setUsed] = useState(false);
+  const fire = async () => {
+    if (!confirm(`Use ${ability.name} now? It's once per day.`)) return;
+    setUsed(true);
+    await useAbility(sid, c.uid, ability);
+    setTimeout(() => setUsed(false), 4000);
+  };
+  return (
+    <section className="ability">
+      <h2>{ability.icon} {ability.name}</h2>
+      <p><span className="tag">Always</span>{ability.passive}</p>
+      <p><span className="tag">Once a day</span>{ability.active}</p>
+      <p className="muted small"><span className="tag tag-warn">Drawback</span>{ability.drawback}</p>
+      <button className="btn gold" disabled={used} onClick={fire}>
+        {used ? 'Announced on the TV' : `Use ${ability.name}`}
+      </button>
+    </section>
+  );
+}
+
+function Sheet({ sid, c, currency, data }) {
   const lvl = levelFor(c.xp);
   const next = nextLevelAt(c.xp);
   const b = bonuses(c);
@@ -47,6 +68,7 @@ function Sheet({ c, currency, data }) {
         })}
       </div>
       <p className="muted small">Roll a d20 and add the bonus of the stat the DM asks for. To hit you, enemies must roll your Defence or higher.</p>
+      {fam?.ability && <AbilityCard sid={sid} c={c} ability={fam.ability} />}
       {fam && (
         <details className="secret">
           <summary>Family secret (only you can see this)</summary>
@@ -234,7 +256,7 @@ export default function PlayerScreen() {
   return (
     <div className="phone">
       <main className="phone-body">
-        {tab === 'sheet' && <Sheet c={me} currency={currency} data={data} />}
+        {tab === 'sheet' && <Sheet sid={sid} c={me} currency={currency} data={data} />}
         {tab === 'shop' && <Shop sid={sid} c={me} data={data} open={shopOpen} />}
         {tab === 'bag' && (
           <Bag c={me} sid={sid} others={others}

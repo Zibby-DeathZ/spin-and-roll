@@ -32,39 +32,75 @@ export const hollowHeir = {
   families: [
     {
       id: 'blackwood', name: 'Blackwood', blood: 'Pureblood', wealth: 'Overflowing vault', vault: 500,
+      ability: {
+        name: 'Portrait Whisperer', icon: '🖼️',
+        passive: 'Portraits recognise the Blackwood name and speak to you freely.',
+        active: 'Once per day, ask any portrait one question and it must answer truthfully.',
+        drawback: 'Portraits gossip. When you break a rule near one, the DM spins to see if a teacher hears about it.',
+      },
       stats: { str: 8, dex: 10, con: 12, int: 14, wis: 13, cha: 15 },
       story: 'One of the oldest wizarding families in Britain. Portraits of Blackwoods line every wall of the family manor, and all of them have opinions.',
       secret: 'Your grandmother’s diary mentions “the painted man” and a debt the Blackwoods never paid. Centuries ago, a Blackwood sealed a dark wizard inside a painting.',
     },
     {
       id: 'sinclair', name: 'Sinclair', blood: 'Half-blood', wealth: 'Comfortable vault', vault: 300,
+      ability: {
+        name: 'Constant Vigilance', icon: '🛡️',
+        passive: 'Auror training at home: you can’t be caught by surprise, and you start the game knowing Stupefy.',
+        active: 'Once per day, re-roll any d20 in a fight and keep the better roll.',
+        drawback: 'You don’t back down. When someone insults your family, you need a WIS roll to walk away.',
+      },
       stats: { str: 14, dex: 12, con: 15, int: 13, wis: 10, cha: 8 },
       story: 'A family of Aurors. Both parents hunt dark wizards for the Ministry and are rarely home. Your older sister is a Hogwarts prefect.',
       secret: 'Your sister wrote home that the castle “feels wrong this year” and asked you to keep an eye out. You’re the only one she told.',
     },
     {
       id: 'fenwick', name: 'Fenwick', blood: 'Half-blood', wealth: 'Healthy vault', vault: 220,
+      ability: {
+        name: 'Marauder’s Legacy', icon: '🗺️',
+        passive: 'Your great-uncle ran with the Marauders. You know the words: “I solemnly swear that I am up to no good.”',
+        active: 'Once per day, open your half of the Marauder’s Map to see who is in any one area of the castle (the DM reveals it).',
+        drawback: 'Half the map is missing. Finding the other half is a side quest only you know about.',
+      },
       stats: { str: 10, dex: 15, con: 12, int: 13, wis: 8, cha: 14 },
       story: 'Your family runs Fenwick’s Fizzing Follies, a joke shop on Diagon Alley. You grew up testing products nobody else would touch.',
-      secret: 'In the shop’s back room is a faded map of Hogwarts passages, drawn by a Fenwick who was expelled. Half of it has been torn away.',
+      secret: 'Your great-uncle copied the Marauder’s Map before he was expelled, but it was torn in half during a duel. Someone at Hogwarts has the other half, and they’ve been watching you.',
     },
     {
       id: 'thornbury', name: 'Thornbury', blood: 'Half-blood', wealth: 'Modest vault', vault: 150,
+      ability: {
+        name: 'Beast Bond', icon: '🐾',
+        passive: 'Magical creatures never attack you first, and you roll with advantage to calm or befriend them.',
+        active: 'Once per day, ask a creature what it has seen. It answers in feelings and images the DM describes.',
+        drawback: 'You can’t stand to see a creature hurt, and you’ll risk yourself to stop it.',
+      },
       stats: { str: 13, dex: 10, con: 14, int: 8, wis: 15, cha: 12 },
       story: 'Creature breeders from the Welsh hills. You could calm a hippogriff before you could read, and animals trust you on sight.',
       secret: 'Last year your family’s prize hippogriff, Bramble, vanished near the Forbidden Forest. Nobody believed you when you said you heard her calling.',
     },
     {
       id: 'quill', name: 'Quill', blood: 'Muggle-born', wealth: 'Hogwarts school fund', vault: 60,
+      ability: {
+        name: 'The Sight', icon: '👁️',
+        passive: 'You see through disguises, glamours and magical illusions that fool everyone else.',
+        active: 'Once per day, ask the DM: “What here is hidden or enchanted?” and get an honest answer.',
+        drawback: 'Your visions come uninvited. Sometimes the DM shows you something you’d rather not have seen.',
+      },
       stats: { str: 8, dex: 12, con: 10, int: 15, wis: 14, cha: 13 },
       story: 'Until your letter arrived, you thought the strange things around you were coincidences. Your parents are dentists and are thrilled and terrified.',
       secret: 'On the train, you’ll be the only one who sees the covered painting’s eyes follow you. It happens again every time you pass one of its kind.',
     },
     {
       id: 'marlowe', name: 'Marlowe', blood: 'Pureblood', wealth: 'Nearly empty vault', vault: 25,
+      ability: {
+        name: 'Parseltongue', icon: '🐍',
+        passive: 'You can speak to and understand snakes. Doors sealed with a serpent open when you command them.',
+        active: 'Once per day, ask a snake to scout, guard, or deliver a message for you.',
+        drawback: 'Anyone who hears you speak it will fear or distrust you. The DM spins to see how they react.',
+      },
       stats: { str: 15, dex: 14, con: 13, int: 10, wis: 12, cha: 8 },
       story: 'Once as grand as the Blackwoods, the Marlowes lost everything in a scandal nobody will explain. People still whisper when they hear your name.',
-      secret: 'Your vault holds only a few coins and an old iron key with a raven on it. An ancestor served a dark wizard, and the key opens something beneath Hogwarts.',
+      secret: 'Your vault holds only a few coins and an old iron key with a serpent on it. An ancestor served a dark wizard, and only a Parseltongue can open the door that key belongs to.',
     },
   ],
 
