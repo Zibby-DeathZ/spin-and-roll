@@ -10,6 +10,7 @@ import { LessonBoard } from '../minigames';
 import { useLessonResults } from '../lib/lessons';
 import { actionsAt, locOf, pcsAt } from '../lib/world';
 import Portrait from '../components/Portrait';
+import { TVPuzzle } from '../components/Puzzles';
 import { HouseBoard, TVQuiz } from '../components/Ceremony';
 import { Splash } from '../components/Gate';
 import Wheel from '../components/Wheel';
@@ -68,7 +69,9 @@ export function TVLive({ session, chars, profiles, data, title, answers, lessonR
   let stage;
   if (quiz) stage = <div className="tv2-center"><TVQuiz quiz={quiz} answer={answers[answerKey(q.id, q.uid)]} name={nameOf(q.uid)} /></div>;
   else if (showSpin) stage = <div className="tv2-center"><TVSpin data={data} spin={spin} name={spin.uid ? nameOf(spin.uid) : null} /></div>;
-  else if (session.state?.lesson) {
+  else if (session.state?.puzzle && data.puzzles?.find((p) => p.id === session.state.puzzle.id)) {
+    stage = <div className="tv2-center"><TVPuzzle p={data.puzzles.find((p) => p.id === session.state.puzzle.id)} st={session.state.puzzle} /></div>;
+  } else if (session.state?.lesson) {
     stage = (
       <div className="tv2-center">
         <LessonBoard lesson={session.state.lesson} cls={data.classes[session.state.lesson.cls]} results={lessonResults} nameOf={nameOf} big />

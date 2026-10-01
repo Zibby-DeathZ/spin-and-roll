@@ -4,7 +4,7 @@ import { defenceOf } from '../lib/game';
 import {
   addToken, endFight, monsterAttack, moveToken, nextTurn, placeToken, removeToken, setTokenHp, startFight,
 } from '../lib/combat';
-import { chestToken, itemToken, locOf, movePlayers, pcsAt, showOnTV } from '../lib/world';
+import { chestToken, itemToken, locOf, movePlayers, pcsAt, placeStaff, showOnTV } from '../lib/world';
 
 const KINDS = [['monsters', '👹 Monsters'], ['people', '🧑 People'], ['chests', '🧰 Chests'], ['items', '✨ Items']];
 
@@ -128,6 +128,9 @@ export default function GMTable({ sid, data, session, chars }) {
               onClick={() => { setSel(null); movePlayers(sid, data, locPick, movers, chars, true); }}>Move them here</button>
             <button className="btn small" disabled={locPick === map.loc} onClick={() => { setSel(null); showOnTV(sid, data, locPick); }}>Just show on TV</button>
           </div>
+          {data.staff && (
+            <button className="linkish" onClick={() => placeStaff(sid, data, session)}>👩‍🏫 Send all staff to their rooms</button>
+          )}
         </Box>
 
         <Box title="➕ Place on this map">

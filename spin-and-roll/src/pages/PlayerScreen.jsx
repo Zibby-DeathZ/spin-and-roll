@@ -311,6 +311,9 @@ export default function PlayerScreen() {
 
   return (
     <div className="phone">
+      {session.state?.puzzle && !session.state.puzzle.solved && (
+        <div className="banner puzzle">🧩 Puzzle on the TV! Work it out together and tell the DM your moves.</div>
+      )}
       {me.expelled && <div className="banner bad">📜 You have been expelled from Hogwarts.</div>}
       {enc && (
         <div className={`banner ${turnOf?.id === me.uid ? 'mine' : ''}`}>

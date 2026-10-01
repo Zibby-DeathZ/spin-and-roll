@@ -28,7 +28,12 @@ export function GMClock({ sid, data, session, clk, chars, lessonResults }) {
       <div className="clock-row">
         <div>
           <p className="clock-label">{info.label}</p>
-          {info.cls && <p className="muted">{info.cls.icon} {info.cls.name} with {info.cls.professor}</p>}
+          {info.cls && (
+            <p className="muted">
+              {info.cls.icon} {info.cls.name} with {info.cls.professor}
+              {info.cls.room && `, in the ${data.locations?.find((l) => l.id === info.cls.room)?.name ?? info.cls.room}`}
+            </p>
+          )}
           {info.slot?.note && <p className="muted">{info.slot.note}</p>}
         </div>
         <div className="actions">
@@ -69,7 +74,7 @@ export function GMClock({ sid, data, session, clk, chars, lessonResults }) {
           </div>
           <div className="actions">
             <button className="btn small gold" disabled={busy || taught || !attending.length || !info.cls?.game}
-              onClick={() => go(() => startLesson(sid, data, clk, attending))}>
+              onClick={() => go(() => startLesson(sid, data, clk, attending, session, chars))}>
               {taught ? 'Class finished' : '🎮 Start class minigame'}
             </button>
             {!taught && (

@@ -468,10 +468,10 @@ export async function sortInto(sid, uid, house) {
 
 // ---------- House points ----------
 
-export async function awardPoints(sid, uid, house, delta) {
+export async function awardPoints(sid, uid, house, delta, reason = '') {
   if (!house || house === 'Unsorted') return;
   await updateDoc(doc(db, 'sessions', sid), { [`state.housePoints.${house}`]: increment(delta) });
-  await logEvent(sid, { type: 'points', targetUid: uid, payload: { house, delta } });
+  await logEvent(sid, { type: 'points', targetUid: uid, payload: { house, delta, reason: reason.trim() || null } });
 }
 
 // ---------- GM screen engine ----------
@@ -755,9 +755,14 @@ export function describe(e, nameOf) {
       ? { icon: '🎩', text: `${target}, step forward. The Sorting Hat awaits`, tone: 'gold' }
       : { icon: '🪄', text: `Mr Ollivander studies ${target} carefully…`, tone: 'gold' };
     case 'sorted': return { icon: '🎩', text: `${target}… ${e.payload.house.toUpperCase()}!`, tone: `house-${e.payload.house.toLowerCase()}`, big: true };
-    case 'points': return e.payload.delta > 0
-      ? { icon: '⏳', text: `${e.payload.delta} points to ${e.payload.house}! (${target})`, tone: `house-${e.payload.house.toLowerCase()}`, big: true }
-      : { icon: '⏳', text: `${-e.payload.delta} points from ${e.payload.house} (${target})`, tone: 'ember' };
+    case 'points': {
+      const why = e.payload.reason ? ` ${e.payload.reason}` : '';
+      return e.payload.delta > 0
+        ? { icon: '⏳', text: `${e.payload.delta} points to ${e.payload.house}! ${target}${why}`, tone: `house-${e.payload.house.toLowerCase()}`, big: true }
+        : { icon: '⏳', text: `${-e.payload.delta} points from ${e.payload.house}. ${target}${why}`, tone: 'ember', big: true };
+    }
+    case 'puzzle_start': return { icon: e.payload.icon, text: `A puzzle! ${e.payload.title}. Look at the TV`, tone: 'violet', big: true };
+    case 'puzzle_solved': return { icon: '✨', text: `Solved: ${e.payload.title}!`, tone: 'teal', big: true };
     case 'shop_open': return { icon: '🛍️', text: 'Diagon Alley is open for shopping', tone: 'gold', big: true };
     case 'shop_closed': return { icon: '🔒', text: 'The shops are closed', tone: 'muted' };
     default: return null;

@@ -199,3 +199,38 @@ export function rewardText(data, r = {}) {
   for (const it of r.items ?? []) parts.push(data.items[it]?.name ?? it);
   return parts.join(', ');
 }
+
+// ---------- Staff ----------
+// Puts every member of staff in their own room, creating their token if needed.
+export async function placeStaff(sid, data, session) {
+  const tokens = session.state?.tokens ?? {};
+  const upd = {};
+  const perRoom = {};
+  for (const [npc, room] of Object.entries(data.staff ?? {})) {
+    const b = data.bestiary[npc];
+    if (!b) continue;
+    const n = (perRoom[room] = (perRoom[room] ?? 0) + 1);
+    const pos = { loc: room, x: 50 + (n - 1) * 12, y: 30 };
+    const existing = Object.entries(tokens).find(([, t]) => t.kind === npc);
+    if (existing) {
+      upd[`state.tokens.${existing[0]}.loc`] = room;
+      upd[`state.tokens.${existing[0]}.x`] = pos.x;
+      upd[`state.tokens.${existing[0]}.y`] = pos.y;
+    } else {
+      upd[`state.tokens.staff-${npc}`] = { kind: npc, name: b.name, icon: b.icon, npc: true, ...pos };
+    }
+  }
+  await updateDoc(sessionRef(sid), upd);
+}
+
+// Makes sure a class's professor is standing in its classroom.
+export async function professorTo(sid, data, session, npc, room) {
+  const b = data.bestiary[npc];
+  if (!b) return;
+  const tokens = session.state?.tokens ?? {};
+  const existing = Object.entries(tokens).find(([, t]) => t.kind === npc);
+  const id = existing ? existing[0] : `staff-${npc}`;
+  await updateDoc(sessionRef(sid), {
+    [`state.tokens.${id}`]: { ...(existing?.[1] ?? { kind: npc, name: b.name, icon: b.icon, npc: true }), loc: room, x: 50, y: 28 },
+  });
+}

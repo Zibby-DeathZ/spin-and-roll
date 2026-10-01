@@ -18,6 +18,10 @@ const items = {
   'vale-page': { name: 'Torn page about Corvin Vale', icon: '📄', note: 'A painter who wanted to live forever' },
   'restorative-draught': { name: 'Restorative Draught', icon: '⚗️', note: 'Wakes one drained student' },
   'frog-card': { name: 'Rare Chocolate Frog card', icon: '🃏', note: 'A collector would love this' },
+  'ring-clue-serpent': { name: 'Scratched note (first ring)', icon: '🗒️', note: '“The first ring remembers what sleeps beneath the castle.”' },
+  'ring-clue-moon': { name: 'Star chart (second ring)', icon: '🗺️', note: '“The second ring follows the lamp of the night.”' },
+  'ring-clue-owl': { name: 'Feathered card (last ring)', icon: '🪶', note: '“The last ring belongs to the one who carries every letter.”' },
+  'diary-page': { name: 'Page of Vale’s diary', icon: '📓', note: 'Written in runes. Collect all three.' },
   'stolen-jars': { name: 'Stolen ingredient jars', icon: '🫙', note: 'Labelled in Grimsby’s spiky handwriting' },
 };
 
@@ -350,6 +354,8 @@ export const hollowHeir = {
     longbottom: { name: 'Professor Longbottom', icon: '🌱', npc: true },
     scamander: { name: 'Professor Scamander', icon: '🐾', npc: true },
     flitwick: { name: 'Professor Flitwick', icon: '✨', npc: true },
+    vance: { name: 'Professor Vance', icon: '🔄', npc: true },
+    hooch: { name: 'Madam Hooch', icon: '🧹', npc: true },
     filch: { name: 'Filch', icon: '🔦', npc: true },
     peeves: { name: 'Peeves', icon: '🤡', npc: true },
     ghost: { name: 'A ghost', icon: '👻', npc: true },
@@ -357,6 +363,13 @@ export const hollowHeir = {
     centaur: { name: 'Centaur', icon: '🏹', npc: true },
     'sinclair-prefect': { name: 'Prefect Sinclair', icon: '🎖️', npc: true },
     painting: { name: 'The covered painting', icon: '🖼️', npc: true },
+  },
+
+  // Where each member of staff belongs. "Staff to their rooms" on the GM screen puts them there.
+  staff: {
+    flitwick: 'charms-classroom', grimsby: 'dungeons', longbottom: 'greenhouses', ashgrove: 'defence-classroom',
+    vance: 'transfiguration-classroom', scamander: 'hagrids-hut', hooch: 'quidditch-pitch',
+    filch: 'entrance-hall', peeves: 'grand-staircase',
   },
 
   // Places on the map. Drop an image at public/maps/<id>.jpg and it shows automatically.
@@ -369,11 +382,13 @@ export const hollowHeir = {
     { id: 'express', area: 'Prologue', name: 'The Hogwarts Express', icon: '🚃', desc: 'Compartments, the trolley witch, and a covered painting in the luggage car.', exits: ['great-hall'], actions: ['Buy from the trolley', 'Explore the carriages', 'Peek at the covered painting'] },
     { id: 'great-hall', area: 'Castle', name: 'The Great Hall', icon: '🕯️', desc: 'Floating candles under an enchanted sky.', exits: ['entrance-hall'], actions: ['Eat a feast', 'Watch the staff table'] },
     { id: 'entrance-hall', area: 'Castle', name: 'Entrance Hall', icon: '🚪', desc: 'The house point hourglasses glitter by the doors.', exits: ['grand-staircase', 'dungeons', 'courtyard'], actions: ['Check the house points', 'Ask a ghost for directions'] },
-    { id: 'grand-staircase', area: 'Castle', name: 'Grand Staircase', icon: '🪜', desc: 'Stairs that change their minds. Portraits everywhere.', exits: ['common-room', 'library', 'defence-classroom', 'trophy-room', 'hospital-wing', 'owlery', 'astronomy-tower', 'room-of-requirement'], actions: ['Talk to a portrait', 'Ride a moving staircase'] },
+    { id: 'grand-staircase', area: 'Castle', name: 'Grand Staircase', icon: '🪜', desc: 'Stairs that change their minds. Portraits everywhere.', exits: ['charms-classroom', 'transfiguration-classroom', 'common-room', 'library', 'defence-classroom', 'trophy-room', 'hospital-wing', 'owlery', 'astronomy-tower', 'room-of-requirement'], actions: ['Talk to a portrait', 'Ride a moving staircase'] },
     { id: 'common-room', area: 'Castle', name: 'Common room', icon: '🛋️', desc: 'A fire, armchairs, and house secrets.', actions: ['Rest by the fire', 'Hear the latest gossip'] },
     { id: 'library', area: 'Castle', name: 'The Library', icon: '📚', desc: 'Silent shelves and a librarian who hears everything.', exits: ['restricted-section'], actions: ['Search the shelves (INT)', 'Ask the librarian'] },
     { id: 'restricted-section', area: 'Castle', name: 'Restricted Section', icon: '⛓️', desc: 'Chained books that whisper when you pass.', secret: true, actions: ['Read a chained book (WIS)', 'Look for the page about Vale'] },
     { id: 'dungeons', area: 'Castle', name: 'The Dungeons', icon: '⚗️', desc: 'Cold stone, green light, and the Potions classroom.', exits: ['undercroft'], actions: ['Check the store cupboard', 'Brew something'] },
+    { id: 'charms-classroom', area: 'Castle', name: 'Charms classroom', icon: '✨', desc: 'Tiered desks and a tall stack of books for the professor to stand on.', actions: ['Practise a charm', 'Ask Flitwick a question'] },
+    { id: 'transfiguration-classroom', area: 'Castle', name: 'Transfiguration classroom', icon: '🔄', desc: 'Neat rows of desks, cages of beetles, and a stern blackboard.', actions: ['Study the transfiguration charts'] },
     { id: 'defence-classroom', area: 'Castle', name: 'Defence classroom', icon: '🛡️', desc: 'Ashgrove’s room. Too many paintings for comfort.', actions: ['Study the paintings', 'Search Ashgrove’s desk'] },
     { id: 'trophy-room', area: 'Castle', name: 'Trophy Room', icon: '🏆', desc: 'Old awards, including a certain Quidditch Cup.', actions: ['Inspect the old trophies'] },
     { id: 'owlery', area: 'Castle', name: 'The Owlery', icon: '🦉', desc: 'Freezing, windy, and full of owls.', actions: ['Send an owl home'] },
@@ -393,13 +408,13 @@ export const hollowHeir = {
   ],
 
   classes: {
-    charms: { name: 'Charms', icon: '✨', professor: 'Professor Flitwick', game: 'charms' },
-    potions: { name: 'Potions', icon: '⚗️', professor: 'Professor Grimsby', game: 'potions' },
-    herbology: { name: 'Herbology', icon: '🌱', professor: 'Professor Longbottom', game: 'herbology' },
-    defence: { name: 'Defence Against the Dark Arts', icon: '🛡️', professor: 'Professor Ashgrove', game: 'defence' },
-    transfiguration: { name: 'Transfiguration', icon: '🔄', professor: 'Professor Vance', game: 'transfiguration' },
-    creatures: { name: 'Care of Magical Creatures', icon: '🐾', professor: 'Professor Scamander', game: 'creatures' },
-    flying: { name: 'Flying Lessons', icon: '🧹', professor: 'Madam Hooch', game: 'flying' },
+    charms: { name: 'Charms', icon: '✨', professor: 'Professor Flitwick', game: 'charms', room: 'charms-classroom', prof: 'flitwick' },
+    potions: { name: 'Potions', icon: '⚗️', professor: 'Professor Grimsby', game: 'potions', room: 'dungeons', prof: 'grimsby' },
+    herbology: { name: 'Herbology', icon: '🌱', professor: 'Professor Longbottom', game: 'herbology', room: 'greenhouses', prof: 'longbottom' },
+    defence: { name: 'Defence Against the Dark Arts', icon: '🛡️', professor: 'Professor Ashgrove', game: 'defence', room: 'defence-classroom', prof: 'ashgrove' },
+    transfiguration: { name: 'Transfiguration', icon: '🔄', professor: 'Professor Vance', game: 'transfiguration', room: 'transfiguration-classroom', prof: 'vance' },
+    creatures: { name: 'Care of Magical Creatures', icon: '🐾', professor: 'Professor Scamander', game: 'creatures', room: 'hagrids-hut', prof: 'scamander' },
+    flying: { name: 'Flying Lessons', icon: '🧹', professor: 'Madam Hooch', game: 'flying', room: 'quidditch-pitch', prof: 'hooch' },
   },
 
   // What each class teaches the students who show up (and pass the minigame).
@@ -621,6 +636,94 @@ export const hollowHeir = {
       desc: 'The Sinclair prefect thinks something is wrong with the castle this year.',
       objectives: ['Meet the prefect after dinner', 'Follow her patrol route', 'Find what she was afraid of'],
       reward: { xp: 30, points: 10 },
+    },
+    // ---------- Hidden quests: only you see these until you hand them out ----------
+    {
+      id: 'vales-trials', hidden: true, title: 'The Trials Beneath', giver: 'A door with a serpent on it', icon: '🚪',
+      desc: 'Vale guarded the way to his chamber with trials, one for each kind of student he despised.',
+      objectives: ['Get past the Devil’s Snare', 'Light every torch on the Torch Wall', 'Win the Living Chessboard', 'Drink from the right bottle'],
+      reward: { xp: 120, points: 40 },
+    },
+    {
+      id: 'turning-lock', hidden: true, title: 'The Turning Lock', giver: 'The Room of Requirement', icon: '⌛',
+      desc: 'In a forgotten corner of the Room of Requirement sits a chest with three stone rings for a lock. Something inside is ticking.',
+      objectives: ['Find the Room of Requirement', 'Find the three ring clues (Trophy Room, Astronomy Tower, Owlery)', 'Turn the rings to open the lock'],
+      reward: { xp: 60 }, manual: 'The Time-Turner (one use). Use it from the Day & class tab.',
+    },
+    {
+      id: 'painters-bargain', hidden: true, title: 'The Painter’s Bargain', giver: 'A whisper from the covered painting', icon: '💚',
+      desc: 'The painting knows a curse that cannot be blocked. It will teach one student, if they can prove they deserve it. Nothing it gives is free.',
+      objectives: [
+        'Find all three pages of Vale’s diary (Restricted Section, Black Lake, Shrieking Shack)',
+        'Decode the diary’s runes',
+        'Go to the painting alone, during curfew',
+        'Answer the painting’s question truthfully',
+        'Choose: accept the bargain, or walk away',
+      ],
+      reward: { xp: 50 }, manual: 'The Killing Curse. Teach it secretly from the Players tab (Edit stats and limits).',
+    },
+    {
+      id: 'old-cup', hidden: true, title: 'The Old Cup', giver: 'A trophy in the Trophy Room', icon: '🏆',
+      desc: 'One old Quidditch Cup has a line engraved beneath the names that nobody seems to have noticed.',
+      objectives: ['Read the engraving on the old cup', 'Follow it to the Astronomy Tower', 'Find what was hidden there'],
+      reward: { xp: 30, items: ['ring-clue-moon', 'felix'] },
+    },
+  ],
+
+  // ---------- TV puzzles: shown on the TV, operated by the GM, solved by talking ----------
+  puzzles: [
+    {
+      id: 'living-chess', type: 'chess', icon: '♟️', title: 'The Living Chessboard',
+      intro: 'You stand on a giant chessboard as the white pieces. White to move: checkmate the black king in two moves. Each of you is a piece. Choose carefully, because the board strikes back.',
+      fen: '7k/R2B4/3p4/6N1/8/n3p2K/6P1/8',
+      solution: '1. Bishop d7 → e6 (quiet move: it clears the rook’s path along the 7th rank AND guards g8). Whatever Black does, 2. Rook a7 → h7 is checkmate. Any other first move: Black escapes; reset the board.',
+    },
+    {
+      id: 'torch-wall', type: 'torches', icon: '🔥', title: 'The Torch Wall',
+      intro: 'Touch a torch and it flips, along with the torches directly above, below, left and right of it. Light every torch to open the way.',
+      size: 5,
+      start: [1,1,0,0,0, 0,0,0,1,0, 0,0,0,0,0, 0,0,0,0,0, 0,1,1,1,0],
+      solution: [[0,0],[0,1],[0,4],[2,2],[3,0],[3,4]],
+    },
+    {
+      id: 'turning-lock', type: 'rings', icon: '🌀', title: 'The Turning Lock',
+      intro: 'Three stone rings, each carved with symbols. Turn them until the right three symbols sit beneath the arrow.',
+      rings: [
+        ['🌙', '🦉', '🐍', '⭐', '🗝️', '🦁'],
+        ['⭐', '🦡', '☀️', '🌙', '🐍', '🦅'],
+        ['🗝️', '🐍', '🦡', '🌙', '🦉', '☀️'],
+      ],
+      answer: ['🐍', '🌙', '🦉'],
+      solution: 'Serpent, Moon, Owl. Clues: “what sleeps beneath the castle” (the serpent in the Undercroft), “the lamp of the night” (the moon), “the one who carries every letter” (an owl).',
+    },
+    {
+      id: 'seven-bottles', type: 'bottles', icon: '⚗️', title: 'The Seven Bottles',
+      intro: 'Seven bottles stand in a row. One lets you walk on through the fire. One leads safely back. Two bring a deep sleep. Three are poison. Only one of you may drink to go forward.',
+      bottles: [
+        { shape: 'tall', colour: 'green', kind: 'poison' },
+        { shape: 'small', colour: 'red', kind: 'sleep' },
+        { shape: 'round', colour: 'blue', kind: 'poison' },
+        { shape: 'small', colour: 'gold', kind: 'forward' },
+        { shape: 'tall', colour: 'purple', kind: 'poison' },
+        { shape: 'round', colour: 'green', kind: 'sleep' },
+        { shape: 'tiny', colour: 'clear', kind: 'back' },
+      ],
+      clues: [
+        'No poison stands beside the way back.',
+        'No two poisons stand side by side.',
+        'Every tall bottle is poison.',
+        'The way back stands beside a sleeping draught.',
+        'The way forward is neither red nor clear.',
+        'The way forward stands somewhere to the left of the way back.',
+      ],
+      solution: 'Bottle 4, the small gold one. Poison: 1, 3, 5. Sleep: 2, 6. Back: 7. (Checked: these six clues allow only this answer, and every clue is needed.)',
+    },
+    {
+      id: 'vale-diary', type: 'cipher', icon: '📓', title: 'Vale’s Diary',
+      intro: 'Vale wrote his diary in runes. Each rune is always the same letter. Work out what it says.',
+      message: 'ONLY THE ONE WHO STANDS ALONE MAY LEARN THE CURSE THAT CANNOT BE BLOCKED',
+      given: ['E', 'T'],
+      solution: 'ONLY THE ONE WHO STANDS ALONE MAY LEARN THE CURSE THAT CANNOT BE BLOCKED. (This is why the painting must be visited alone.)',
     },
   ],
 

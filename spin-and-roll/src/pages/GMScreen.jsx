@@ -16,6 +16,8 @@ import { GMSpin } from '../components/SpinWheel';
 import GMTable from '../components/GMTable';
 import Portrait from '../components/Portrait';
 import GMQuests from '../components/GMQuests';
+import GMPoints from '../components/GMPoints';
+import { GMPuzzles } from '../components/Puzzles';
 import { useLessonEngine } from '../lib/lessons';
 import { setExpelled, teachForbidden } from '../lib/combat';
 
@@ -193,7 +195,8 @@ function Feed({ sid, nameOf }) {
 }
 
 const TABS = [
-  ['table', '🗺️ Table'], ['day', '🕰️ Day & class'], ['quests', '📜 Quests'], ['players', '🧑‍🎓 Players'], ['wheels', '🎡 Wheels'],
+  ['table', '🗺️ Table'], ['day', '🕰️ Day & class'], ['quests', '📜 Quests'], ['puzzles', '🧩 Puzzles'],
+  ['players', '🧑‍🎓 Players'], ['wheels', '🎡 Wheels'],
 ];
 
 export default function GMScreen() {
@@ -207,6 +210,7 @@ export default function GMScreen() {
   const lessonResults = useLessonEngine(sid, data, session?.state?.lesson);
   const [tab, setTab] = useState('table');
   const [feedOpen, setFeedOpen] = useState(false);
+  const [pointsOpen, setPointsOpen] = useState(false);
   const nameOf = useCallback(
     (u) => chars?.[u]?.name ?? profiles[u]?.displayName ?? 'Someone', [chars, profiles]);
 
@@ -217,7 +221,7 @@ export default function GMScreen() {
   const quizState = session.state?.quiz;
   const enc = session.state?.encounter;
   const lesson = session.state?.lesson;
-  const tabs = TABS.filter(([id]) => (id === 'day' ? data.clock : id === 'quests' ? data.quests : id === 'wheels' ? data.wheels : id === 'table' ? data.locations : true));
+  const tabs = TABS.filter(([id]) => (id === 'day' ? data.clock : id === 'quests' ? data.quests : id === 'wheels' ? data.wheels : id === 'table' ? data.locations : id === 'puzzles' ? data.puzzles : true));
   const active = tabs.some(([id]) => id === tab) ? tab : tabs[0][0];
 
   return (
@@ -229,6 +233,9 @@ export default function GMScreen() {
         </div>
         <div className="gm-top-right">
           {data.quizzes && <HouseBoard points={session.state?.housePoints} compact />}
+          {data.quizzes && (
+            <button className="btn small gold" onClick={() => setPointsOpen(!pointsOpen)} aria-expanded={pointsOpen}>⏳ Points</button>
+          )}
           {data.shops && (
             <button className={`btn small ${shopOpen ? 'ember' : ''}`} onClick={() => setShopOpen(sid, !shopOpen)}>
               {shopOpen ? '🛍️ Close shops' : '🛍️ Open shops'}
@@ -246,9 +253,12 @@ export default function GMScreen() {
             {label}
             {id === 'table' && enc && <span className="gm-dot ember" aria-label="fight in progress" />}
             {id === 'day' && lesson && <span className="gm-dot gold" aria-label="class in progress" />}
+            {id === 'puzzles' && session.state?.puzzle && <span className="gm-dot violet" aria-label="puzzle on the TV" />}
           </button>
         ))}
       </nav>
+
+      {pointsOpen && <GMPoints sid={sid} session={session} chars={chars} onClose={() => setPointsOpen(false)} />}
 
       {quizState && data.quizzes?.[quizState.id] && (
         <GMQuiz sid={sid} quizState={quizState} data={data} chars={chars} answers={answers} />
@@ -259,6 +269,7 @@ export default function GMScreen() {
           {active === 'table' && <GMTable sid={sid} data={data} session={session} chars={chars} />}
           {active === 'day' && <GMClock sid={sid} data={data} session={session} clk={clockOf(session)} chars={chars} lessonResults={lessonResults} />}
           {active === 'quests' && <GMQuests sid={sid} data={data} session={session} chars={chars} />}
+          {active === 'puzzles' && <GMPuzzles sid={sid} data={data} session={session} chars={chars} />}
           {active === 'wheels' && <GMSpin sid={sid} data={data} session={session} chars={chars} />}
           {active === 'players' && (
             <section className="gm-players">

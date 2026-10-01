@@ -748,3 +748,97 @@ select.wide { width: 100%; background: var(--ink); color: var(--bone); border: 1
 .seg.four { grid-template-columns: repeat(2, 1fr); }
 .seg.four button { white-space: nowrap; font-size: .85rem; }
 @media (max-width: 1150px) { .gm-table { grid-template-columns: 1fr; } }
+
+/* ---------- Points panel ---------- */
+.gm-points { background: var(--panel); border: 2px solid var(--gold); border-radius: 14px; padding: 1rem 1.15rem; margin-bottom: 1rem; max-width: 640px; }
+.gm-points h2 { font-size: 1.4rem; margin: 0; }
+.wide-input { width: 100%; background: var(--ink); color: var(--bone); border: 1.5px solid var(--line); border-radius: 10px; padding: .55rem .75rem; font: 500 .95rem var(--body); margin: .5rem 0; }
+.points-list { list-style: none; padding: 0; margin: 0; }
+.points-list li { display: flex; align-items: center; gap: .7rem; padding: .45rem 0; border-bottom: 1px solid var(--line); }
+.points-name { display: flex; flex-direction: column; flex: 1; }
+.gm-dot.violet { background: var(--violet); }
+.secret-q { border-left-color: var(--slytherin); }
+.banner.puzzle { background: var(--violet); color: var(--ink); }
+
+/* ---------- Puzzles ---------- */
+.gm-puzzle { background: var(--panel); border-radius: 14px; padding: 1rem 1.15rem; }
+.gm-puzzle h2 { font-size: 1.4rem; margin: 0; }
+.puzzle-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: .7rem; }
+.solution { margin-top: .8rem; background: var(--ink); border-radius: 10px; padding: .6rem .8rem; }
+.solution summary { cursor: pointer; color: var(--gold); font-weight: 700; }
+.tv-puzzle { display: flex; flex-direction: column; align-items: center; gap: .6rem; text-align: center; max-width: 1200px; width: 100%; height: 100%; justify-content: center; }
+.tv-puzzle h2 { font-size: clamp(2rem, 3.5vw, 3rem); margin: 0; color: var(--bone); }
+.puzzle-intro { font-size: 1.2rem; color: var(--muted); max-width: 60ch; margin: 0; }
+.puzzle-note { margin: .4rem 0 0; color: var(--gold); font-weight: 700; }
+.puzzle-solved { font: 700 2.4rem var(--display); color: var(--teal); margin: 0; animation: toast-in .5s ease-out; }
+.tv-puzzle.solved .chess, .tv-puzzle.solved .torches, .tv-puzzle.solved .rings, .tv-puzzle.solved .cipher { box-shadow: 0 0 0 4px var(--teal), 0 0 40px rgb(79 179 169 / .5); }
+
+/* chess */
+.chess-wrap { display: flex; flex-direction: column; align-items: center; }
+.chess { display: grid; grid-template-columns: repeat(8, 1fr); width: min(62vh, 90vw); aspect-ratio: 1; border: 6px solid #3a2a1a; border-radius: 6px; }
+.gm-puzzle .chess { width: min(460px, 100%); }
+.sq { position: relative; border: 0; padding: 0; display: flex; align-items: center; justify-content: center; cursor: default; }
+.gm-puzzle .sq { cursor: pointer; }
+.sq.light { background: #d9c7a3; } .sq.dark { background: #8a6a45; }
+.sq.sel { box-shadow: inset 0 0 0 4px var(--gold); }
+.sq.last { box-shadow: inset 0 0 0 4px rgb(79 179 169 / .9); }
+.pc { font-size: min(6.2vh, 9vw); line-height: 1; }
+.gm-puzzle .pc { font-size: 2.6rem; }
+.pc.w { color: #fffaf0; text-shadow: 0 0 2px #000, 0 2px 3px #000; }
+.pc.b { color: #1a1426; text-shadow: 0 0 2px #fff8; }
+.pc-label { position: absolute; bottom: 1px; left: 50%; transform: translateX(-50%); font: 700 .7rem var(--body); background: var(--gold); color: var(--ink); padding: 0 .3rem; border-radius: 4px; white-space: nowrap; }
+.rank-l, .file-l { position: absolute; font-size: .65rem; font-weight: 700; color: #3a2a1acc; }
+.rank-l { top: 2px; left: 3px; } .file-l { bottom: 1px; right: 3px; }
+
+/* torches */
+.torches { display: grid; gap: .5rem; width: min(56vh, 90vw); }
+.gm-puzzle .torches { width: min(360px, 100%); }
+.torch { aspect-ratio: 1; border-radius: 12px; border: 2px solid var(--line); background: #1d1930; font-size: 2.4rem; filter: grayscale(.8) brightness(.7); }
+.gm-puzzle .torch { font-size: 1.6rem; cursor: pointer; }
+.torch.on { filter: none; background: #3a2a1a; border-color: var(--gold); box-shadow: 0 0 18px rgb(227 176 75 / .45); }
+
+/* rings */
+.rings { display: flex; flex-direction: column; align-items: center; gap: .6rem; }
+.ring-arrow { font-size: 2rem; color: var(--gold); line-height: 1; }
+.ring-row { display: flex; align-items: center; gap: .6rem; }
+.ring-strip { display: flex; gap: .4rem; background: #2c2547; border-radius: 999px; padding: .4rem 1rem; border: 3px solid #4a3f6e; }
+.ring-strip span { font-size: 2.6rem; width: 1.6em; text-align: center; opacity: .35; }
+.ring-strip span.centre { opacity: 1; transform: scale(1.2); }
+.gm-puzzle .ring-strip span { font-size: 1.6rem; }
+
+/* bottles */
+.bottles-wrap { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+.bottles { display: flex; align-items: flex-end; gap: 1.2rem; }
+.bottle { display: flex; flex-direction: column; align-items: center; gap: .3rem; background: none; border: 0; color: var(--bone); }
+.gm-puzzle .bottle:not(:disabled) { cursor: pointer; }
+.bottle-glass { display: block; background: linear-gradient(to top, var(--liquid) 70%, rgb(255 255 255 / .12) 70%); border: 3px solid rgb(236 228 211 / .7); }
+.bottle.tall .bottle-glass { width: 46px; height: 150px; border-radius: 12px 12px 8px 8px; }
+.bottle.small .bottle-glass { width: 46px; height: 82px; border-radius: 10px; }
+.bottle.round .bottle-glass { width: 92px; height: 92px; border-radius: 50%; }
+.bottle.tiny .bottle-glass { width: 30px; height: 46px; border-radius: 8px; }
+.bottle-num { font: 700 1.4rem var(--display); }
+.bottle-kind { font-size: .9rem; font-weight: 700; }
+.bottle.shown.poison .bottle-kind { color: #f08a78; } .bottle.shown.forward .bottle-kind { color: var(--gold); }
+.clues { text-align: left; font-size: 1.15rem; margin: 0; padding-left: 1.4rem; max-width: 60ch; }
+.clues li { margin: .2rem 0; }
+.gm-puzzle .bottle.tall .bottle-glass { height: 100px; } .gm-puzzle .bottle.round .bottle-glass { width: 64px; height: 64px; }
+.gm-puzzle .clues { font-size: .9rem; }
+
+/* cipher */
+.cipher { display: flex; flex-wrap: wrap; justify-content: center; gap: .8rem 1.6rem; max-width: 1100px; padding: 1rem; border-radius: 14px; background: #2b2318; border: 2px solid #5a4630; }
+.cipher-word { display: flex; gap: .2rem; }
+.cipher-ch { display: flex; flex-direction: column; align-items: center; min-width: 1.6em; }
+.rune { font-size: 2.4rem; color: #e8d9b8; line-height: 1.1; }
+.plain { font: 700 1.3rem var(--display); color: var(--gold); border-top: 2px solid #8a7656; min-width: 1.2em; text-align: center; min-height: 1.4em; }
+.gm-puzzle .rune { font-size: 1.5rem; } .gm-puzzle .plain { font-size: .95rem; }
+.cipher-keys { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: .6rem; }
+.chess { grid-template-rows: repeat(8, 1fr); }
+.sq { min-height: 0; min-width: 0; }
+.tv-puzzle .bottles { gap: 2rem; }
+.tv-puzzle .bottle.tall .bottle-glass { width: 64px; height: 220px; }
+.tv-puzzle .bottle.small .bottle-glass { width: 64px; height: 120px; }
+.tv-puzzle .bottle.round .bottle-glass { width: 130px; height: 130px; }
+.tv-puzzle .bottle.tiny .bottle-glass { width: 42px; height: 66px; }
+.tv-puzzle .bottle-num { font-size: 2rem; }
+.tv-puzzle .bottle-kind { font-size: 1.2rem; }
+.tv-puzzle .clues { font-size: 1.35rem; }

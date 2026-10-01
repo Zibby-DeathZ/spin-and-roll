@@ -26,6 +26,8 @@ sessions/{sessionId}          one game night (or a two-day campaign)
     encounter { order [{ kind: 'pc'|'mon', id, name, init }], turn, round, loc, monsters [] }
     forbiddenLearner                                       the one character who knows the Killing Curse
     lesson { id, key, cls, game, diff, uids [], lesson, lessonName }   the class minigame in progress
+    puzzle { id, solved, …type state }   the TV puzzle in progress
+           chess: board { square: { p, label } }, last · torches: lit [] · rings: pos [] · bottles: revealed [] · cipher: revealed []
 
   lessons/{lessonId}_{uid}    a student's minigame result: attempts (max 2), passed, score, announced
 

@@ -68,6 +68,8 @@ thornbury, quill, marlowe). They become map tokens and show on the picker and sh
   - [x] Hidden Killing Curse (one learner, secret wheel, expulsion)
   - [x] Class minigames: 7 games, 2 attempts, harder as the week goes on, pass to learn
   - [x] Characters on the map (party can split up), chests with lock rolls, items to pick up, quest log
+  - [x] Staff in their classrooms, quick house points, secret quests, five TV puzzles
+See NOTES.md for a full summary and ideas.
 - [x] 7. Win/loss history and trophies
 
 See `DATA_MODEL.md` for how the database is laid out.

@@ -5,6 +5,7 @@ import {
 import { useEffect, useState } from 'react';
 import { db } from '../firebase';
 import { clockInfo, lessonName, logEvent, taughtKey, teachLesson } from './game';
+import { movePlayers, professorTo } from './world';
 
 export const MAX_ATTEMPTS = 2;
 const sessionRef = (sid) => doc(db, 'sessions', sid);
@@ -12,7 +13,7 @@ const resultRef = (sid, lessonId, uid) => doc(db, 'sessions', sid, 'lessons', `$
 
 export const difficultyFor = (day) => (day <= 2 ? 1 : day <= 5 ? 2 : 3);
 
-export async function startLesson(sid, data, clk, uids) {
+export async function startLesson(sid, data, clk, uids, session, chars) {
   const info = clockInfo(data, clk);
   const slot = info.slot;
   const id = `${clk.day}-${clk.block}-${Date.now().toString(36)}`;
@@ -22,6 +23,10 @@ export async function startLesson(sid, data, clk, uids) {
       diff: difficultyFor(clk.day), uids, lesson: slot.lesson, lessonName: lessonName(data, slot.lesson),
     },
   });
+  if (info.cls.room && session && chars) {
+    if (info.cls.prof) await professorTo(sid, data, session, info.cls.prof, info.cls.room);
+    await movePlayers(sid, data, info.cls.room, uids, chars, true);
+  }
   await logEvent(sid, { type: 'lesson_start', payload: { cls: info.cls.name, prof: info.cls.professor, lesson: lessonName(data, slot.lesson) } });
 }
 
