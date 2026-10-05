@@ -7,6 +7,8 @@ import { getCampaign } from '../campaigns';
 import { joinSession, OPEN, useQueryList } from '../lib/sessions';
 import TopBar from '../components/TopBar';
 import StatusPill from '../components/StatusPill';
+import Portrait from '../components/Portrait';
+import { useHeroes } from '../lib/heroes';
 
 export default function PlayerDashboard() {
   const { user, profile } = useAuth();
@@ -22,6 +24,7 @@ export default function PlayerDashboard() {
   const history = useQueryList(collection(db, 'users', user.uid, 'history'), [user.uid]) ?? [];
   const trophies = useQueryList(collection(db, 'users', user.uid, 'trophies'), [user.uid]) ?? [];
   const live = (mine ?? []).filter((s) => OPEN.includes(s.status));
+  const heroes = useHeroes(user.uid);
   const wins = history.filter((h) => h.result === 'won').length;
 
   const join = async (e) => {
@@ -81,6 +84,29 @@ export default function PlayerDashboard() {
             </ul>
           )}
         </section>
+
+        {heroes.length > 0 && (
+          <section>
+            <h2>Your characters</h2>
+            <ul className="heroes">
+              {heroes.map((h) => (
+                <li key={h.id} className="hero-card">
+                  <Portrait family={h.family} name={h.name} className="hero-portrait" />
+                  <div>
+                    <span className="tag">{h.seriesName}, Year {h.year} complete</span>
+                    <strong className="hero-name">{h.name}</strong>
+                    <span className="muted small">{h.house}, level {h.level}, {h.xp} XP</span>
+                    <span className="muted small">
+                      {(h.spells ?? []).length} spells, {(h.inventory ?? []).reduce((n, i) => n + (i.qty ?? 1), 0)} items, {h.gold} Galleons
+                      {h.equipment?.wand ? `. ${h.equipment.wand.name}` : ''}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <p className="muted small">Your character carries on into the next year: same level, spells and belongings.</p>
+          </section>
+        )}
 
         <section>
           <h2>Trophy cabinet</h2>

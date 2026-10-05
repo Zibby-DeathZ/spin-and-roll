@@ -7,7 +7,9 @@ Wide 16:9 images look best (e.g. 1920×1080). Without an image, a plain backdrop
 Location ids for The Hollow Heir:
 
 home, gringotts, diagon-alley, ollivanders, platform, express,
-great-hall, entrance-hall, grand-staircase, common-room, library, restricted-section,
+great-hall, entrance-hall, grand-staircase, kitchens,
+gryffindor-common, ravenclaw-common, hufflepuff-common, slytherin-common,
+charms-classroom, transfiguration-classroom, library, restricted-section,
 dungeons, defence-classroom, trophy-room, owlery, astronomy-tower, hospital-wing,
 room-of-requirement, undercroft, courtyard, greenhouses, quidditch-pitch, black-lake,
 hagrids-hut, forbidden-forest, hogsmeade, three-broomsticks, shrieking-shack

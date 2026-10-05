@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { collection, query, where } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuth } from '../auth/AuthProvider';
-import { campaigns, getCampaign } from '../campaigns';
+import { campaigns, getCampaign, getCampaignData } from '../campaigns';
 import {
   byNewest, createSession, endSession, OPEN, startSession, useProfiles, useQueryList,
 } from '../lib/sessions';
@@ -41,7 +41,7 @@ function SessionRow({ s }) {
           <Link className="btn" to={`/session/${s.id}/gm`} target="_blank">Open GM screen</Link>
           <Link className="btn" to={`/session/${s.id}/tv`} target="_blank">Open TV screen</Link>
           {s.status === 'lobby' && (
-            <button className="btn gold" disabled={!names.length} onClick={() => startSession(s.id)}>
+            <button className="btn gold" disabled={!names.length} onClick={() => startSession(s.id, !!getCampaignData(s.campaignId).intro)}>
               Start game
             </button>
           )}

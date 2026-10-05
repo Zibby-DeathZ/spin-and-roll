@@ -22,6 +22,8 @@ service cloud.firestore {
 
       // Campaign results and trophies are only ever written by the DM.
       match /history/{sid}  { allow read: if signedIn(); allow write: if isDM(); }
+      // Saved characters that carry into the next year of a series.
+      match /heroes/{series} { allow read: if signedIn(); allow write: if isDM(); }
       match /trophies/{sid} { allow read: if signedIn(); allow write: if isDM(); }
     }
 
@@ -61,7 +63,7 @@ service cloud.firestore {
         allow read: if signedIn();
         allow create: if inSession(sid)
           && request.resource.data.uid == request.auth.uid
-          && request.resource.data.keys().hasOnly(['uid', 'firstName', 'createdAt'])
+          && request.resource.data.keys().hasOnly(['uid', 'firstName', 'carry', 'createdAt'])
           && request.resource.data.firstName is string
           && request.resource.data.firstName.size() > 0
           && request.resource.data.firstName.size() <= 20;
@@ -96,6 +98,16 @@ service cloud.firestore {
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['attempts', 'passed', 'score', 'updatedAt'])
           && request.resource.data.attempts == resource.data.attempts + 1
           && request.resource.data.attempts <= 2
+        );
+      }
+
+      // Owl Post: private letters. Only the recipient (and the DM) can read one.
+      match /owls/{oid} {
+        allow read: if isDM() || (signedIn() && resource.data.toUid == request.auth.uid);
+        allow create, delete: if isDM();
+        allow update: if isDM() || (
+          signedIn() && resource.data.toUid == request.auth.uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read'])
         );
       }
 

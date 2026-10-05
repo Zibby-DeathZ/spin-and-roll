@@ -3,6 +3,7 @@
 ```
 users/{uid}
   displayName, photoURL, role: 'player' | 'dm', createdAt
+  heroes/{series}       a saved character that carries into the next year (level, spells, bag…)
   history/{sessionId}    campaignId, campaignTitle, result: 'won'|'lost', endedAt
   trophies/{sessionId}   campaignId, title, icon, awardedAt
 
@@ -45,6 +46,8 @@ sessions/{sessionId}          one game night (or a two-day campaign)
   events/{eventId}            the action feed; GM screen + TV animate each new one
     type ('trade' | 'item_used' | 'spell' | 'roll' | 'wheel' | 'damage' | ...)
     actorUid, targetUid, payload {}, createdAt
+
+  owls/{owlId}                private letter: toUid, from, text, read (only the recipient can read it)
 
   trades/{tradeId}
     fromUid, toUid, offer [], request [], status: 'pending'|'accepted'|'declined'

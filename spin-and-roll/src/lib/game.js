@@ -5,7 +5,7 @@ import {
 import { useEffect, useState } from 'react';
 import { db } from '../firebase';
 import { applyAttack } from './combat';
-import { applyOpenChest, applyPickup } from './world';
+import { applyOpenChest, applyPickup, sendToDetention } from './world';
 
 // ---------- Rules of the game ----------
 
@@ -13,9 +13,36 @@ export const STATS = [
   ['str', 'Strength'], ['dex', 'Dexterity'], ['con', 'Constitution'],
   ['int', 'Intelligence'], ['wis', 'Wisdom'], ['cha', 'Charisma'],
 ];
-export const XP_LEVELS = [0, 100, 250, 450, 700]; // levels 1–5
+// XP needed for each level, all the way to level 35 (Year 7).
+// Level n → n+1 costs 50 × (n + 1): 100, 150, 200… so Year 1 is 0, 100, 250, 450, 700.
+export const XP_LEVELS = (() => {
+  const t = [0];
+  for (let n = 1; n < 35; n++) t.push(t[n - 1] + 50 * (n + 1));
+  return t;
+})();
 export const levelFor = (xp = 0) => XP_LEVELS.filter((t) => xp >= t).length;
-export const nextLevelAt = (xp = 0) => XP_LEVELS.find((t) => t > xp) ?? null;
+export const xpForLevel = (lvl) => XP_LEVELS[Math.max(0, lvl - 1)] ?? 0;
+// Highest XP allowed under a level cap (Year 1 caps at level 5, so 999 XP).
+export const xpCap = (cap) => (cap && XP_LEVELS[cap] ? XP_LEVELS[cap] - 1 : Infinity);
+export const nextLevelAt = (xp = 0, cap = Infinity) =>
+  (levelFor(xp) >= cap ? null : XP_LEVELS.find((t) => t > xp) ?? null);
+export const LEVEL_HP = 4;
+export const LEVEL_MANA = 2;
+
+// Applies XP with the year's cap and the level-up bonuses. Returns the fields to update.
+export function gainXp(c, amount) {
+  const before = c.xp ?? 0;
+  const after = Math.max(0, Math.min(xpCap(c.levelCap), before + amount));
+  const gained = levelFor(after) - levelFor(before);
+  const upd = { xp: after };
+  if (gained > 0) {
+    upd.maxHp = c.maxHp + LEVEL_HP * gained;
+    upd.hp = Math.min(upd.maxHp, c.hp + LEVEL_HP * gained);
+    upd.maxMana = c.maxMana + LEVEL_MANA * gained;
+    upd.mana = Math.min(upd.maxMana, c.mana + LEVEL_MANA * gained);
+  }
+  return { upd, before, after };
+}
 export const mod = (score) => Math.floor((score - 10) / 2);
 export const fmtMod = (m) => (m >= 0 ? `+${m}` : `${m}`);
 
@@ -150,6 +177,12 @@ export async function adjust(sid, uid, field, delta) {
     const snap = await tx.get(charRef(sid, uid));
     const c = snap.data();
     before = c[field] ?? 0;
+    if (field === 'xp') {
+      const g = gainXp(c, delta);
+      after = g.after;
+      tx.update(charRef(sid, uid), g.upd);
+      return;
+    }
     const max = field === 'hp' ? c.maxHp : field === 'mana' ? c.maxMana : Infinity;
     after = clamp(before + delta, 0, max);
     tx.update(charRef(sid, uid), { [field]: after });
@@ -215,8 +248,8 @@ export async function setShopOpen(sid, open) {
 
 // Claiming a family locks it: the doc id is the family id, so only one
 // claim can exist. The GM screen then builds the character.
-export const claimFamily = (sid, uid, familyId, firstName) =>
-  setDoc(doc(db, 'sessions', sid, 'claims', familyId), { uid, firstName, createdAt: serverTimestamp() });
+export const claimFamily = (sid, uid, familyId, firstName, carry = false) =>
+  setDoc(doc(db, 'sessions', sid, 'claims', familyId), { uid, firstName, carry, createdAt: serverTimestamp() });
 
 export const useAbility = (sid, uid, ability) =>
   logEvent(sid, { type: 'ability_used', actorUid: uid, processed: false, payload: { name: ability.name, icon: ability.icon } });
@@ -331,8 +364,9 @@ export async function teachLesson(sid, data, uid, lesson) {
     const c = snap.data();
     if (!c) return;
     name = c.firstName ?? c.name;
-    before = c.xp; after = c.xp + xpGain;
-    const upd = { xp: after };
+    const g = gainXp(c, xpGain);
+    before = g.before; after = g.after;
+    const upd = { ...g.upd };
     if (lesson.type === 'spell' && !(c.spells ?? []).some((x) => x.id === lesson.spell)) {
       upd.spells = [...(c.spells ?? []), { id: lesson.spell, ...data.spells[lesson.spell] }];
     }
@@ -401,6 +435,7 @@ export async function applySpin(sid, data, spin) {
   const fx = seg.effect ?? {};
   if (!spin.uid) return;
   for (const f of ['hp', 'mana', 'xp', 'gold']) if (fx[f]) await adjust(sid, spin.uid, f, fx[f]);
+  if (fx.detention) await sendToDetention(sid, data, spin.uid);
   if (fx.expel) {
     await updateDoc(charRef(sid, spin.uid), { expelled: true });
     await logEvent(sid, { type: 'expelled', targetUid: spin.uid });
@@ -410,6 +445,30 @@ export async function applySpin(sid, data, spin) {
     const c = (await getDocs(query(col(sid, 'characters')))).docs.find((d) => d.id === spin.uid)?.data();
     if (c?.house) await awardPoints(sid, spin.uid, c.house, fx.points);
   }
+}
+
+// ---------- GM spell teaching ----------
+
+export async function teachSpell(sid, uid, spell, announce = false) {
+  let name = null;
+  await runTransaction(db, async (tx) => {
+    const snap = await tx.get(charRef(sid, uid));
+    const c = snap.data();
+    if (!c) return;
+    const spells = (c.spells ?? []).filter((x) => x.id !== spell.id);
+    tx.update(snap.ref, { spells: [...spells, spell] });
+    name = c.firstName ?? c.name;
+  });
+  if (announce && name) await logEvent(sid, { type: 'spell_learned', targetUid: uid, payload: { name: spell.name, icon: spell.icon, form: spell.form ?? null } });
+}
+
+export async function forgetSpell(sid, uid, spellId) {
+  await runTransaction(db, async (tx) => {
+    const snap = await tx.get(charRef(sid, uid));
+    const c = snap.data();
+    if (!c) return;
+    tx.update(snap.ref, { spells: (c.spells ?? []).filter((x) => x.id !== spellId) });
+  });
 }
 
 // ---------- Ceremonies: Sorting Hat and Ollivanders ----------
@@ -540,19 +599,31 @@ async function applyItemUse(sid, eid, data) {
 
 function buildCharacter(data, fam, firstName) {
   const d = structuredClone(data.defaults);
-  const maxHp = d.maxHp + mod(fam.stats.con) * 2;
-  const maxMana = d.maxMana + mod(fam.stats.int) * 2;
+  const floor = data.levelFloor ?? 1; // later years start new students at a higher level
+  const maxHp = d.maxHp + mod(fam.stats.con) * 2 + LEVEL_HP * (floor - 1);
+  const maxMana = d.maxMana + mod(fam.stats.int) * 2 + LEVEL_MANA * (floor - 1);
   return {
     ...d,
     stats: { ...fam.stats },
     hp: maxHp, maxHp, mana: maxMana, maxMana,
     family: fam.id, familyName: fam.name, firstName,
     name: `${firstName} ${fam.name}`,
+    xp: xpForLevel(data.levelFloor ?? 1), levelCap: data.levelCap ?? null,
     vaultOpened: false,
     spells: (fam.startSpells ?? []).filter((id) => data.spells?.[id]).map((id) => ({ id, ...data.spells[id] })),
     perks: [],
     inventory: (fam.startItems ?? []).filter((id) => data.items[id]).map((id) => ({ id, ...data.items[id], qty: 1 })),
     createdAt: serverTimestamp(),
+  };
+}
+
+function continuedCharacter(data, hero) {
+  const d = structuredClone(data.defaults);
+  const floorXp = xpForLevel(data.levelFloor ?? 1);
+  return {
+    ...d, ...hero,
+    xp: Math.max(hero.xp ?? 0, floorXp), levelCap: data.levelCap ?? null,
+    hp: hero.maxHp, mana: hero.maxMana, vaultOpened: true, continued: true, createdAt: serverTimestamp(),
   };
 }
 
@@ -563,11 +634,15 @@ async function processClaim(sid, familyId, data) {
   await runTransaction(db, async (tx) => {
     const claim = await tx.get(cRef);
     if (!claim.exists() || claim.data().status) return;
-    const { uid, firstName } = claim.data();
+    const { uid, firstName, carry } = claim.data();
     const existing = await tx.get(charRef(sid, uid));
     const fam = data.families?.find((f) => f.id === familyId);
     if (existing.exists() || !fam) { reject = true; return; }
-    tx.set(charRef(sid, uid), buildCharacter(data, fam, String(firstName).slice(0, 20)));
+    const heroSnap = carry && data.series ? await tx.get(doc(db, 'users', uid, 'heroes', data.series)) : null;
+    const hero = heroSnap?.exists() ? heroSnap.data() : null;
+    tx.set(charRef(sid, uid), hero && hero.family === familyId
+      ? continuedCharacter(data, hero)
+      : buildCharacter(data, fam, String(firstName).slice(0, 20)));
     tx.update(cRef, { status: 'ok' });
     created = uid;
   });
@@ -701,6 +776,7 @@ export function describe(e, nameOf) {
     case 'lesson_start': return { icon: '🔔', text: `Class begins: ${e.payload.cls} with ${e.payload.prof}. Today: ${e.payload.lesson}`, tone: 'gold', big: true };
     case 'lesson_passed': return { icon: '🎓', text: `${target} mastered ${e.payload.lesson}!`, tone: 'teal', big: true };
     case 'lesson_failed': return { icon: '😬', text: `${target} couldn’t get ${e.payload.lesson} right today`, tone: 'ember' };
+    case 'spell_learned': return { icon: e.payload.icon, text: `${target} knows ${e.payload.name}${e.payload.form ? ` (a ${e.payload.form})` : ''}!`, tone: 'violet', big: true };
     case 'wheel': return { icon: e.payload.icon, text: `${e.targetUid ? `${target}: ` : ''}${e.payload.text}`, tone: 'gold' };
     case 'time_turner': return { icon: '⌛', text: 'The Time-Turner spins… It’s Day 1 again. Then it cracks.', tone: 'violet', big: true };
     case 'class_held': return { icon: '🎓', text: `${e.payload.names.join(', ')} learned ${e.payload.lesson} in ${e.payload.cls}`, tone: 'teal' };
@@ -722,9 +798,11 @@ export function describe(e, nameOf) {
     case 'monster_attack': {
       const p = e.payload;
       if (p.disarmed) return { icon: p.icon, text: `${p.name} reaches for its weapon… it’s been disarmed! Miss.`, tone: 'muted', big: true };
+      const mirror = p.mirror ? ` casts ${p.mirror} back at` : ' →';
+      const ate = p.swallowed ? ` It swallows ${target}’s ${p.swallowed}${p.heal ? ` and heals ${p.heal}` : ''}, and grows!` : '';
       return {
         icon: p.icon,
-        text: `${p.name} → ${target}: ${p.total} vs Defence ${p.defence}. ${p.hit ? `Hit for ${p.dmg}!` : 'Miss.'}${p.ko ? ` ${target} is knocked out!` : ''}`,
+        text: `${p.name}${mirror} ${target}: ${p.total} vs Defence ${p.defence}. ${p.hit ? `Hit for ${p.dmg}!` : 'Miss.'}${ate}${p.ko ? ` ${target} is knocked out!` : ''}`,
         tone: p.hit ? 'ember' : 'muted', big: true,
       };
     }
@@ -733,9 +811,13 @@ export function describe(e, nameOf) {
       const detail = `${p.rolls.join(p.mode === 'normal' ? ' + ' : ' / ')}${p.mod ? ` ${p.mod > 0 ? '+' : '−'} ${Math.abs(p.mod)}` : ''}`;
       return { icon: '🎲', text: `${actor} rolled ${p.label}: ${p.total} (${detail})`, tone: 'gold' };
     }
+    case 'hazard': return { icon: e.payload.icon, text: `${e.payload.action}! ${e.payload.desc}`, tone: 'ember', big: true };
+    case 'detention': return { icon: '🔦', text: `${target} has detention with ${e.payload.npc} in the ${e.payload.place}`, tone: 'ember', big: true };
     case 'moved': return { icon: e.payload.icon, text: `${e.payload.names.join(', ')} → ${e.payload.name}`, tone: 'gold' };
+    case 'owl': return { icon: '🦉', text: `An owl swoops in with a sealed letter for ${target}…`, tone: 'violet', big: true };
+    case 'mimic': return { icon: e.payload.icon, text: `IT’S A MIMIC! ${e.payload.name}!`, tone: 'ember', big: true };
     case 'open_chest': {
-      if (e.failed) return null;
+      if (e.failed || e.payload?.mimic) return null;
       const p = e.payload;
       if (p.ok) {
         const loot = [...(p.gold ? [`${p.gold} Galleons`] : []), ...p.items].join(', ');

@@ -13,6 +13,11 @@ import DiceTab from './DiceTab';
 import HereTab from './HereTab';
 import { locOf } from '../lib/world';
 import Portrait from '../components/Portrait';
+import MainEventLock from '../components/MainEventLock';
+import JumpScare from '../components/JumpScare';
+import { OwlArchive, OwlArrival } from '../components/OwlPost';
+import { useMyOwls } from '../lib/owls';
+import { mainEvent } from '../lib/intro';
 import { LessonScreen } from '../minigames';
 import { useLessonResults } from '../lib/lessons';
 import { HouseBoard, PlayerQuiz } from '../components/Ceremony';
@@ -44,9 +49,9 @@ function AbilityCard({ sid, c, ability, dawn }) {
   );
 }
 
-function Sheet({ sid, c, currency, data, points, clk, loc, discovered }) {
+function Sheet({ sid, c, currency, data, points, clk, loc, discovered, owls = [] }) {
   const lvl = levelFor(c.xp);
-  const next = nextLevelAt(c.xp);
+  const next = nextLevelAt(c.xp, c.levelCap ?? Infinity);
   const b = bonuses(c);
   const fam = data.families?.find((f) => f.id === c.family);
   return (
@@ -60,7 +65,7 @@ function Sheet({ sid, c, currency, data, points, clk, loc, discovered }) {
       </div>
       <Bar label="HP" value={c.hp} max={c.maxHp} tone="ember" />
       <Bar label="Mana" value={c.mana} max={c.maxMana} tone="violet" />
-      <Bar label={next ? `XP to level ${lvl + 1}` : 'XP (max level)'} value={c.xp} max={next ?? c.xp} tone="gold" />
+      <Bar label={next ? `XP to level ${lvl + 1}` : `XP (top level for this year)`} value={c.xp} max={next ?? c.xp} tone="gold" />
       <div className="vitals">
         <span><b>{defenceOf(c)}</b> Defence</span>
         {b.spellPower > 0 && <span><b>+{b.spellPower}</b> Spell damage</span>}
@@ -101,6 +106,7 @@ function Sheet({ sid, c, currency, data, points, clk, loc, discovered }) {
         </section>
       )}
       {fam?.ability && <AbilityCard sid={sid} c={c} ability={fam.ability} dawn={clk.dawn} />}
+      <OwlArchive owls={owls} />
       {fam && (
         <details className="secret">
           <summary>Family secret (only you can see this)</summary>
@@ -249,6 +255,8 @@ export default function PlayerScreen() {
   const answers = useAnswers(sid);
   const lessonResults = useLessonResults(sid, session?.state?.lesson?.id);
   const [leftLesson, setLeftLesson] = useState(null);
+  const owls = useMyOwls(sid, user.uid);
+  const unread = owls.filter((o) => !o.read).slice(-1)[0];
   const [tab, setTab] = useState('sheet');
   const [composer, setComposer] = useState(null);
 
@@ -268,7 +276,9 @@ export default function PlayerScreen() {
   const me = chars[user.uid];
   const shopOpen = !!session.state?.shopOpen;
 
+  const locked = mainEvent(session);
   if (!me && data.families && session.status !== 'won' && session.status !== 'lost') {
+    if (locked) return <MainEventLock />;
     return <FamilyPicker sid={sid} uid={user.uid} data={data} claims={claims} title={campaign?.title} />;
   }
 
@@ -311,9 +321,9 @@ export default function PlayerScreen() {
 
   return (
     <div className="phone">
-      {session.state?.puzzle && !session.state.puzzle.solved && (
-        <div className="banner puzzle">🧩 Puzzle on the TV! Work it out together and tell the DM your moves.</div>
-      )}
+      {locked && <MainEventLock />}
+      <JumpScare scare={session.state?.scare} phone />
+      {unread && <OwlArrival sid={sid} owl={unread} />}
       {me.expelled && <div className="banner bad">📜 You have been expelled from Hogwarts.</div>}
       {enc && (
         <div className={`banner ${turnOf?.id === me.uid ? 'mine' : ''}`}>
@@ -323,7 +333,7 @@ export default function PlayerScreen() {
       <main className="phone-body">
         {tab === 'sheet' && <Sheet sid={sid} c={me} currency={currency} data={data} points={session.state?.housePoints ?? {}} clk={clockOf(session)}
           loc={data.locations?.find((l) => l.id === locOf(session, user.uid))}
-          discovered={session.state?.map?.discovered ?? []} />}
+          discovered={session.state?.map?.discovered ?? []} owls={owls} />}
         {tab === 'here' && <HereTab sid={sid} c={me} data={data} session={session} chars={chars} />}
         {tab === 'dice' && <DiceTab sid={sid} c={me} data={data} session={session} chars={chars} />}
         {tab === 'shop' && <Shop sid={sid} c={me} data={data} open={shopOpen} />}

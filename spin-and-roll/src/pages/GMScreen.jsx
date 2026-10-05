@@ -18,6 +18,16 @@ import Portrait from '../components/Portrait';
 import GMQuests from '../components/GMQuests';
 import GMPoints from '../components/GMPoints';
 import { GMPuzzles } from '../components/Puzzles';
+import { GMShows } from '../components/Shows';
+import GMSpells from '../components/GMSpells';
+import { GMOwlPost } from '../components/OwlPost';
+import GMMedia from '../components/GMMedia';
+import { saveHeroes } from '../lib/heroes';
+import { sendOwl } from '../lib/owls';
+import { sendToDetention } from '../lib/world';
+import { GMIntro, GMMusic } from '../components/GMIntro';
+import { introActive, setLock, setMusicState, startIntro } from '../lib/intro';
+import { useClaims } from '../lib/game';
 import { useLessonEngine } from '../lib/lessons';
 import { setExpelled, teachForbidden } from '../lib/combat';
 
@@ -87,7 +97,7 @@ function CharacterControls({ sid, c, data, playerName, quizBusy, forbiddenLearne
         <div>
           <Portrait family={c.family} name={c.name} className="card-portrait" />
           <strong className="gm-name">{c.name}</strong>
-          <span className="muted small"> {playerName}, level {levelFor(c.xp)}, Defence {defenceOf(c)}</span>
+          <span className="muted small"> {playerName}, level {levelFor(c.xp)}{c.levelCap && levelFor(c.xp) >= c.levelCap ? ' (max)' : ''}, Defence {defenceOf(c)}</span>
           {c.hp <= 0 && <span className="tag tag-warn">Knocked out</span>}
           {c.expelled && <span className="tag tag-warn">Expelled</span>}
           {forbiddenLearner === c.uid && <span className="tag tag-green">Knows the Killing Curse</span>}
@@ -126,6 +136,11 @@ function CharacterControls({ sid, c, data, playerName, quizBusy, forbiddenLearne
           </span>
         </div>
       )}
+      {data.detention && (
+        <button className="btn small ghost" onClick={() => confirm(`Give ${c.name} detention?`) && sendToDetention(sid, data, c.uid)}>
+          🔦 Detention
+        </button>
+      )}
       {data.families && !c.vaultOpened && (
         <button className="btn small gold vault-btn" onClick={() => openVault(sid, c.uid, data)}>
           🏦 Open the {c.familyName} vault
@@ -152,7 +167,10 @@ function CharacterControls({ sid, c, data, playerName, quizBusy, forbiddenLearne
         <div className="actions secret-actions">
           {!forbiddenLearner && (
             <button className="btn small" onClick={() => {
-              if (confirm(`Teach ${c.name} the Killing Curse? Only one character can ever learn it. Nothing is shown on the TV.`)) teachForbidden(sid, data, c.uid);
+              if (confirm(`Teach ${c.name} the Killing Curse? Only one character can ever learn it. They get a secret owl from the painting; nothing else shows on the TV.`)) {
+                teachForbidden(sid, data, c.uid).then(() => sendOwl(sid, c.uid, 'The covered painting',
+                  'You have it now: the curse that cannot be blocked. Two words. Use it wisely, and never where anyone can see. I will be watching through your eyes.'));
+              }
             }}>💚 Teach the Killing Curse (secret)</button>
           )}
           <button className="btn small ghost" onClick={() => setExpelled(sid, c.uid, !c.expelled)}>
@@ -196,7 +214,7 @@ function Feed({ sid, nameOf }) {
 
 const TABS = [
   ['table', '🗺️ Table'], ['day', '🕰️ Day & class'], ['quests', '📜 Quests'], ['puzzles', '🧩 Puzzles'],
-  ['players', '🧑‍🎓 Players'], ['wheels', '🎡 Wheels'],
+  ['shows', '🎬 TV shows'], ['players', '🧑‍🎓 Players'], ['owls', '🦉 Owl Post'], ['spells', '✨ Spells'], ['wheels', '🎡 Wheels'], ['media', '🎞️ Media'],
 ];
 
 export default function GMScreen() {
@@ -205,6 +223,7 @@ export default function GMScreen() {
   const chars = useCharacters(sid);
   const profiles = useProfiles(session?.playerUids ?? []);
   const answers = useAnswers(sid);
+  const claims = useClaims(sid);
   const data = session ? getCampaignData(session.campaignId) : null;
   useGameEngine(sid, data); // carries out claims, purchases, trades and item uses while open
   const lessonResults = useLessonEngine(sid, data, session?.state?.lesson);
@@ -221,7 +240,7 @@ export default function GMScreen() {
   const quizState = session.state?.quiz;
   const enc = session.state?.encounter;
   const lesson = session.state?.lesson;
-  const tabs = TABS.filter(([id]) => (id === 'day' ? data.clock : id === 'quests' ? data.quests : id === 'wheels' ? data.wheels : id === 'table' ? data.locations : id === 'puzzles' ? data.puzzles : true));
+  const tabs = TABS.filter(([id]) => (id === 'day' ? data.clock : id === 'quests' ? data.quests : id === 'wheels' ? data.wheels : id === 'table' ? data.locations : id === 'puzzles' ? data.puzzles : id === 'shows' ? data.suspects : id === 'spells' ? data.spells : true));
   const active = tabs.some(([id]) => id === tab) ? tab : tabs[0][0];
 
   return (
@@ -233,6 +252,11 @@ export default function GMScreen() {
         </div>
         <div className="gm-top-right">
           {data.quizzes && <HouseBoard points={session.state?.housePoints} compact />}
+          {data.music && <GMMusic sid={sid} data={data} session={session} setMusicState={setMusicState} />}
+          <button className={`btn small ${session.state?.lock ? 'ember' : ''}`} onClick={() => setLock(sid, !session.state?.lock)}
+            title="Lock every phone so everyone watches the TV">
+            🎬 {session.state?.lock ? 'End main event' : 'Main event'}
+          </button>
           {data.quizzes && (
             <button className="btn small gold" onClick={() => setPointsOpen(!pointsOpen)} aria-expanded={pointsOpen}>⏳ Points</button>
           )}
@@ -258,6 +282,12 @@ export default function GMScreen() {
         ))}
       </nav>
 
+      {data.intro && introActive(session) && <GMIntro sid={sid} data={data} session={session} claims={claims} />}
+      {data.intro && !session.state?.intro && session.status === 'active' && !Object.keys(chars).length && (
+        <section className="gm-intro">
+          <p>The opening cutscene hasn’t played. <button className="btn small gold" onClick={() => startIntro(sid)}>🎬 Play the intro</button></p>
+        </section>
+      )}
       {pointsOpen && <GMPoints sid={sid} session={session} chars={chars} onClose={() => setPointsOpen(false)} />}
 
       {quizState && data.quizzes?.[quizState.id] && (
@@ -269,6 +299,10 @@ export default function GMScreen() {
           {active === 'table' && <GMTable sid={sid} data={data} session={session} chars={chars} />}
           {active === 'day' && <GMClock sid={sid} data={data} session={session} clk={clockOf(session)} chars={chars} lessonResults={lessonResults} />}
           {active === 'quests' && <GMQuests sid={sid} data={data} session={session} chars={chars} />}
+          {active === 'media' && <GMMedia data={data} session={session} />}
+          {active === 'owls' && <GMOwlPost sid={sid} session={session} chars={chars} />}
+          {active === 'spells' && <GMSpells sid={sid} data={data} session={session} chars={chars} />}
+          {active === 'shows' && <GMShows sid={sid} data={data} session={session} chars={chars} />}
           {active === 'puzzles' && <GMPuzzles sid={sid} data={data} session={session} chars={chars} />}
           {active === 'wheels' && <GMSpin sid={sid} data={data} session={session} chars={chars} />}
           {active === 'players' && (
@@ -277,6 +311,14 @@ export default function GMScreen() {
                 ? <CharacterControls key={u} sid={sid} c={chars[u]} data={data} playerName={profiles[u]?.displayName} quizBusy={!!quizState} forbiddenLearner={session.state?.forbiddenLearner} />
                 : <NewCharacter key={u} sid={sid} uid={u} profile={profiles[u]} data={data} />)}
               {!session.playerUids.length && <p className="muted">Players appear here once they join with the code.</p>}
+              {data.series && Object.keys(chars).length > 0 && (
+                <p className="muted small save-row">
+                  Characters are saved to player profiles when you record a win or loss.{' '}
+                  <button className="btn small" onClick={async () => { const n = await saveHeroes(sid, session, data); alert(`Saved ${n} characters to their profiles.`); }}>
+                    💾 Save characters now
+                  </button>
+                </p>
+              )}
             </section>
           )}
         </main>

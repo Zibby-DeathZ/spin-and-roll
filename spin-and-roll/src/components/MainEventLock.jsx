@@ -1,0 +1,11 @@
+// Covers the phone and swallows taps while everyone should be watching the TV.
+export default function MainEventLock() {
+  return (
+    <div className="main-event" role="alertdialog" aria-label="Main event: watch the TV"
+      onClickCapture={(e) => e.stopPropagation()} onTouchStart={(e) => e.stopPropagation()}>
+      <span className="me-eye" aria-hidden="true">📺</span>
+      <p className="me-title">Main Event</p>
+      <p className="me-sub">Pay attention to the screen</p>
+    </div>
+  );
+}

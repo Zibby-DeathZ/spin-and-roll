@@ -68,7 +68,12 @@ thornbury, quill, marlowe). They become map tokens and show on the picker and sh
   - [x] Hidden Killing Curse (one learner, secret wheel, expulsion)
   - [x] Class minigames: 7 games, 2 attempts, harder as the week goes on, pass to learn
   - [x] Characters on the map (party can split up), chests with lock rolls, items to pick up, quest log
-  - [x] Staff in their classrooms, quick house points, secret quests, five TV puzzles
+  - [x] Staff in their classrooms, quick house points, secret quests, nine TV puzzles
+  - [x] Four common rooms, suspect board, detention, hazards, awards, House Cup
+  - [x] Opening cutscene, sound effects, music, main event phone lock
+  - [x] Spell library and GM Spells tab, mimics with jump scares
+  - [x] Owl Post, yearly levels, characters saved to profiles for the next year
+  - [x] Media tab for testing, custom intro and jump scare videos
 See NOTES.md for a full summary and ideas.
 - [x] 7. Win/loss history and trophies
 

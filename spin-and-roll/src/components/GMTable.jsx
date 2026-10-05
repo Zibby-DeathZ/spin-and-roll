@@ -4,9 +4,10 @@ import { defenceOf } from '../lib/game';
 import {
   addToken, endFight, monsterAttack, moveToken, nextTurn, placeToken, removeToken, setTokenHp, startFight,
 } from '../lib/combat';
-import { chestToken, itemToken, locOf, movePlayers, pcsAt, placeStaff, showOnTV } from '../lib/world';
+import { doubleToken, springMimic, trunkToken } from '../lib/mimic';
+import { chestToken, hazardToken, itemToken, locOf, movePlayers, pcsAt, placeStaff, showOnTV, triggerHazard } from '../lib/world';
 
-const KINDS = [['monsters', '👹 Monsters'], ['people', '🧑 People'], ['chests', '🧰 Chests'], ['items', '✨ Items']];
+const KINDS = [['monsters', '👹 Monsters'], ['people', '🧑 People'], ['chests', '🧰 Chests'], ['items', '✨ Items'], ['hazards', '🔥 Hazards'], ['mimics', '👄 Mimics']];
 
 function Box({ title, children, open: startOpen = true }) {
   const [open, setOpen] = useState(startOpen);
@@ -30,6 +31,7 @@ export default function GMTable({ sid, data, session, chars }) {
   const [kind, setKind] = useState('monsters');
   const [sel, setSel] = useState(null);
   const [target, setTarget] = useState('');
+  const [copyWho, setCopyWho] = useState('flitwick');
   const movers = who ?? players;
   const loc = data.locations.find((l) => l.id === map.loc);
   const areas = [...new Set(data.locations.map((l) => l.area))];
@@ -45,6 +47,8 @@ export default function GMTable({ sid, data, session, chars }) {
     let newId;
     if (type === 'chests') newId = await placeToken(sid, chestToken(data, id, loc.id));
     else if (type === 'items') newId = await placeToken(sid, itemToken(data, id, loc.id));
+    else if (type === 'hazards') newId = await placeToken(sid, hazardToken(data, id, loc.id));
+    else if (type === 'mimics') newId = await placeToken(sid, id === 'hungry-trunk' ? trunkToken(data, loc.id) : doubleToken(data, loc.id, copyWho));
     else newId = await addToken(sid, data, id, loc.id, tokens);
     setSel(newId);
   };
@@ -54,6 +58,8 @@ export default function GMTable({ sid, data, session, chars }) {
     people: Object.entries(data.bestiary).filter(([, b]) => b.npc).map(([id, b]) => [id, b.icon, b.name, '']),
     chests: Object.entries(data.chests ?? {}).map(([id, c]) => [id, c.icon, c.name, `lock ${c.dc}`]),
     items: Object.entries(data.items).map(([id, it]) => [id, it.icon, it.name, '']),
+    hazards: Object.entries(data.hazards ?? {}).map(([id, h]) => [id, h.icon, h.name, '']),
+    mimics: Object.entries(data.mimics ?? {}).map(([id, m]) => [id, m.icon, m.name, id === 'hungry-trunk' ? 'looks like a Locked chest' : 'copies a person']),
   };
 
   return (
@@ -71,7 +77,20 @@ export default function GMTable({ sid, data, session, chars }) {
               <span><strong>{selPc.name}</strong> <span className="muted small">{selPc.hp}/{selPc.maxHp} HP, Defence {defenceOf(selPc)}</span></span>
             )}
             {t && <strong>{t.icon} {t.name}</strong>}
-            {t?.kind === 'chest' && (
+            {t?.mimic && !t.revealed && (
+              <>
+                <span className="tag tag-warn">Secretly {data.mimics[t.mimic].name}</span>
+                <button className="btn small ember" onClick={() => springMimic(sid, data, sel)}>😱 Spring the mimic</button>
+              </>
+            )}
+            {t?.revealed && (
+              <span className="muted small">
+                {data.mimics[t.mimic].desc}
+                {(t.belly ?? []).length > 0 && ` Swallowed: ${t.belly.map((b) => b.name).join(', ')}.`}
+                {t.lastSpell && ` Next turn it mirrors ${t.lastSpell.name} (${t.lastSpell.dmg}) at ${name(t.lastSpell.caster)}.`}
+              </span>
+            )}
+            {t?.kind === 'chest' && !t.mimic && (
               <span className="muted small">
                 Lock {t.dc} ({t.stat.toUpperCase()}){t.trap ? `, cursed (${t.trap} dmg)` : ''}.{' '}
                 {t.opened ? 'Opened.' : `Holds ${t.contents.gold} Galleons${t.contents.items.length ? `, ${t.contents.items.map((i) => data.items[i]?.name).join(', ')}` : ''}.`}
@@ -79,6 +98,14 @@ export default function GMTable({ sid, data, session, chars }) {
               </span>
             )}
             {t?.kind === 'item' && <span className="muted small">Waiting to be picked up.</span>}
+            {t?.kind === 'hazard' && (
+              <>
+                <span className="muted small">{t.desc}</span>
+                <button className="btn small ember" disabled={t.used} onClick={() => triggerHazard(sid, data, session, sel, chars)}>
+                  {t.used ? 'Used' : t.action}
+                </button>
+              </>
+            )}
             {t && isMonster(t) && (
               <>
                 <span className="muted small">{t.hp}/{t.maxHp} HP, Defence {t.defence}{data.bestiary[t.kind]?.note ? `. ${data.bestiary[t.kind].note}` : ''}</span>
@@ -144,6 +171,13 @@ export default function GMTable({ sid, data, session, chars }) {
               </button>
             ))}
           </div>
+          {kind === 'mimics' && (
+            <label className="gm-give small">The Painted Double copies:
+              <select value={copyWho} onChange={(e) => setCopyWho(e.target.value)}>
+                {Object.entries(data.bestiary).filter(([, b]) => b.npc).map(([id, b]) => <option key={id} value={id}>{b.icon} {b.name}</option>)}
+              </select>
+            </label>
+          )}
           {!loc && <p className="muted small">Choose a place first.</p>}
         </Box>
 

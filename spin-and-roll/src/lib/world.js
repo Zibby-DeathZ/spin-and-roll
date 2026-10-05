@@ -1,7 +1,8 @@
 // Player positions, chests, items on the ground, and quests.
-import { arrayUnion, doc, runTransaction, updateDoc } from 'firebase/firestore';
+import { arrayUnion, collection, deleteField, doc, getDoc, getDocs, runTransaction, updateDoc, writeBatch } from 'firebase/firestore';
 import { db } from '../firebase';
 import { adjust, awardPoints, giveItem, logEvent } from './game';
+import { springMimic } from './mimic';
 
 const sessionRef = (sid) => doc(db, 'sessions', sid);
 const charRef = (sid, uid) => doc(db, 'sessions', sid, 'characters', uid);
@@ -40,6 +41,7 @@ export function actionsAt(data, session, locId) {
   for (const t of tokens) {
     if (t.kind === 'chest') { if (!t.opened) things.push({ icon: t.icon, text: `Open the ${t.name.toLowerCase()}` }); }
     else if (t.kind === 'item') things.push({ icon: t.icon, text: `Pick up the ${t.name}` });
+    else if (t.kind === 'hazard') { if (!t.used) things.push({ icon: t.icon, text: t.action, hazard: true }); }
     else if (t.npc) things.push({ icon: t.icon, text: `Talk to ${t.name}` });
     else if (t.hp > 0) things.push({ icon: '⚔️', text: `Fight the ${t.name}`, danger: true });
   }
@@ -106,6 +108,7 @@ function addToInv(inv = [], item, qty = 1) {
 
 export async function applyOpenChest(sid, eid, data) {
   const eRef = doc(db, 'sessions', sid, 'events', eid);
+  let sprung = null;
   await runTransaction(db, async (tx) => {
     const e = (await tx.get(eRef)).data();
     if (!e || e.processed) return;
@@ -117,6 +120,11 @@ export async function applyOpenChest(sid, eid, data) {
     const here = sess?.state?.pcPos?.[e.actorUid]?.loc;
     if (!c || !t || t.kind !== 'chest' || t.opened || t.loc !== here || (t.tried ?? []).includes(e.actorUid)) {
       tx.update(eRef, { processed: true, failed: true });
+      return;
+    }
+    if (t.mimic) {
+      tx.update(eRef, { processed: true, payload: { ...e.payload, mimic: true } });
+      sprung = { id, uid: e.actorUid };
       return;
     }
     const { nat, total } = e.payload;
@@ -138,6 +146,7 @@ export async function applyOpenChest(sid, eid, data) {
       },
     });
   });
+  if (sprung) await springMimic(sid, data, sprung.id, sprung.uid);
 }
 
 export async function applyPickup(sid, eid, data) {
@@ -233,4 +242,119 @@ export async function professorTo(sid, data, session, npc, room) {
   await updateDoc(sessionRef(sid), {
     [`state.tokens.${id}`]: { ...(existing?.[1] ?? { kind: npc, name: b.name, icon: b.icon, npc: true }), loc: room, x: 50, y: 28 },
   });
+}
+
+// ---------- Hazards ----------
+export function hazardToken(data, id, loc) {
+  const h = data.hazards[id];
+  return { kind: 'hazard', hazard: id, loc, name: h.name, icon: h.icon, action: h.action, desc: h.desc, used: false };
+}
+
+export async function triggerHazard(sid, data, session, tokenId, chars) {
+  const t = session.state.tokens[tokenId];
+  const fx = data.hazards[t.hazard].effect;
+  const tokens = session.state.tokens;
+  const upd = { [`state.tokens.${tokenId}.used`]: true, [`state.tokens.${tokenId}.icon`]: '✔️' };
+  for (const [id, m] of Object.entries(tokens)) {
+    if (m.loc !== t.loc || m.npc || m.kind === 'chest' || m.kind === 'item' || m.kind === 'hazard' || !(m.hp > 0)) continue;
+    let hp = m.hp;
+    if (fx.killKind && m.kind === fx.killKind) hp = 0;
+    if (fx.bossDamage && m.boss) hp -= fx.bossDamage;
+    if (fx.damageAll) hp -= fx.damageAll;
+    if (hp !== m.hp) upd[`state.tokens.${id}.hp`] = Math.max(0, hp);
+    if (fx.bossDefence && m.boss) upd[`state.tokens.${id}.defence`] = m.defence + fx.bossDefence;
+  }
+  await updateDoc(sessionRef(sid), upd);
+  if (fx.heal) {
+    const here = Object.entries(session.state.pcPos ?? {}).filter(([, p]) => p.loc === t.loc).map(([u]) => u);
+    for (const u of here) if (chars[u]) await adjust(sid, u, 'hp', fx.heal);
+  }
+  await logEvent(sid, { type: 'hazard', payload: { icon: data.hazards[t.hazard].icon, action: t.action, desc: t.desc } });
+}
+
+// ---------- Detention ----------
+export async function sendToDetention(sid, data, uid) {
+  const d = data.detention;
+  if (!d) return;
+  const session = (await getDoc(sessionRef(sid))).data();
+  const c = (await getDoc(charRef(sid, uid))).data();
+  if (!c) return;
+  const chars = { [uid]: c };
+  await professorTo(sid, data, session, d.npc, d.loc);
+  await movePlayers(sid, data, d.loc, [uid], chars, false);
+  const q = session.state?.quests?.[d.quest];
+  if (d.quest && !q) {
+    await updateDoc(sessionRef(sid), { [`state.quests.${d.quest}`]: { status: 'active', uids: [uid], done: [] } });
+    const quest = data.quests?.find((x) => x.id === d.quest);
+    if (quest) await logEvent(sid, { type: 'quest_new', payload: { title: quest.title, icon: quest.icon, giver: quest.giver } });
+  } else if (q && q.status === 'active' && !q.uids.includes(uid)) {
+    await updateDoc(sessionRef(sid), { [`state.quests.${d.quest}.uids`]: [...q.uids, uid] });
+  }
+  const loc = data.locations.find((l) => l.id === d.loc);
+  await logEvent(sid, { type: 'detention', targetUid: uid, payload: { place: loc?.name ?? d.loc, npc: data.bestiary[d.npc]?.name ?? 'Filch' } });
+}
+
+// ---------- TV shows: suspect board, awards, House Cup ----------
+export const setShow = (sid, show) => updateDoc(sessionRef(sid), { 'state.show': show ?? deleteField() });
+export const pinClue = (sid, clueId, suspectId) =>
+  updateDoc(sessionRef(sid), { [`state.board.pinned.${clueId}`]: suspectId ?? deleteField() });
+export const setSuspectMark = (sid, suspectId, mark) =>
+  updateDoc(sessionRef(sid), { [`state.board.marks.${suspectId}`]: mark ?? deleteField() });
+
+// Works out the night's awards from everything that happened.
+export async function computeAwards(sid, chars) {
+  const snap = await getDocs(collection(db, 'sessions', sid, 'events'));
+  const tally = {};
+  const add = (key, uid, n = 1) => { if (!uid || !chars[uid]) return; (tally[key] ??= {}); tally[key][uid] = (tally[key][uid] ?? 0) + n; };
+  snap.docs.forEach((d) => {
+    const e = d.data();
+    if (e.failed) return;
+    const p = e.payload ?? {};
+    if (e.type === 'attack') {
+      add('damage', e.actorUid, p.dmg ?? 0);
+      if (p.nat === 20) add('nat20', e.actorUid);
+      if (p.nat === 1) add('nat1', e.actorUid);
+    }
+    if (e.type === 'roll' && Array.isArray(p.rolls) && String(p.label ?? '').startsWith('d20')) {
+      const kept = p.total - (p.mod ?? 0);
+      if (kept === 20) add('nat20', e.actorUid);
+      if (kept === 1) add('nat1', e.actorUid);
+    }
+    if (e.type === 'open_chest') { if (p.nat === 20) add('nat20', e.actorUid); if (p.nat === 1) add('nat1', e.actorUid); if (p.ok) add('chests', e.actorUid); }
+    if (e.type === 'monster_attack' && p.hit) add('tank', e.targetUid, p.dmg ?? 0);
+    if (e.type === 'points' && p.delta > 0) add('points', e.targetUid, p.delta);
+    if (e.type === 'lesson_passed') add('lessons', e.targetUid);
+    if (e.type === 'spell_cast' || e.type === 'attack') add('spells', e.actorUid);
+  });
+  const DEFS = [
+    ['damage', '⚔️', 'Heaviest Hitter', 'damage dealt'],
+    ['tank', '🛡️', 'Unbreakable', 'damage taken'],
+    ['points', '⏳', 'Point Machine', 'house points earned'],
+    ['nat20', '🍀', 'Luckiest Wand', 'natural 20s'],
+    ['nat1', '💀', 'Glorious Disaster', 'natural 1s'],
+    ['lessons', '🎓', 'Top of the Class', 'lessons mastered'],
+    ['chests', '🧰', 'Treasure Hunter', 'chests opened'],
+    ['spells', '🪄', 'Wand Never Rests', 'spells and attacks'],
+  ];
+  return DEFS.map(([key, icon, title, unit]) => {
+    const row = Object.entries(tally[key] ?? {}).sort((a, b) => b[1] - a[1])[0];
+    if (!row || row[1] <= 0) return null;
+    return { icon, title, unit, uid: row[0], name: chars[row[0]].firstName ?? chars[row[0]].name, value: row[1] };
+  }).filter(Boolean);
+}
+
+// The House Cup: shown on the TV, and recorded as a trophy for every student in the winning house.
+export async function houseCup(sid, session, chars) {
+  const pts = session.state?.housePoints ?? {};
+  const standings = ['Gryffindor', 'Hufflepuff', 'Ravenclaw', 'Slytherin'].map((h) => [h, pts[h] ?? 0]).sort((a, b) => b[1] - a[1]);
+  const winner = standings[0][0];
+  const winners = Object.values(chars).filter((c) => c.house === winner);
+  const batch = writeBatch(db);
+  winners.forEach((c) => {
+    batch.set(doc(db, 'users', c.uid, 'trophies', `${sid}-housecup`), {
+      campaignId: session.campaignId, title: `House Cup: ${winner}`, icon: '🏆', awardedAt: new Date(),
+    });
+  });
+  await batch.commit();
+  await setShow(sid, { type: 'housecup', standings, winner, names: winners.map((c) => c.firstName ?? c.name) });
 }

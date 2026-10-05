@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { claimFamily, fmtMod, mod, STATS } from '../lib/game';
 import Wheel from '../components/Wheel';
 import Portrait from '../components/Portrait';
+import { useHeroes } from '../lib/heroes';
 
 // Each family can be claimed by one player; the rest see it as taken.
 export default function FamilyPicker({ sid, uid, data, claims, title }) {
@@ -10,6 +11,9 @@ export default function FamilyPicker({ sid, uid, data, claims, title }) {
   const [error, setError] = useState('');
   const [sending, setSending] = useState(false);
 
+  const heroes = useHeroes(uid);
+  // A character saved at the end of an earlier year of this series can carry on.
+  const hero = heroes.find((h) => h.series === data.series && (h.year ?? 0) < (data.year ?? 1));
   const mine = Object.entries(claims).find(([, c]) => c.uid === uid);
   if (mine) {
     const fam = data.families.find((f) => f.id === mine[0]);
@@ -38,7 +42,21 @@ export default function FamilyPicker({ sid, uid, data, claims, title }) {
   return (
     <main className="phone-body picker-page">
       <h1>{title}</h1>
-      <p className="muted">Choose the family you were born into. Once someone claims a family, it’s theirs.</p>
+      {hero && (
+        <div className="continue-card">
+          <Portrait family={hero.family} name={hero.name} className="picker-portrait" />
+          <div>
+            <p className="muted small">Your character from Year {hero.year}</p>
+            <strong>{hero.name}</strong>
+            <p className="muted small">{hero.house}, level {hero.level}, {(hero.spells ?? []).length} spells, {hero.gold} Galleons</p>
+          </div>
+          <button className="btn gold" disabled={!!claims[hero.family] || sending}
+            onClick={async () => { setSending(true); try { await claimFamily(sid, uid, hero.family, hero.firstName, true); } finally { setSending(false); } }}>
+            {claims[hero.family] ? 'Family taken' : `Continue as ${hero.firstName}`}
+          </button>
+        </div>
+      )}
+      <p className="muted">{hero ? 'Or start fresh: ' : ''}Choose the family you were born into. Once someone claims a family, it’s theirs.</p>
       {error && <p className="error">{error}</p>}
       <ul className="families">
         {data.families.map((f) => {

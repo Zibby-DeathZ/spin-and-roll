@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { applySpin, hideSpin, SPIN_MS, startSpin } from '../lib/game';
+import { play } from '../lib/sound';
 
 const COLORS = ['#E3B04B', '#4FB3A9', '#D0543F', '#8E7CC3'];
 
@@ -71,6 +72,16 @@ export function WheelView({ wheel, idx, spinId, size = 420, onLanded }) {
 // ---------- TV ----------
 export function TVSpin({ data, spin, name }) {
   const wheel = data.wheels[spin.wheelId];
+  useEffect(() => {
+    const timers = [];
+    // Ticks that slow down like the wheel does, then a chime when it lands.
+    for (let i = 0; i < 26; i++) {
+      const t = SPIN_MS * (1 - Math.pow(1 - i / 26, 0.45));
+      timers.push(setTimeout(() => play('tick'), t));
+    }
+    timers.push(setTimeout(() => play('chime'), SPIN_MS + 50));
+    return () => timers.forEach(clearTimeout);
+  }, [spin.id]);
   return (
     <div className="tv-spin">
       <h2>{wheel.icon} {wheel.name}{name && !wheel.secret ? `: ${name}` : ''}</h2>

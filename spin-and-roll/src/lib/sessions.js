@@ -4,7 +4,8 @@ import {
 } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { db } from '../firebase';
-import { getCampaign } from '../campaigns';
+import { getCampaign, getCampaignData } from '../campaigns';
+import { saveHeroes } from './heroes';
 
 // No 0/O or 1/I so codes are easy to read off the TV.
 const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -38,8 +39,11 @@ export async function joinSession(rawCode, uid) {
   return open.id;
 }
 
-export const startSession = (sid) =>
-  updateDoc(doc(db, 'sessions', sid), { status: 'active', startedAt: serverTimestamp() });
+export const startSession = (sid, withIntro = false) =>
+  updateDoc(doc(db, 'sessions', sid), {
+    status: 'active', startedAt: serverTimestamp(),
+    ...(withIntro ? { 'state.intro': { stage: 'opening', page: 0, at: Date.now() } } : {}),
+  });
 
 // Closes the game and writes the result + trophy onto every player's account.
 export async function endSession(session, result) {
@@ -62,6 +66,7 @@ export async function endSession(session, result) {
     }
   }
   await batch.commit();
+  await saveHeroes(session.id, session, getCampaignData(session.campaignId));
 }
 
 // ---- Live hooks ----

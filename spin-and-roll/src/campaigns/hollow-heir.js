@@ -26,6 +26,9 @@ const items = {
 };
 
 export const hollowHeir = {
+  // Part of the Hogwarts series. Characters are saved to player profiles and carry into the next year.
+  series: 'hogwarts', seriesName: 'Hogwarts', year: 1, levelFloor: 1, levelCap: 5,
+
   currency: { name: 'Galleons', icon: '🪙' },
   houses: ['Unsorted', 'Gryffindor', 'Hufflepuff', 'Ravenclaw', 'Slytherin'],
 
@@ -324,13 +327,35 @@ export const hollowHeir = {
   spells: {
     // hit: stat added to a d20 roll that must reach the target's Defence.
     // dice: the spell's own die. damage spells add the caster's spell damage bonus.
-    lumos: { name: 'Lumos', icon: '💡', mana: 1, desc: 'Light in the dark. Reveals invisible ink.' },
-    avifors: { name: 'Avifors', icon: '🐦', mana: 2, dice: { count: 1, die: 4 }, effectLabel: 'rounds of distraction', desc: 'Turns a small object into a flock of birds.' },
-    alohomora: { name: 'Alohomora', icon: '🔓', mana: 2, check: 'int', desc: 'Unlocks a lock if your roll beats its difficulty.' },
-    protego: { name: 'Protego', icon: '🛡️', mana: 3, dice: { count: 1, die: 6 }, effectLabel: 'damage blocked', desc: 'Shield charm. Blocks damage from the next attack on you or an ally.' },
-    expelliarmus: { name: 'Expelliarmus', icon: '🪄', mana: 3, hit: 'dex', attack: true, desc: 'Disarms the target. On a hit, their next attack misses.' },
-    stupefy: { name: 'Stupefy', icon: '💥', mana: 4, hit: 'int', attack: true, dice: { count: 1, die: 8 }, damage: true, desc: 'Stunning spell.' },
-    incendio: { name: 'Incendio', icon: '🔥', mana: 5, hit: 'int', attack: true, dice: { count: 1, die: 10 }, damage: true, desc: 'Conjures fire. Painted creatures burn.' },
+    lumos: { group: 'class', name: 'Lumos', icon: '💡', mana: 1, desc: 'Light in the dark. Reveals invisible ink.' },
+    avifors: { group: 'class', name: 'Avifors', icon: '🐦', mana: 2, dice: { count: 1, die: 4 }, effectLabel: 'rounds of distraction', desc: 'Turns a small object into a flock of birds.' },
+    alohomora: { group: 'class', name: 'Alohomora', icon: '🔓', mana: 2, check: 'int', desc: 'Unlocks a lock if your roll beats its difficulty.' },
+    protego: { group: 'class', name: 'Protego', icon: '🛡️', mana: 3, dice: { count: 1, die: 6 }, effectLabel: 'damage blocked', desc: 'Shield charm. Blocks damage from the next attack on you or an ally.' },
+    expelliarmus: { group: 'class', name: 'Expelliarmus', icon: '🪄', mana: 3, hit: 'dex', attack: true, desc: 'Disarms the target. On a hit, their next attack misses.' },
+    stupefy: { group: 'class', name: 'Stupefy', icon: '💥', mana: 4, hit: 'int', attack: true, dice: { count: 1, die: 8 }, damage: true, desc: 'Stunning spell.' },
+    incendio: { group: 'class', name: 'Incendio', icon: '🔥', mana: 5, hit: 'int', attack: true, dice: { count: 1, die: 10 }, damage: true, desc: 'Conjures fire. Painted creatures burn.' },
+    // Other charms and jinxes (teach from the GM Spells tab)
+    'wingardium-leviosa': { group: 'extra', name: 'Wingardium Leviosa', icon: '🪶', mana: 2, check: 'int', desc: 'Levitates an object. Heavier things need a higher roll.' },
+    accio: { group: 'extra', name: 'Accio', icon: '🧲', mana: 3, check: 'int', desc: 'Summons an object you can name and see, or know is close.' },
+    reparo: { group: 'extra', name: 'Reparo', icon: '🔧', mana: 1, desc: 'Mends something broken.' },
+    aguamenti: { group: 'extra', name: 'Aguamenti', icon: '💧', mana: 2, desc: 'A jet of water. Puts out fires.' },
+    'finite-incantatem': { group: 'extra', name: 'Finite Incantatem', icon: '✋', mana: 2, check: 'wis', desc: 'Ends a spell or curse if the roll beats it.' },
+    episkey: { group: 'extra', name: 'Episkey', icon: '🩹', mana: 3, dice: { count: 1, die: 6 }, effectLabel: 'HP healed (GM applies)', desc: 'Heals small wounds on yourself or a friend.' },
+    flipendo: { group: 'extra', name: 'Flipendo', icon: '💨', mana: 2, hit: 'int', attack: true, dice: { count: 1, die: 6 }, damage: true, desc: 'Knockback jinx.' },
+    rictusempra: { group: 'extra', name: 'Rictusempra', icon: '😂', mana: 2, hit: 'cha', attack: true, desc: 'Tickling charm. On a hit, the target loses its next turn laughing.' },
+    diffindo: { group: 'extra', name: 'Diffindo', icon: '✂️', mana: 3, hit: 'dex', attack: true, dice: { count: 1, die: 6 }, damage: true, desc: 'Severing charm. Cuts ropes, vines and bags.' },
+    riddikulus: { group: 'extra', name: 'Riddikulus', icon: '🤡', mana: 3, hit: 'cha', attack: true, dice: { count: 1, die: 10 }, damage: true, onlyKind: 'boggart', desc: 'Turns fear into a joke. Only hurts Boggarts.' },
+    silencio: { group: 'extra', name: 'Silencio', icon: '🤐', mana: 3, hit: 'cha', attack: true, desc: 'On a hit, the target can’t cast spells on its next turn.' },
+    glacius: { group: 'extra', name: 'Glacius', icon: '❄️', mana: 4, hit: 'int', attack: true, dice: { count: 1, die: 8 }, damage: true, desc: 'Freezing charm.' },
+    confundo: { group: 'extra', name: 'Confundo', icon: '😵', mana: 4, hit: 'cha', attack: true, desc: 'On a hit, the target attacks the wrong person next turn (GM decides).' },
+    immobulus: { group: 'extra', name: 'Immobulus', icon: '⏸️', mana: 4, hit: 'wis', attack: true, desc: 'On a hit, freezes a creature in place for a round.' },
+    'petrificus-totalus': { group: 'extra', name: 'Petrificus Totalus', icon: '🧊', mana: 5, hit: 'int', attack: true, desc: 'Full body-bind. On a hit, the target skips its next turn.' },
+    // Advanced magic
+    bombarda: { group: 'advanced', name: 'Bombarda', icon: '💣', mana: 7, hit: 'int', attack: true, dice: { count: 2, die: 8 }, damage: true, desc: 'Explosive. Loud. Very loud.' },
+    'expecto-patronum': {
+      group: 'advanced', name: 'Expecto Patronum', icon: '🦌', mana: 8, hit: 'wis', attack: true, dice: { count: 1, die: 12 }, damage: true, patronus: true,
+      desc: 'Your Patronus. Drives back dark creatures and Vale’s servants. Advanced magic, usually learned in Year 3.',
+    },
     'avada-kedavra': {
       name: 'Avada Kedavra', icon: '💚', mana: 10, hit: 'cha', attack: true, kill: true, forbidden: true,
       desc: 'The Killing Curse. Kills any creature outright; bosses take 20. If anyone sees, you are expelled.',
@@ -363,6 +388,7 @@ export const hollowHeir = {
     centaur: { name: 'Centaur', icon: '🏹', npc: true },
     'sinclair-prefect': { name: 'Prefect Sinclair', icon: '🎖️', npc: true },
     painting: { name: 'The covered painting', icon: '🖼️', npc: true },
+    rival: { name: 'Cassius Thorne', icon: '😏', npc: true },
   },
 
   // Where each member of staff belongs. "Staff to their rooms" on the GM screen puts them there.
@@ -381,12 +407,16 @@ export const hollowHeir = {
     { id: 'platform', area: 'Prologue', name: 'Platform Nine and Three-Quarters', icon: '🚂', desc: 'Steam, trunks, and a scarlet engine.', exits: ['express'], actions: ['Find the hidden barrier', 'Look for friends'] },
     { id: 'express', area: 'Prologue', name: 'The Hogwarts Express', icon: '🚃', desc: 'Compartments, the trolley witch, and a covered painting in the luggage car.', exits: ['great-hall'], actions: ['Buy from the trolley', 'Explore the carriages', 'Peek at the covered painting'] },
     { id: 'great-hall', area: 'Castle', name: 'The Great Hall', icon: '🕯️', desc: 'Floating candles under an enchanted sky.', exits: ['entrance-hall'], actions: ['Eat a feast', 'Watch the staff table'] },
-    { id: 'entrance-hall', area: 'Castle', name: 'Entrance Hall', icon: '🚪', desc: 'The house point hourglasses glitter by the doors.', exits: ['grand-staircase', 'dungeons', 'courtyard'], actions: ['Check the house points', 'Ask a ghost for directions'] },
-    { id: 'grand-staircase', area: 'Castle', name: 'Grand Staircase', icon: '🪜', desc: 'Stairs that change their minds. Portraits everywhere.', exits: ['charms-classroom', 'transfiguration-classroom', 'common-room', 'library', 'defence-classroom', 'trophy-room', 'hospital-wing', 'owlery', 'astronomy-tower', 'room-of-requirement'], actions: ['Talk to a portrait', 'Ride a moving staircase'] },
-    { id: 'common-room', area: 'Castle', name: 'Common room', icon: '🛋️', desc: 'A fire, armchairs, and house secrets.', actions: ['Rest by the fire', 'Hear the latest gossip'] },
+    { id: 'entrance-hall', area: 'Castle', name: 'Entrance Hall', icon: '🚪', desc: 'The house point hourglasses glitter by the doors.', exits: ['grand-staircase', 'dungeons', 'courtyard', 'kitchens'], actions: ['Check the house points', 'Ask a ghost for directions'] },
+    { id: 'grand-staircase', area: 'Castle', name: 'Grand Staircase', icon: '🪜', desc: 'Stairs that change their minds. Portraits everywhere.', exits: ['charms-classroom', 'transfiguration-classroom', 'gryffindor-common', 'ravenclaw-common', 'library', 'defence-classroom', 'trophy-room', 'hospital-wing', 'owlery', 'astronomy-tower', 'room-of-requirement'], actions: ['Talk to a portrait', 'Ride a moving staircase'] },
+    { id: 'gryffindor-common', area: 'Common rooms', name: 'Gryffindor common room', icon: '🦁', desc: 'A round tower room in scarlet and gold, behind the portrait of the Fat Lady.', actions: ['Give the password to the Fat Lady', 'Rest by the fire', 'Hear the latest gossip'] },
+    { id: 'ravenclaw-common', area: 'Common rooms', name: 'Ravenclaw common room', icon: '🦅', desc: 'An airy blue tower with a starry domed ceiling. The door has no password, only a riddle.', actions: ['Answer the eagle knocker’s riddle', 'Read by the windows', 'Hear the latest gossip'] },
+    { id: 'hufflepuff-common', area: 'Common rooms', name: 'Hufflepuff common room', icon: '🦡', desc: 'A cosy round basement room full of plants, copper pots and honey-coloured wood, near the kitchens.', actions: ['Tap the barrels in the right rhythm', 'Rest by the fire', 'Hear the latest gossip'] },
+    { id: 'slytherin-common', area: 'Common rooms', name: 'Slytherin common room', icon: '🐍', desc: 'A long low dungeon under the lake, lit green by the water outside the windows.', actions: ['Give the password to the bare stone wall', 'Watch the lake through the windows', 'Hear the latest gossip'] },
+    { id: 'kitchens', area: 'Castle', name: 'The Kitchens', icon: '🍲', exits: ['hufflepuff-common'], desc: 'Behind a painting of a fruit bowl: tickle the pear. House-elves everywhere.', actions: ['Tickle the pear to get in', 'Ask the house-elves for food', 'Ask the house-elves what they’ve heard'] },
     { id: 'library', area: 'Castle', name: 'The Library', icon: '📚', desc: 'Silent shelves and a librarian who hears everything.', exits: ['restricted-section'], actions: ['Search the shelves (INT)', 'Ask the librarian'] },
     { id: 'restricted-section', area: 'Castle', name: 'Restricted Section', icon: '⛓️', desc: 'Chained books that whisper when you pass.', secret: true, actions: ['Read a chained book (WIS)', 'Look for the page about Vale'] },
-    { id: 'dungeons', area: 'Castle', name: 'The Dungeons', icon: '⚗️', desc: 'Cold stone, green light, and the Potions classroom.', exits: ['undercroft'], actions: ['Check the store cupboard', 'Brew something'] },
+    { id: 'dungeons', area: 'Castle', name: 'The Dungeons', icon: '⚗️', desc: 'Cold stone, green light, and the Potions classroom.', exits: ['undercroft', 'slytherin-common'], actions: ['Check the store cupboard', 'Brew something'] },
     { id: 'charms-classroom', area: 'Castle', name: 'Charms classroom', icon: '✨', desc: 'Tiered desks and a tall stack of books for the professor to stand on.', actions: ['Practise a charm', 'Ask Flitwick a question'] },
     { id: 'transfiguration-classroom', area: 'Castle', name: 'Transfiguration classroom', icon: '🔄', desc: 'Neat rows of desks, cages of beetles, and a stern blackboard.', actions: ['Study the transfiguration charts'] },
     { id: 'defence-classroom', area: 'Castle', name: 'Defence classroom', icon: '🛡️', desc: 'Ashgrove’s room. Too many paintings for comfort.', actions: ['Study the paintings', 'Search Ashgrove’s desk'] },
@@ -496,7 +526,7 @@ export const hollowHeir = {
         { label: 'Safe', text: 'Nobody saw a thing' },
         { label: 'Mrs Norris', text: 'Mrs Norris spots you. −5 points', effect: { points: -5 } },
         { label: 'Safe', text: 'Nobody saw a thing' },
-        { label: 'Filch!', text: 'Filch catches you! −10 points and detention', effect: { points: -10 } },
+        { label: 'Filch!', text: 'Filch catches you! −10 points and detention', effect: { points: -10, detention: true } },
         { label: 'Peeves', text: 'Peeves shrieks your name down the corridor. −5 points', effect: { points: -5 } },
         { label: 'Prefect', text: 'A prefect sees you… and lets it slide' },
         { label: 'Safe', text: 'Nobody saw a thing' },
@@ -670,6 +700,95 @@ export const hollowHeir = {
     },
   ],
 
+  // ---------- Opening cutscene (TV) ----------
+  // Story images: public/story/page-1.jpg … page-6.jpg. Recorded narration (optional):
+  // public/sounds/narration/page-1.mp3 … page-6.mp3. Intro music (optional): public/sounds/music/intro.mp3.
+  intro: {
+    studio: { mark: 'GM', name: 'Zibby', presents: 'presents' },
+    title: { over: 'Harry Potter', main: 'and the Hollow Heir' },
+    cover: 'The Hollow Heir',
+    pages: [
+      { icon: '🎨', text: 'Three hundred years ago, a painter named Corvin Vale made portraits so lifelike that people swore his subjects breathed.' },
+      { icon: '⏳', text: 'He feared one thing above all others: growing old. So he began his greatest work, a portrait of himself that would never age, never fade, and never end.' },
+      { icon: '🌑', text: 'To finish it, he needed the light of the young. Students began to be found at dawn, grey and silent, as if someone had painted them in ash.' },
+      { icon: '🔒', text: 'A family called Blackwood stopped him. They sealed Vale inside his own unfinished canvas, and hid it where no one would ever think to look.' },
+      { icon: '🚂', text: 'For three centuries, the painting slept. Until this summer, when someone found it, wrapped it in grey cloth, and put it on a train to Hogwarts.' },
+      { icon: '✉️', text: 'Six families are about to receive a letter. Six children are about to begin their first year. None of them know that the painting is waiting for them.' },
+    ],
+    choose: 'Choose your family',
+  },
+
+  // ---------- Music (files in public/sounds/music/<id>.mp3) ----------
+  music: [
+    { id: 'castle', name: 'Castle halls' },
+    { id: 'great-hall', name: 'Great Hall feast' },
+    { id: 'diagon', name: 'Diagon Alley' },
+    { id: 'mystery', name: 'Mystery and clues' },
+    { id: 'forest', name: 'Forbidden Forest' },
+    { id: 'battle', name: 'Battle' },
+    { id: 'undercroft', name: 'The Undercroft' },
+    { id: 'victory', name: 'Victory' },
+  ],
+
+  // ---------- Mimics: disguised until someone gets too close ----------
+  mimics: {
+    'hungry-trunk': {
+      name: 'The Hungry Trunk', icon: '🧳', disguise: 'chest', looksLike: 'locked-chest',
+      hp: 30, defence: 13, atk: 5, dmg: { count: 1, die: 8 }, init: 2, xp: 60, hoard: [30, 60],
+      behaviour: 'swallow',
+      desc: 'Bites swallow a random item from the target’s bag. Each item: it grows and gains 5 max HP. Potions heal it. 3+ items: +1d6 bite. Spits everything out when beaten.',
+    },
+    'painted-double': {
+      name: 'The Painted Double', icon: '🎭', disguise: 'person',
+      hp: 26, defence: 14, atk: 4, dmg: { count: 1, die: 6 }, init: 3, xp: 60, hoard: [15, 30],
+      behaviour: 'mirror', weakTo: 'incendio',
+      desc: 'Copies a person. On its turn it casts the last spell that hit it back at that caster, for the same damage. Incendio does double damage.',
+    },
+  },
+  // Items a mimic can never swallow (the story needs them).
+  unswallowable: ['serpent-key', 'map-half', 'diary-page', 'ring-clue-serpent', 'ring-clue-moon', 'ring-clue-owl', 'vale-page'],
+
+  // ---------- Detention: where it happens and what it quietly starts ----------
+  detention: { loc: 'trophy-room', npc: 'filch', quest: 'old-cup' },
+
+  // ---------- Suspect board ----------
+  suspects: [
+    { id: 'ashgrove', name: 'Professor Ashgrove', icon: '🧙', note: 'Defence teacher. Everyone’s favourite.' },
+    { id: 'grimsby', name: 'Professor Grimsby', icon: '⚗️', note: 'Potions master. Nobody’s favourite.' },
+    { id: 'filch', name: 'Argus Filch', icon: '🔦', note: 'Has a key to everything.' },
+    { id: 'rival', name: 'Cassius Thorne', icon: '😏', note: 'A smug older student.' },
+    { id: 'ghost', name: 'A Hogwarts ghost', icon: '👻', note: 'Goes through walls.' },
+    { id: 'painting', name: 'The covered painting', icon: '🖼️', note: 'Arrived on the train.' },
+  ],
+  // Pin a clue under a suspect when the players find it. "clears" clues point away from someone.
+  clues: [
+    { id: 'cupboard-raided', text: 'Grimsby’s store cupboard was raided the night of the first attack', points: 'grimsby' },
+    { id: 'grimsby-standing', text: 'Grimsby was found standing over the third victim', points: 'grimsby' },
+    { id: 'grimsby-draught', text: 'Grimsby was secretly brewing a draught to wake the victims', points: 'grimsby', clears: true },
+    { id: 'more-paintings', text: 'Ashgrove’s classroom has more paintings every day', points: 'ashgrove' },
+    { id: 'wet-paint', text: 'Flecks of wet paint on Ashgrove’s sleeve', points: 'ashgrove' },
+    { id: 'ashgrove-eyes', text: 'Ashgrove’s eyes looked like brushstrokes for a moment', points: 'ashgrove' },
+    { id: 'filch-keys', text: 'Filch has keys to every corridor where students were drained', points: 'filch' },
+    { id: 'filch-detention', text: 'Filch was supervising a detention on the night of the second attack', points: 'filch', clears: true },
+    { id: 'rival-map', text: 'Cassius was seen with half of an old map', points: 'rival' },
+    { id: 'rival-alibi', text: 'Cassius was in the Hospital Wing himself on night three', points: 'rival', clears: true },
+    { id: 'portraits-silent', text: 'Every portrait near an attack had gone silent', points: 'painting' },
+    { id: 'painting-moves', text: 'The covered painting hangs in a different corridor each night', points: 'painting' },
+    { id: 'painting-eyes', text: 'The covered painting’s eyes follow a Quill', points: 'painting' },
+    { id: 'vale-page', text: 'A page about Corvin Vale, a painter who wanted to live forever', points: 'painting' },
+    { id: 'ghost-saw', text: 'A ghost saw a figure “step out of a frame”', points: 'ghost' },
+  ],
+
+  // ---------- Hazards: things on the map the players can use in a fight ----------
+  hazards: {
+    'paint-jars': { name: 'Shelf of paint jars', icon: '🎨', action: 'Set the paint jars alight', effect: { killKind: 'paint-wraith', bossDamage: 5 }, desc: 'Destroys every Paint Wraith here and burns bosses for 5.' },
+    'cracked-mirror': { name: 'Cracked mirror', icon: '🪞', action: 'Bounce a spell off the cracked mirror', effect: { bossDamage: 8 }, desc: 'Reflected magic hits bosses for 8.' },
+    braziers: { name: 'Cold braziers', icon: '🔥', action: 'Light the braziers', effect: { heal: 5 }, desc: 'Warmth heals every student here by 5.' },
+    'ritual-circle': { name: 'Ritual circle', icon: '⭕', action: 'Break the ritual circle', effect: { bossDefence: -3 }, desc: 'Bosses here lose 3 Defence.' },
+    canvas: { name: 'Vale’s empty canvas', icon: '🖼️', action: 'Slash or burn the empty canvas', effect: { bossDamage: 15 }, desc: 'His anchor to this world: 15 damage to bosses.' },
+    pillar: { name: 'Cracked pillar', icon: '🏛️', action: 'Topple the cracked pillar', effect: { damageAll: 6 }, desc: '6 damage to every enemy here.' },
+  },
+
   // ---------- TV puzzles: shown on the TV, operated by the GM, solved by talking ----------
   puzzles: [
     {
@@ -725,6 +844,37 @@ export const hollowHeir = {
       given: ['E', 'T'],
       solution: 'ONLY THE ONE WHO STANDS ALONE MAY LEARN THE CURSE THAT CANNOT BE BLOCKED. (This is why the painting must be visited alone.)',
     },
+    {
+      id: 'constellation', type: 'constellation', icon: '✨', title: 'The Serpent in the Stars',
+      intro: 'On the Astronomy Tower, the stars are numbered in silver. “Draw the serpent: begin at its eye, the brightest star, and always move to the next brightest.” Tell the DM which stars to join.',
+      stars: [
+        { n: 5, x: 14, y: 30, r: 26 }, { n: 2, x: 26, y: 20, r: 22 }, { n: 7, x: 39, y: 30, r: 19 }, { n: 1, x: 48, y: 46, r: 16 },
+        { n: 8, x: 58, y: 60, r: 13 }, { n: 3, x: 70, y: 66, r: 10 }, { n: 6, x: 80, y: 54, r: 8 }, { n: 4, x: 88, y: 38, r: 6 },
+      ],
+      answer: [[5, 2], [2, 7], [7, 1], [1, 8], [8, 3], [3, 6], [6, 4]],
+      solution: 'Join 5–2–7–1–8–3–6–4 (brightest to faintest). Any order of joining works; it checks the lines.',
+    },
+    {
+      id: 'moving-stairs', type: 'stairs', icon: '🪜', title: 'The Moving Staircases',
+      intro: 'The staircases have swung out of place. Turn the pieces until a single path runs from the arrow on the left to the door on the right.',
+      size: 4,
+      tiles: [[5, 2], [3, 3], [3, 3], [7, 1], [5, 3], [5, 3], [3, 3], [3, 0], [5, 3], [3, 2], [3, 0], [5, 1], [7, 0], [7, 3], [3, 1], [3, 3]],
+      solution: 'Clockwise turns (row-column): 1-1 ×3, 1-2 ×3, 2-2 ×1, 3-2 ×2, 3-3 ×3, 2-3 ×2, 2-4 ×2, 3-4 ×3, 4-4 ×1. It checks the path, so any working route counts.',
+    },
+    {
+      id: 'portrait-jigsaw', type: 'slider', icon: '🖼️', title: 'The Scrambled Portrait',
+      intro: 'A portrait has been cut into squares and shuffled. Slide the pieces into the gap until the picture is whole. The portrait will tell you a secret.',
+      start: [0, 4, 1, 7, 2, 3, 6, 5, 8],
+      solution: 'Slide pieces into the gap until they read 1–8 with the gap last. The shortest solution is 16 slides.',
+    },
+    {
+      id: 'rune-floor', type: 'runefloor', icon: '🪨', title: 'The Rune Floor',
+      intro: 'Above the far door, five runes are carved. Cross the floor from the bottom row to the top, stepping only up, left or right, on those runes in that order, again and again. One wrong step and the floor bites.',
+      word: 'ALONE',
+      grid: ['OLNBL', 'EAAAR', 'NOLRO', 'STAEN', 'NRTLO', 'NBOAI'],
+      solution: 'Start on the bottom row, 4th tile. Path (row counted from the bottom, column): 1-4, 2-4, 2-5, 3-5, 3-4, 3-3, 4-3, 4-2, 4-1, 5-1, 5-2, 6-2. Checked: it is the only safe path.',
+    },
+
   ],
 
   items,

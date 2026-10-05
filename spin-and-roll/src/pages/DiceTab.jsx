@@ -232,7 +232,7 @@ export default function DiceTab({ sid, c, data, session, chars }) {
               <span className="item-name">
                 <span className="item-icon">{sp.icon}</span>
                 <span>
-                  <strong>{sp.name}</strong> <span className="muted small">{sp.mana ? `${sp.mana} mana` : 'free'}</span>
+                  <strong>{sp.name}{sp.form ? ` (${sp.form})` : ''}</strong> <span className="muted small">{sp.mana ? `${sp.mana} mana` : 'free'}</span>
                   <br /><span className="badges">{badges(sp, c).map((b) => <span key={b} className="badge-pill">{b}</span>)}</span>
                   <br /><span className="muted small">{sp.desc}</span>
                 </span>

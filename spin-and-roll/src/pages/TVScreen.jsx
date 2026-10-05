@@ -11,6 +11,14 @@ import { useLessonResults } from '../lib/lessons';
 import { actionsAt, locOf, pcsAt } from '../lib/world';
 import Portrait from '../components/Portrait';
 import { TVPuzzle } from '../components/Puzzles';
+import { TVShow } from '../components/Shows';
+import TVIntro from '../components/Intro';
+import SoundGate from '../components/SoundGate';
+import JumpScare from '../components/JumpScare';
+import { setMusic, play, soundForEvent } from '../lib/sound';
+import { introActive, skipToBook } from '../lib/intro';
+import { useEffect } from 'react';
+import { useClaims } from '../lib/game';
 import { HouseBoard, TVQuiz } from '../components/Ceremony';
 import { Splash } from '../components/Gate';
 import Wheel from '../components/Wheel';
@@ -22,6 +30,7 @@ export default function TVScreen() {
   const chars = useCharacters(sid);
   const profiles = useProfiles(session?.playerUids ?? []);
   const answers = useAnswers(sid);
+  const claims = useClaims(sid);
   const lessonResults = useLessonResults(sid, session?.state?.lesson?.id);
   const nameOf = useCallback(
     (u) => chars?.[u]?.name ?? profiles[u]?.displayName ?? 'Someone', [chars, profiles]);
@@ -46,18 +55,28 @@ export default function TVScreen() {
         <ul className="tv-players">
           {session.playerUids.map((u) => <li key={u} className="arrive">{profiles[u]?.displayName ?? '…'}</li>)}
         </ul>
+        <SoundGate />
       </main>
     );
   }
 
   return (
-    <TVLive session={session} chars={chars} profiles={profiles} data={data} title={title} answers={answers}
+    <TVLive claims={claims} session={session} chars={chars} profiles={profiles} data={data} title={title} answers={answers}
       lessonResults={lessonResults} nameOf={nameOf} sid={sid} />
   );
 }
 
 // The live table view, split out so it can be previewed with sample data.
-export function TVLive({ session, chars, profiles, data, title, answers, lessonResults, nameOf, sid }) {
+export function TVLive({ session, chars, profiles, data, title, answers, lessonResults, nameOf, sid, claims = {} }) {
+  // Music: the intro track during the opening, otherwise whatever the GM picked.
+  const music = session.state?.music;
+  const opening = introActive(session);
+  useEffect(() => {
+    const base = import.meta.env.BASE_URL;
+    if (opening) setMusic(`${base}sounds/music/intro.mp3`, 0.5, true);
+    else setMusic(music?.track ? `${base}sounds/music/${music.track}.mp3` : null, music?.volume ?? 0.5, !!music?.playing);
+  }, [opening, music?.track, music?.playing, music?.volume]);
+
   const q = session.state?.quiz;
   const quiz = q && data.quizzes?.[q.id];
   const spin = session.state?.spin;
@@ -66,8 +85,20 @@ export function TVLive({ session, chars, profiles, data, title, answers, lessonR
   const enc = session.state?.encounter;
   const acts = loc ? actionsAt(data, session, loc.id) : null;
 
+  const ist = session.state?.intro;
+  const closingDone = ist?.stage === 'closing' && Date.now() - (ist.at ?? 0) > 3600;
+  if (data.intro && ist && ist.stage !== 'done' && !closingDone) {
+    return (
+      <main className="tv2 tv-intro">
+        <TVIntro intro={data.intro} data={data} st={ist} claims={claims} onVideoDone={() => sid && skipToBook(sid)} />
+        <SoundGate />
+      </main>
+    );
+  }
+
   let stage;
-  if (quiz) stage = <div className="tv2-center"><TVQuiz quiz={quiz} answer={answers[answerKey(q.id, q.uid)]} name={nameOf(q.uid)} /></div>;
+  if (session.state?.show) stage = <div className="tv2-center"><TVShow data={data} session={session} /></div>;
+  else if (quiz) stage = <div className="tv2-center"><TVQuiz quiz={quiz} answer={answers[answerKey(q.id, q.uid)]} name={nameOf(q.uid)} /></div>;
   else if (showSpin) stage = <div className="tv2-center"><TVSpin data={data} spin={spin} name={spin.uid ? nameOf(spin.uid) : null} /></div>;
   else if (session.state?.puzzle && data.puzzles?.find((p) => p.id === session.state.puzzle.id)) {
     stage = <div className="tv2-center"><TVPuzzle p={data.puzzles.find((p) => p.id === session.state.puzzle.id)} st={session.state.puzzle} /></div>;
@@ -151,7 +182,10 @@ export function TVLive({ session, chars, profiles, data, title, answers, lessonR
           );
         })}
       </footer>
-      {sid && <EventToasts sid={sid} nameOf={nameOf} big skip={['wheel']} />}
+      {sid && <EventToasts sid={sid} nameOf={nameOf} big skip={['wheel']}
+        onNew={(e) => { const s2 = soundForEvent(e); (Array.isArray(s2) ? s2 : s2 ? [s2] : []).forEach((n, i) => setTimeout(() => play(n), i * 180)); }} />}
+      <JumpScare scare={session.state?.scare} />
+      <SoundGate />
     </main>
   );
 }

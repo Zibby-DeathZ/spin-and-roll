@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import Portrait from './Portrait';
 
 const EXTS = ['jpg', 'png', 'webp'];
-export const isMonster = (t) => !t.npc && t.kind !== 'chest' && t.kind !== 'item';
+export const isMonster = (t) => !t.npc && t.kind !== 'chest' && t.kind !== 'item' && t.kind !== 'hazard';
 
 // A location with its tokens and characters.
 // Images: public/maps/<location id>.jpg (or .png / .webp).
@@ -31,12 +31,13 @@ export default function MapView({ loc, tokens = {}, pcs = [], encounter, selecte
       {here.map(([id, t]) => {
         const mon = isMonster(t);
         const down = mon && t.hp <= 0;
-        const cls = t.kind === 'chest' ? `chest ${t.opened ? 'opened' : ''}` : t.kind === 'item' ? 'item' : t.npc ? 'npc' : 'mon';
+        const cls = t.kind === 'chest' ? `chest ${t.opened ? 'opened' : ''}` : t.kind === 'item' ? 'item' : t.kind === 'hazard' ? `hazard ${t.used ? 'opened' : ''}` : t.npc ? 'npc' : 'mon';
         return (
           <button key={id} type="button"
             className={`token ${cls} ${down ? 'down' : ''} ${selected === id ? 'sel' : ''} ${current?.id === id ? 'turn' : ''}`}
-            style={{ left: `${t.x}%`, top: `${t.y}%` }} onClick={pick(id)} aria-label={t.name} tabIndex={onSelect ? 0 : -1}>
-            <span className="token-icon">{t.icon}</span>
+            style={{ left: `${t.x}%`, top: `${t.y}%`, ...(t.scale ? { transform: `translate(-50%, -50%) scale(${t.scale})` } : {}) }}
+            onClick={pick(id)} aria-label={t.name} tabIndex={onSelect ? 0 : -1}>
+            <span className={`token-icon ${t.revealed ? 'mimic-icon' : ''}`}>{t.icon}</span>
             {!small && <span className="token-name">{t.name}</span>}
             {mon && <span className="token-hp"><span style={{ width: `${Math.max(0, (t.hp / t.maxHp) * 100)}%` }} /></span>}
           </button>

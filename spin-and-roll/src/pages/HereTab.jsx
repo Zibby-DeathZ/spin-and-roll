@@ -100,6 +100,9 @@ export default function HereTab({ sid, c, data, session, chars }) {
                   </li>
                 );
               }
+              if (t.kind === 'hazard') {
+                return <li key={id}><span>{t.icon} {t.name}</span><span className="muted small">{t.used ? 'Used' : 'Tell the DM if you want to use it'}</span></li>;
+              }
               if (isMonster(t)) {
                 return (
                   <li key={id} className={t.hp <= 0 ? 'muted' : ''}>

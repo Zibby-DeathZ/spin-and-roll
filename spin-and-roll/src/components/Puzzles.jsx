@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import {
-  closePuzzle, flipTorches, GLYPH, initialState, isSolved, lettersIn, markSolved, PIECE_NAME, runeFor, setPuzzle, startPuzzle,
+  closePuzzle, edgeKey, flipTorches, GLYPH, initialState, isSolved, lettersIn, markSolved, PIECE_NAME, rotMask, runeFor,
+  runeStepOk, setPuzzle, startPuzzle, stairsConnected,
 } from '../lib/puzzles';
 
 const FILES = 'abcdefgh';
@@ -100,6 +101,75 @@ export function PuzzleView({ p, st, gm = false, onAct, sel }) {
       </div>
     );
   }
+  if (p.type === 'constellation') {
+    const byN = Object.fromEntries(p.stars.map((s) => [s.n, s]));
+    return (
+      <svg className="sky-svg" viewBox="0 0 100 80" role="img" aria-label="Star chart">
+        {st.lines.map((k) => {
+          const [a, b] = k.split('-').map(Number);
+          return <line key={k} x1={byN[a].x} y1={byN[a].y} x2={byN[b].x} y2={byN[b].y} stroke="#e3b04b" strokeWidth=".6" strokeLinecap="round" />;
+        })}
+        {p.stars.map((s) => (
+          <g key={s.n} onClick={() => gm && onAct?.(s.n)} style={{ cursor: gm ? 'pointer' : 'default' }}>
+            <circle cx={s.x} cy={s.y} r={s.r / 9} fill="#fff7dc" className={sel === s.n ? 'star sel' : 'star'} />
+            <circle cx={s.x} cy={s.y} r={s.r / 4.5} fill="rgba(255,240,200,.08)" />
+            <text x={s.x} y={s.y + s.r / 9 + 4} textAnchor="middle" fontSize="3.2" fill="#a69fbe" fontWeight="700">{s.n}</text>
+          </g>
+        ))}
+      </svg>
+    );
+  }
+  if (p.type === 'stairs') {
+    const done = stairsConnected(p, st.rots);
+    return (
+      <div className="stairs-wrap">
+        <span className="stairs-in" aria-hidden="true">➡️</span>
+        <div className="stairs" style={{ gridTemplateColumns: `repeat(${p.size}, 1fr)` }}>
+          {p.tiles.map(([base], i) => {
+            const m = rotMask(base, st.rots[i]);
+            return (
+              <button key={i} type="button" disabled={!gm} className={`stair ${done ? 'lit' : ''}`} onClick={() => onAct?.(i)}
+                aria-label={`Staircase ${Math.floor(i / p.size) + 1}-${(i % p.size) + 1}`}>
+                <span className="hub" />
+                {m & 1 ? <span className="arm n" /> : null}{m & 2 ? <span className="arm e" /> : null}
+                {m & 4 ? <span className="arm s" /> : null}{m & 8 ? <span className="arm w" /> : null}
+              </button>
+            );
+          })}
+        </div>
+        <span className="stairs-out" aria-hidden="true">🚪</span>
+      </div>
+    );
+  }
+  if (p.type === 'slider') {
+    return (
+      <div className="slider">
+        {st.tiles.map((t, i) => (
+          <button key={i} type="button" disabled={!gm || t === 0} className={`slide ${t === 0 ? 'gap' : ''}`} onClick={() => onAct?.(i)}
+            style={t ? { '--sx': `${((t - 1) % 3) * 50}%`, '--sy': `${Math.floor((t - 1) / 3) * 50}%`, backgroundImage: `url(${import.meta.env.BASE_URL}puzzles/portrait.jpg)` } : undefined}>
+            {t ? <span className="slide-n">{t}</span> : ''}
+          </button>
+        ))}
+      </div>
+    );
+  }
+  if (p.type === 'runefloor') {
+    const cols = p.grid[0].length;
+    return (
+      <div className="runefloor-wrap">
+        <p className="runeword">{p.word.split('').map((l) => runeFor(l)).join(' ')}</p>
+        <div className="runefloor" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
+          {p.grid.join('').split('').map((l, i) => (
+            <button key={i} type="button" disabled={!gm} onClick={() => onAct?.(i)}
+              className={`rtile ${st.path.includes(i) ? 'stepped' : ''} ${st.trapped === i ? 'trap' : ''} ${st.path[st.path.length - 1] === i ? 'here' : ''}`}>
+              {runeFor(l)}
+            </button>
+          ))}
+        </div>
+        <p className="muted small">Start on the bottom row. The top row is the far door.</p>
+      </div>
+    );
+  }
   return null;
 }
 
@@ -145,6 +215,30 @@ function ActivePuzzle({ sid, p, st, chars, players }) {
       setPuzzle(sid, { pos });
     }
     if (p.type === 'bottles') setPuzzle(sid, { revealed: [...st.revealed, args[0]] });
+    if (p.type === 'constellation') {
+      const n = args[0];
+      if (sel == null) { setSel(n); return; }
+      if (sel === n) { setSel(null); return; }
+      const k = edgeKey(sel, n);
+      setPuzzle(sid, { lines: st.lines.includes(k) ? st.lines.filter((x) => x !== k) : [...st.lines, k] });
+      setSel(null);
+    }
+    if (p.type === 'stairs') {
+      const rots = [...st.rots]; rots[args[0]] = (rots[args[0]] + 1) % 4;
+      setPuzzle(sid, { rots });
+    }
+    if (p.type === 'slider') {
+      const i = args[0], gap = st.tiles.indexOf(0);
+      const near = (Math.abs(i - gap) === 3) || (Math.abs(i - gap) === 1 && Math.floor(i / 3) === Math.floor(gap / 3));
+      if (!near) return;
+      const tiles = [...st.tiles]; tiles[gap] = tiles[i]; tiles[i] = 0;
+      setPuzzle(sid, { tiles });
+    }
+    if (p.type === 'runefloor') {
+      const i = args[0];
+      if (runeStepOk(p, st.path, i)) setPuzzle(sid, { path: [...st.path, i], trapped: null });
+      else setPuzzle(sid, { path: [], trapped: i });
+    }
   };
 
   const label = (name) => {
@@ -168,6 +262,10 @@ function ActivePuzzle({ sid, p, st, chars, players }) {
         {p.type === 'rings' && 'Turn the ring the players ask for.'}
         {p.type === 'bottles' && 'When a player drinks, tap that bottle to reveal it on the TV. Apply poison or sleep yourself.'}
         {p.type === 'cipher' && 'When the players guess a rune correctly, reveal that letter everywhere.'}
+        {p.type === 'constellation' && (sel != null ? `Star ${sel} selected. Tap the star to join it to (tap a line’s two stars again to remove it).` : 'Tap one star, then another, to draw a line between them.')}
+        {p.type === 'stairs' && 'Tap a piece to turn it a quarter clockwise. The path glows when it connects.'}
+        {p.type === 'slider' && 'Tap a piece next to the gap to slide it in.'}
+        {p.type === 'runefloor' && 'Tap the tile the walker steps on. A wrong step springs the trap and sends them back to the start (apply damage yourself).'}
       </p>
       <PuzzleView p={p} st={st} gm onAct={act} sel={sel} />
       {p.type === 'chess' && sel && st.board[sel] && (

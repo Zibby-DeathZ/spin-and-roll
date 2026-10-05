@@ -19,18 +19,42 @@
 - **Classes:** seven minigames on phones, two attempts, harder through the week. Professors and students
   move into the right classroom automatically.
 - **House points:** ⏳ Points button in the GM header, with an optional reason that shows on the TV.
-- **Map:** 31 connected places, secret places hidden until found, characters as tokens, monsters,
+- **Map:** 35 connected places (all four common rooms, the kitchens), secret places hidden until found, characters as tokens, monsters,
   people, chests (lock rolls), items on the ground, staff in their own rooms.
 - **TV:** full-screen map, "Here you can…" choices, paths, slim party bar.
 - **Dice and fights:** dice tab, spells with their own dice, initiative, Defence, knockouts, duels, XP.
 - **Hidden Killing Curse:** one learner, anonymous green flash, secret expulsion wheel.
 - **Wheels:** eight themed wheels that spin on the TV and apply their results.
 - **Quests:** 8 normal + 4 secret (The Trials Beneath, The Turning Lock, The Painter's Bargain, The Old Cup).
-- **TV puzzles you operate:** Living Chessboard, Torch Wall, Turning Lock, Seven Bottles, Vale's Diary.
-  Chess and bottle answers were checked by computer: each has exactly one solution.
+- **TV puzzles you operate (9):** Living Chessboard, Torch Wall, Turning Lock, Seven Bottles, Vale's Diary,
+  Serpent in the Stars, Moving Staircases, Scrambled Portrait, Rune Floor. Every answer was checked by computer.
+- **Suspect board** on the TV: pin clues under suspects, clear or accuse them.
+- **Detention:** a button, or Filch on the curfew wheel. Sends the student to the Trophy Room with Filch
+  and quietly starts *The Old Cup* for them.
+- **Hazards** for environmental fights: paint jars, cracked mirror, braziers, ritual circle, Vale's canvas, a pillar.
+- **End-of-night awards** worked out from the night's events, and the **House Cup ceremony**,
+  which also puts the cup in each winner's trophy cabinet.
+
+- **Opening cutscene:** studio ident (GM crest, your name), cinematic title, a red storybook the GM pages
+  through, families chosen inside the book, then the book closes into the game.
+- **Sound:** built-in effects on the TV; music tracks from `public/sounds/music/`; optional recorded narration.
+- **Main event lock:** phones lock during the opening, puzzles and TV shows, or whenever the GM presses 🎬.
+
+- **Owl Post:** private letters from the GM to one player (database-enforced privacy).
+- **Levels by year** (Year 1: 1–5, Year 2: 5–10 … Year 7: up to 35), +4 HP / +2 mana per level.
+- **Saved characters:** recording a win or loss saves every character to its player's profile;
+  the next year's family picker offers “Continue as…”.
+
+- **Media tab (GM):** previews of every cutscene and moment, every sound, music and narration, and a
+  checklist of every media file. Custom `video/intro.mp4` and `video/jumpscare.mp4` replace the built-ins.
 
 ### Still to make (your side)
-- Map images in `public/maps/` (31 files, prompts in our chat; also `charms-classroom` and `transfiguration-classroom`).
+- Map images in `public/maps/` (35 files; prompts in our chat).
+- `public/puzzles/portrait.jpg` for the Scrambled Portrait (optional).
+- Storybook pictures `public/story/page-1.jpg` … `page-6.jpg`.
+- Music in `public/sounds/music/` (see the README there) and optional narration recordings.
+- Optional videos: `public/video/intro.mp4`, `public/video/jumpscare.mp4`.
+- A printed cover: `docs/dm-guide/cover.jpg` (2480 × 3508 px).
 - Portraits in `public/portraits/` (6 files).
 - Physical wands and Hogwarts letters.
 - A test night: prologue → sorting → one class → one fight → one puzzle.
@@ -81,5 +105,10 @@ Your group is now comfortable with DnD and good at puzzles, so the best upgrades
 10. **The House Cup finale.** Great Hall in the winning house's colours on the TV, and a real prize
     (first pick in the Pokémon campaign).
 
-Pick two or three per session rather than all of them. The best ones for this group are probably
-**1 (suspect board)**, **5 (secret passages)** and **6 (environmental boss fight)**.
+**Built so far from this list:** 1, 3, 6, 7, 9 and 10. Still open: 2 (hint shop), 4 (named rival as a
+running character; Cassius Thorne exists as a suspect and token), 5 (secret passages), 8 (frog cards).
+
+### Running the finale with hazards
+Place in the Undercroft: the ritual circle, Vale's empty canvas, a shelf of paint jars, a cracked mirror and
+two cold braziers. The TV lists each one under "Here", so the players can plan around them. Ashgrove
+(phase 1) then Vale (phase 2). Breaking the circle and burning the canvas are what make phase 2 winnable.
