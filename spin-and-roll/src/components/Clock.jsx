@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import {
-  clockInfo, holdClass, lessonName, moveClock, taughtKey, turnBackTime,
+  clockInfo, holdClass, lessonName, moveClock, sceneBudget, setScenes, taughtKey, turnBackTime,
 } from '../lib/game';
 import { endLesson, startLesson } from '../lib/lessons';
 import { LessonBoard } from '../minigames';
@@ -45,6 +45,7 @@ export function GMClock({ sid, data, session, clk, chars, lessonResults }) {
         </div>
       </div>
 
+      <SceneControl sid={sid} data={data} clk={clk} scenes={session.state?.scenes} />
       {beat && <p className="beat"><strong>Story beat:</strong> {beat}</p>}
       {data.routines && <GMWorld sid={sid} data={data} session={session} chars={chars} />}
       {info.last && (
@@ -103,14 +104,55 @@ export function GMClock({ sid, data, session, clk, chars, lessonResults }) {
   );
 }
 
+// ---------- GM: the scene counter (how much the players can still do this block) ----------
+function SceneControl({ sid, data, clk, scenes }) {
+  if (!data.clock?.scenes) return null;
+  if (!scenes) {
+    const def = sceneBudget(data, clk);
+    return (
+      <p className="scene-ctl muted small">
+        No scene counter this block.{' '}
+        <button className="linkish" onClick={() => setScenes(sid, def ?? { left: 2, total: 2 })}>Add one</button>
+      </p>
+    );
+  }
+  const { left, total } = scenes;
+  return (
+    <div className={`scene-ctl${left === 0 ? ' out' : ''}`}>
+      <span className="scene-label">Time left this block</span>
+      <Pips left={left} total={total} />
+      <button className="btn small gold" disabled={left === 0} onClick={() => setScenes(sid, { left: left - 1, total })}>✓ Scene done</button>
+      <button className="btn small ghost" disabled={left >= total} onClick={() => setScenes(sid, { left: left + 1, total })}>Undo</button>
+      <button className="btn small ghost" title="Give them more time this block" onClick={() => setScenes(sid, { left: left + 1, total: total + 1 })}>+1</button>
+      <button className="linkish small" onClick={() => setScenes(sid, null)}>Hide</button>
+      {left === 1 && <span className="small warn">Warn them: “One more thing before the bell.”</span>}
+      {left === 0 && <span className="small warn">Out of time. Press Advance time when you’re ready.</span>}
+    </div>
+  );
+}
+
+function Pips({ left, total }) {
+  return (
+    <span className="scene-pips" aria-label={`${left} of ${total} left`}>
+      {Array.from({ length: total }, (_, i) => <i key={i} className={i < left ? 'on' : ''} />)}
+    </span>
+  );
+}
+
 // ---------- TV and phone: where we are in the week ----------
-export function ClockChip({ data, clk }) {
+export function ClockChip({ data, clk, scenes = null }) {
   const info = clockInfo(data, clk);
   if (!info) return null;
   return (
     <p className="clock-chip">
       🕰️ {info.label}
       {info.cls && <span>, {info.cls.icon} {info.cls.name}</span>}
+      {scenes && (
+        <span className={`chip-scenes${scenes.left === 0 ? ' out' : ''}`}>
+          <Pips left={scenes.left} total={scenes.total} />
+          {scenes.left === 0 ? 'The bell is ringing' : scenes.left === 1 ? 'Time for one more thing' : `Time for ${scenes.left} things`}
+        </span>
+      )}
     </p>
   );
 }

@@ -1201,3 +1201,20 @@ select.wide { width: 100%; background: var(--ink); color: var(--bone); border: 1
 .talk-note { margin: .2rem 0; font-size: .82rem; color: var(--teal); }
 .token-talk { width: 100%; margin-top: .3rem; }
 .token-talk summary { cursor: pointer; font-weight: 700; color: var(--gold); }
+
+/* ---------- Scene counter ---------- */
+.scene-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin: .6rem 0; padding: .5rem .7rem;
+  border: 1px solid rgba(232, 185, 76, .35); border-radius: 10px; background: rgba(232, 185, 76, .06); }
+.scene-ctl.out { border-color: rgba(230, 90, 90, .6); background: rgba(230, 90, 90, .08); }
+p.scene-ctl { border: none; background: none; padding: 0; }
+.scene-label { font-weight: 600; }
+.scene-pips { display: inline-flex; gap: .3rem; vertical-align: middle; }
+.scene-pips i { width: .8rem; height: .8rem; border-radius: 50%; border: 2px solid #e8b94c; display: inline-block; }
+.scene-pips i.on { background: #e8b94c; box-shadow: 0 0 8px rgba(232, 185, 76, .6); }
+.chip-scenes { display: inline-flex; align-items: center; gap: .45rem; margin-left: .8rem; padding-left: .8rem;
+  border-left: 1px solid rgba(255, 255, 255, .2); }
+.chip-scenes.out { color: #f08a8a; animation: bell 1.2s ease-in-out infinite; }
+.chip-scenes.out .scene-pips i { border-color: #f08a8a; }
+@keyframes bell { 50% { opacity: .55; } }
+.last-chance { color: #f0a35a; font-size: .8em; font-style: normal; margin-left: .3rem; }
+.world-offers.missed { border-left-color: #8fa9e8; }

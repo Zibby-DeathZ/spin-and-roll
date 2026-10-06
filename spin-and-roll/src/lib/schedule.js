@@ -1,9 +1,11 @@
 // The living castle: when time advances, everyone moves to where they should be,
 // the block's monsters, items, chests and hazards appear, and passing monsters leave.
-import { doc, getDoc, updateDoc, deleteField } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, updateDoc, deleteField } from 'firebase/firestore';
 import { db } from '../firebase';
 import { chestToken, hazardToken, itemToken } from './world';
 import { doubleToken, trunkToken } from './mimic';
+import { giveQuest } from './world';
+import { sendOwl } from './owls';
 
 const sessionRef = (sid) => doc(db, 'sessions', sid);
 
@@ -132,3 +134,48 @@ export async function applyWorld(sid, data, clkIn = null) {
 }
 
 export const setAutoWorld = (sid, on) => updateDoc(sessionRef(sid), { 'state.autoWorld': on });
+
+
+// ---------- Missed quests arrive by owl ----------
+// Quests whose window closed without anyone taking them, and that haven't been owled yet.
+export function missedOffers(data, session) {
+  const clk = session?.state?.clock ?? { day: 0, block: 0 };
+  const idx = clockIndex(data, clk);
+  const given = session?.state?.quests ?? {};
+  const owled = session?.state?.questOwls ?? {};
+  return (data.offers ?? []).filter((o) => o.owl && !given[o.quest] && !owled[o.quest] && idx > slotIndex(data, o.to));
+}
+// Is this the last block a quest is on offer?
+export const lastChance = (data, session, o) =>
+  slotIndex(data, o.to) === clockIndex(data, session?.state?.clock ?? { day: 0, block: 0 });
+
+export const setAutoOwls = (sid, on) => updateDoc(sessionRef(sid), { 'state.autoOwls': on });
+
+// Sends an owl for every missed quest and gives it to the students it was written for.
+export async function owlMissedQuests(sid, data, { force = false } = {}) {
+  if (!data?.offers) return [];
+  const snap = await getDoc(sessionRef(sid));
+  const session = snap.data();
+  if (!session || (!force && session.state?.autoOwls === false)) return [];
+  const missed = missedOffers(data, session);
+  if (!missed.length) return [];
+  const chars = Object.fromEntries((await getDocs(collection(db, 'sessions', sid, 'characters'))).docs.map((d) => [d.id, d.data()]));
+  const all = (session.playerUids ?? []).filter((u) => chars[u] && !chars[u].expelled);
+  if (!all.length) return [];
+  const sent = [];
+  for (const o of missed) {
+    let uids = all;
+    if (o.owl.to === 'one') uids = [all[Math.floor(Math.random() * all.length)]];
+    else if (o.owl.to?.startsWith('family:')) {
+      const fam = all.filter((u) => chars[u].family === o.owl.to.slice(7));
+      uids = fam.length ? fam : all;
+    }
+    // Mark first, so two quick clicks can't send it twice.
+    await updateDoc(sessionRef(sid), { [`state.questOwls.${o.quest}`]: uids });
+    const q = data.quests.find((x) => x.id === o.quest);
+    for (const u of uids) await sendOwl(sid, u, o.owl.from, o.owl.text);
+    if (q) await giveQuest(sid, data, o.quest, uids, { quiet: true });
+    sent.push(o.quest);
+  }
+  return sent;
+}

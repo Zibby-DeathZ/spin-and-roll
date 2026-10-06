@@ -163,6 +163,17 @@ BLOCKS = [
         '<b>Moving people yourself</b> still works. They stay put until their next scheduled move. Untick <b>Move everyone automatically</b> to run a block entirely by hand, and press <b>Put everyone in place now</b> to snap back to the timetable.',
         'The Time-Turner resets the castle to Day 1 morning along with everything else.',
     ]),
+    ('h3', 'Missed quests arrive by owl'),
+    ('p', 'Every quest is on offer for a few blocks. On its last block the panel marks it <b>Last chance</b>. If nobody picks it up, the person who would have given it sends an owl at the start of the next block, and the quest goes straight onto the players’ phones. The TV only shows that an owl arrived, so secret quests stay secret. The letters are spread out, about one a block, so nobody is buried in post.'),
+    ('list', [
+        'Most letters go to everyone. <b>The Other Half</b> goes to the Fenwick student, and <b>The Painter’s Bargain</b> to one student chosen at random.',
+        '<b>The Trials Beneath</b> never comes by owl. The players have to find the serpent door themselves.',
+        'Untick <b>Send missed quests by owl</b> to stop this. Anything missed then waits in the panel with a <b>Send them by owl now</b> button.',
+    ]),
+    ('tip', 'An owl is a second chance, not a punishment. Read the letter aloud in the sender’s voice when the player opens it. The full letters are in the Conversation Book.'),
+    ('h3', 'The scene counter'),
+    ('p', 'Lunch gives the players time for <b>2</b> things, free time <b>3</b>, curfew <b>2</b>. A no-class block, like the Hogsmeade trip or the lockdown, gives 3. Classes have no counter. The TV shows the time left as little gold lights next to the clock. Press <b>Scene done</b> after each thing they do. On the last one the GM screen reminds you to warn them, and at zero the TV says the bell is ringing. <b>+1</b> gives them more time, <b>Undo</b> takes a press back, and <b>Hide</b> removes the counter for that block.'),
+    ('p', 'One <b>scene</b> means going somewhere and doing one meaningful thing: a proper conversation, searching a room, opening a chest, shopping, a fight, a puzzle, or sneaking somewhere. Walking through a place on the way is free. Somewhere far, like the Forbidden Forest, takes a scene just to reach. Fights and puzzles end the block. A split party gets one budget per group; alternate one scene at a time between them.'),
     ('tip', 'The full timetable and every conversation are printed in the companion <b>Conversation Book</b>. Keep it open beside this one: this book tells you the story, that one tells you who is where and what they will say.'),
     ('h2', 'Sound, music and the main event'),
     ('list', [

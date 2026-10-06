@@ -130,17 +130,29 @@ export const schedule = {
 
 // ---------- Who offers which quest, and for how long ----------
 // npc: null means it isn't given by a person (the GM hands it out when the moment comes).
+// A quest is on offer from `from` to `to`. If nobody picks it up in time, it arrives by
+// Owl Post at the start of the next block (owl.from writes it; owl.to 'one' = a single student).
 export const offers = [
-  { quest: 'keep-an-eye-out', npc: 'sinclair-prefect', from: '1-Lunch', to: '2-Free time' },
-  { quest: 'stolen-ingredients', npc: 'grimsby', from: '1-Free time', to: '5-Free time' },
-  { quest: 'dueling-champion', npc: 'flitwick', from: '2-Free time', to: '6-Free time' },
-  { quest: 'card-collector', npc: 'collector', from: '2-Lunch', to: '6-Afternoon class' },
-  { quest: 'hollow-heir', npc: null, from: '2-Curfew', to: '7-Curfew', when: 'After the first victim is found' },
-  { quest: 'wake-sleepers', npc: 'longbottom', from: '3-Lunch', to: '6-Free time' },
-  { quest: 'bramble', npc: 'scamander', from: '3-Afternoon class', to: '5-Free time' },
-  { quest: 'other-half', npc: 'rival', from: '4-Lunch', to: '6-Free time' },
-  { quest: 'turning-lock', npc: null, from: '5-Free time', to: '7-Free time', when: 'When they find the Room of Requirement' },
-  { quest: 'painters-bargain', npc: 'painting', from: '5-Curfew', to: '7-Free time', when: 'To one student who visits the painting alone' },
+  { quest: 'keep-an-eye-out', npc: 'sinclair-prefect', from: '1-Lunch', to: '2-Free time',
+    owl: { from: 'Prefect Sinclair', text: 'First-years, sorry to write instead of finding you, I keep missing you. Something is wrong in this castle. The portraits near Ravenclaw Tower have gone quiet and I don’t think I’m imagining it. Keep your eyes open for me? Tell me anything strange, however small. — S.' } },
+  { quest: 'stolen-ingredients', npc: 'grimsby', from: '1-Free time', to: '3-Free time',
+    owl: { from: 'Professor Grimsby', text: 'Someone has been stealing from my store cupboard. Since half the school seems to think it was you lot, you can make yourselves useful and find out who. Find the ingredients, find the thief, and I may forget I ever suspected you. H. Grimsby.' } },
+  { quest: 'dueling-champion', npc: 'flitwick', from: '2-Free time', to: '4-Lunch',
+    owl: { from: 'Professor Flitwick', text: 'My dear students! The Dueling Club is still short of a first-year champion, and I have heard SUCH good things about your wandwork. Come to the Great Hall any evening. Fair fights, friendly spells, and a very shiny prize! F.F.' } },
+  { quest: 'card-collector', npc: 'collector', from: '2-Lunch', to: '5-Free time',
+    owl: { from: 'Wren Ashby', text: 'You don’t know me. Wren Ashby, Ravenclaw, fourth year, the one with all the cards. I am one Chocolate Frog card short of a set I have been building for three years, and I hear first-years get lucky. Find me a rare one and I will trade you a secret worth far more. I know a lot of secrets. — W.A.' } },
+  { quest: 'hollow-heir', npc: null, from: '2-Curfew', to: '3-Lunch', when: 'After the first victim is found',
+    owl: { from: 'The Headmaster', text: 'To the first-years who were in the corridor last night. You saw what happened to Miss Sinclair. I will not insult you by pretending it was an accident. If you notice anything, anything at all, I would be grateful to hear it. Be careful. Be together. Do not be brave alone.' } },
+  { quest: 'wake-sleepers', npc: 'longbottom', from: '3-Lunch', to: '5-Lunch',
+    owl: { from: 'Professor Longbottom', text: 'I think I can wake them. The drained students. There’s a Restorative Draught in an old book, but it needs three Mandrake leaves and more hands than I have, and I can’t leave the Hospital Wing right now. Come and find me there? Professor Longbottom.' } },
+  { quest: 'bramble', npc: 'scamander', from: '3-Afternoon class', to: '4-Free time',
+    owl: { from: 'Professor Scamander', text: 'A hippogriff has been seen at the edge of the Forbidden Forest wearing a torn tag with a Thornbury crest on it. Her name is Bramble, and she is frightened, and frightened hippogriffs are dangerous. Remember to bow. Do not hurt her. Bring her out if you can. Professor Scamander.' } },
+  { quest: 'other-half', npc: 'rival', from: '4-Lunch', to: '6-Lunch',
+    owl: { from: 'Cassius Thorne', text: 'I know you have half of an old map, Fenwick. I have the other half. One of us is going to end up with both. Courtyard, any lunchtime, if you’re brave. Bring yours. C. Thorne.', to: 'family:fenwick' } },
+  { quest: 'turning-lock', npc: null, from: '5-Free time', to: '6-Free time', when: 'When they find the Room of Requirement',
+    owl: { from: 'An unknown hand', text: 'Walk past the blank wall on the seventh floor three times, wanting what you need. Inside, in the corner nobody tidies, something is ticking. Its lock has three rings. The answers are hidden where the owls sleep, where the stars are counted, and where old victories are kept.' } },
+  { quest: 'painters-bargain', npc: 'painting', from: '5-Curfew', to: '6-Curfew', when: 'To one student who visits the painting alone',
+    owl: { from: 'The covered painting', to: 'one', text: 'You have not come to see me. That is wise. But wisdom will not save your friends on the seventh night. I know a curse that cannot be blocked. Find my three lost pages and I will teach it to you. Only you. Tell no one. — V.' } },
   { quest: 'vales-trials', npc: null, from: '7-Lunch', to: '7-Curfew', when: 'When they reach the serpent door below the Dungeons' },
 ];
 

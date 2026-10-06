@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { applyWorld, npcLocAt, offersNow, setAutoWorld, slotKey, talkNow } from '../lib/schedule';
+import { applyWorld, lastChance, missedOffers, npcLocAt, offersNow, owlMissedQuests, setAutoOwls, setAutoWorld, slotKey, talkNow } from '../lib/schedule';
 import { giveQuest, pinClue } from '../lib/world';
 
 // What a person can say today, with one-click clue pins and quest offers.
@@ -46,6 +46,9 @@ export function Conversation({ sid, data, session, chars, npcId, name }) {
 export default function GMWorld({ sid, data, session, chars }) {
   const clk = session.state?.clock ?? { day: 0, block: 0, dawn: 0 };
   const auto = session.state?.autoWorld !== false;
+  const autoOwls = session.state?.autoOwls !== false;
+  const missed = missedOffers(data, session);
+  const owled = Object.entries(session.state?.questOwls ?? {});
   const [open, setOpen] = useState(null);
   const [busy, setBusy] = useState(false);
   const offers = offersNow(data, session);
@@ -67,6 +70,10 @@ export default function GMWorld({ sid, data, session, chars }) {
             <input type="checkbox" checked={auto} onChange={(e) => setAutoWorld(sid, e.target.checked)} />
             Move everyone automatically when time advances
           </label>
+          <label className="announce">
+            <input type="checkbox" checked={autoOwls} onChange={(e) => setAutoOwls(sid, e.target.checked)} />
+            Send missed quests by owl
+          </label>
           <button className="btn small ghost" disabled={busy}
             onClick={async () => { setBusy(true); try { await applyWorld(sid, data, clk); } finally { setBusy(false); } }}>
             ↻ Put everyone in place now
@@ -79,7 +86,9 @@ export default function GMWorld({ sid, data, session, chars }) {
           <p className="muted small">Quests on offer right now:</p>
           {offers.map((o) => (
             <div key={o.quest} className="offer-row">
-              <span>{o.q.icon} <strong>{o.q.title}</strong>{o.q.hidden ? ' (secret)' : ''}</span>
+              <span>{o.q.icon} <strong>{o.q.title}</strong>{o.q.hidden ? ' (secret)' : ''}
+                {lastChance(data, session, o) && <em className="last-chance">{o.owl ? ' Last chance: arrives by owl next block' : ' Last chance'}</em>}
+              </span>
               <span className="muted small">
                 {o.npc ? `from ${data.bestiary[o.npc]?.name}, ${npcLocAt(data, o.npc, clk) ? `now at ${locName(npcLocAt(data, o.npc, clk))}` : 'not around this block'}` : o.when}
               </span>
@@ -88,6 +97,24 @@ export default function GMWorld({ sid, data, session, chars }) {
           ))}
           <p className="muted small">Or give a quest to only some students on the Quests tab.</p>
         </div>
+      )}
+
+      {missed.length > 0 && (
+        <div className="world-offers missed">
+          <p className="muted small">
+            Missed: {missed.map((o) => data.quests.find((q) => q.id === o.quest)?.title).join(', ')}.
+            {autoOwls ? ' They go out by owl when you next advance time.' : ''}
+          </p>
+          <button className="btn small" disabled={busy}
+            onClick={async () => { setBusy(true); try { await owlMissedQuests(sid, data, { force: true }); } finally { setBusy(false); } }}>
+            🦉 Send them by owl now
+          </button>
+        </div>
+      )}
+      {owled.length > 0 && (
+        <p className="muted small">
+          🦉 Arrived by owl: {owled.map(([qid, uids]) => `${data.quests.find((q) => q.id === qid)?.title} (to ${uids.length === players.length ? 'everyone' : uids.map((u) => chars[u]?.firstName ?? chars[u]?.name ?? '?').join(', ')})`).join('; ')}.
+        </p>
       )}
 
       {sch?.spawn?.length > 0 && (

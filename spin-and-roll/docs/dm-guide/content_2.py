@@ -7,10 +7,10 @@ BLOCKS = [
     ('h2', 'How a day runs'),
     ('table', ['Block', 'What the players do', 'Your job'], [
         ['Morning class', 'Go to class and play the minigame. Or skip it, and miss the lesson.', 'Start the class minigame.'],
-        ['Lunch', 'Explore, talk to people, follow leads.', 'Read beats. Give quests on offer. People and clues place themselves.'],
+        ['Lunch', 'Two things: explore, talk to people, follow leads.', 'Read beats. Give quests on offer. People and clues place themselves.'],
         ['Afternoon class', 'Second class of the day.', 'Start the class minigame.'],
-        ['Free time', 'Explore, quests, puzzles, the library.', 'Same as Lunch.'],
-        ['Curfew', 'Sneak around (risky) or rest.', 'Spin <b>Out after curfew</b> for anyone caught moving.'],
+        ['Free time', 'Three things: explore, quests, puzzles, the library.', 'Same as Lunch.'],
+        ['Curfew', 'Two things: sneak around (risky) or rest.', 'Spin <b>Out after curfew</b> for anyone caught moving.'],
     ], [30, 80, 60]),
     ('p', 'When you press <b>Advance time</b> past Curfew, a new morning begins: every student is restored to full HP and mana, and once-a-day abilities recharge. That is the long rest. If the party wants to keep going through the night, the clock does not care.'),
     ('gm', 'Every <b>Advance time</b> also moves the whole castle: staff, prefects, ghosts and Peeves go to their places for the new block, and that block’s clues, chests, hazards and monsters appear on the map. The tables below say what happens; the <b>Conversation Book</b> says exactly who is where. See <b>The living castle</b> in Part 3.'),

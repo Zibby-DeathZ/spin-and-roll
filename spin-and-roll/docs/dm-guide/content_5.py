@@ -141,6 +141,7 @@ BLOCKS = [
     ]),
     ('h2', 'Version log'),
     ('table', ['Version', 'Date', 'Changes'], [
+        ['2.2', 'October 2026', 'The scene counter (2 things at lunch, 3 in free time, 2 at curfew) shown on the TV and phones. Missed quests now arrive by Owl Post, spread through the week. Fixed new mornings not restoring HP.'],
         ['2.1', 'October 2026', 'The living castle: every person has a place for all 35 blocks of the week and moves there on Advance time, along with the clues, chests, hazards and monsters for that block. Quests on offer, conversations on the GM screen, and the companion Conversation Book.'],
         ['2.0', 'October 2026', 'Final edition for Year 1. Written by Zibby. Custom intro and jump scare videos, the Media tab for testing, the media file list, print notes and support for a designed cover.'],
         ['1.4', 'October 2026', 'Owl Post, yearly levels with level-up bonuses, saved characters carrying into Year 2, a pacing plan (three sessions, what to cut), and the Year 2 hook.'],

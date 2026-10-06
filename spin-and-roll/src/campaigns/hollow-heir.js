@@ -325,6 +325,9 @@ export const hollowHeir = {
     prologue: ['Letters arrive', 'Gringotts and Diagon Alley', 'The Hogwarts Express', 'The Welcome Feast'],
     blocks: ['Morning class', 'Lunch', 'Afternoon class', 'Free time', 'Curfew'],
     xpPerClass: 10,
+    // How many things the players can do in a block (one scene = go somewhere and do one thing).
+    // Class blocks have no counter; a class block with no class (Hogsmeade, lockdown) uses `free`.
+    scenes: { Lunch: 2, 'Free time': 3, Curfew: 2, free: 3 },
   },
 
   // Spells a character can learn. damage gets the character's spell damage bonus added.

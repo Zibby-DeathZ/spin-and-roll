@@ -49,14 +49,14 @@ function AbilityCard({ sid, c, ability, dawn }) {
   );
 }
 
-function Sheet({ sid, c, currency, data, points, clk, loc, discovered, owls = [] }) {
+function Sheet({ sid, c, currency, data, points, clk, scenes = null, loc, discovered, owls = [] }) {
   const lvl = levelFor(c.xp);
   const next = nextLevelAt(c.xp, c.levelCap ?? Infinity);
   const b = bonuses(c);
   const fam = data.families?.find((f) => f.id === c.family);
   return (
     <>
-      {data.clock && <ClockChip data={data} clk={clk} />}
+      {data.clock && <ClockChip data={data} clk={clk} scenes={scenes} />}
       {loc && <p className="loc-chip">📍 {loc.name}</p>}
       <div className="char-head">
         <Portrait family={c.family} name={c.name} className="sheet-portrait" />
@@ -334,7 +334,7 @@ export default function PlayerScreen() {
         </div>
       )}
       <main className="phone-body">
-        {tab === 'sheet' && <Sheet sid={sid} c={me} currency={currency} data={data} points={session.state?.housePoints ?? {}} clk={clockOf(session)}
+        {tab === 'sheet' && <Sheet sid={sid} c={me} currency={currency} data={data} points={session.state?.housePoints ?? {}} clk={clockOf(session)} scenes={session.state?.scenes}
           loc={data.locations?.find((l) => l.id === locOf(session, user.uid))}
           discovered={session.state?.map?.discovered ?? []} owls={owls} />}
         {tab === 'here' && <HereTab sid={sid} c={me} data={data} session={session} chars={chars} />}

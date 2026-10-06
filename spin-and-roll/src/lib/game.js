@@ -1,12 +1,12 @@
 import {
   addDoc, collection, deleteDoc, deleteField, doc, getDocs, increment, limit, onSnapshot, orderBy, query,
-  runTransaction, serverTimestamp, setDoc, updateDoc, where,
+  runTransaction, serverTimestamp, setDoc, updateDoc, where, writeBatch,
 } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { db } from '../firebase';
 import { applyAttack } from './combat';
 import { applyOpenChest, applyPickup, sendToDetention } from './world';
-import { applyWorld } from './schedule';
+import { applyWorld, owlMissedQuests } from './schedule';
 
 // ---------- Rules of the game ----------
 
@@ -319,6 +319,24 @@ async function restEveryone(sid) {
   await batch.commit();
 }
 
+// ---------- Scenes: how much the players can do this block ----------
+// A scene = go somewhere and do one meaningful thing. Classes and the prologue have no counter.
+export function sceneBudget(data, clk) {
+  const S = data.clock?.scenes;
+  if (!S || !clk || clk.day === 0) return null;
+  const info = clockInfo(data, clk);
+  if (info?.cls) return null;
+  const block = data.clock.blocks[clk.block];
+  const n = S[block] ?? S.free ?? null;
+  return n == null ? null : { left: n, total: n };
+}
+export function setScenes(sid, scenes) {
+  if (!scenes) return updateDoc(doc(db, 'sessions', sid), { 'state.scenes': null });
+  const total = Math.max(1, scenes.total);
+  const left = Math.max(0, Math.min(total, scenes.left));
+  return updateDoc(doc(db, 'sessions', sid), { 'state.scenes': { left, total } });
+}
+
 export async function moveClock(sid, data, clk, dir) {
   let { day, block, dawn } = clk;
   const P = data.clock.prologue.length, B = data.clock.blocks.length;
@@ -335,9 +353,10 @@ export async function moveClock(sid, data, clk, dir) {
     else { day--; block = B - 1; }
   }
   const next = { day, block, dawn };
-  await updateDoc(doc(db, 'sessions', sid), { 'state.clock': next });
+  await updateDoc(doc(db, 'sessions', sid), { 'state.clock': next, 'state.scenes': sceneBudget(data, next) });
   if (newDawn) await restEveryone(sid);
   await applyWorld(sid, data, next).catch(console.error);
+  if (dir > 0) await owlMissedQuests(sid, data).catch(console.error);
   if (dir > 0) {
     const info = clockInfo(data, next);
     await logEvent(sid, {
@@ -350,6 +369,7 @@ export async function moveClock(sid, data, clk, dir) {
 export async function turnBackTime(sid, clk, data = null) {
   await updateDoc(doc(db, 'sessions', sid), {
     'state.clock': { day: 1, block: 0, dawn: clk.dawn + 1 },
+    'state.scenes': data ? sceneBudget(data, { day: 1, block: 0 }) : null,
     'state.timeTurnerUsed': true,
     'state.taught': deleteField(),
   });

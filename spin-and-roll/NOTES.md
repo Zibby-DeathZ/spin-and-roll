@@ -21,6 +21,8 @@
   passing monsters leave when the block ends. Quests on offer show a scroll on the TV and a Give button for the GM.
 - **Conversations:** tap anyone on the GM map (or in the castle panel) for their voice, wants and today's topics,
   with buttons to pin clues and give quests. Printed as `docs/dm-guide/Conversation-Book.pdf`.
+- **Scene counter:** time left this block (Lunch 2, Free time 3, Curfew 2) as gold pips on the TV and phones;
+  the GM taps Scene done. **Missed quests** arrive by Owl Post at the start of the next block.
 - **Classes:** seven minigames on phones, two attempts, harder through the week. Professors and students
   move into the right classroom automatically.
 - **House points:** ⏳ Points button in the GM header, with an optional reason that shows on the TV.

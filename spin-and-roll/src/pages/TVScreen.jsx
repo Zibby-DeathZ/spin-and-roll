@@ -160,7 +160,7 @@ export function TVLive({ session, chars, profiles, data, title, answers, lessonR
     <main className="tv2">
       <header className="tv2-top">
         <span className="tv2-title">{title}</span>
-        {data.clock && <ClockChip data={data} clk={clockOf(session)} />}
+        {data.clock && <ClockChip data={data} clk={clockOf(session)} scenes={session.state?.scenes} />}
         {data.quizzes && <HouseBoard points={session.state?.housePoints} compact />}
       </header>
       <div className="tv2-stage">{stage}</div>

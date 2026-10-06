@@ -179,10 +179,11 @@ export async function applyPickup(sid, eid, data) {
 
 // ---------- Quests: state.quests[id] = { status, uids, done: [objective index…] } ----------
 
-export async function giveQuest(sid, data, qid, uids) {
+// quiet: no announcement on the TV (used when the quest arrives privately by owl).
+export async function giveQuest(sid, data, qid, uids, { quiet = false } = {}) {
   const q = data.quests.find((x) => x.id === qid);
   await updateDoc(sessionRef(sid), { [`state.quests.${qid}`]: { status: 'active', uids, done: [] } });
-  await logEvent(sid, { type: 'quest_new', payload: { title: q.title, icon: q.icon, giver: q.giver } });
+  if (!quiet) await logEvent(sid, { type: 'quest_new', payload: { title: q.title, icon: q.icon, giver: q.giver } });
 }
 
 export async function toggleObjective(sid, qid, qs, idx) {

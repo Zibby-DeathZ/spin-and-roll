@@ -19,7 +19,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import build_dm_guide as G  # shared fonts, colours, boxes and page layout
 
-VERSION = '1.0'
+VERSION = '1.1'
 D = json.load(open(os.path.join(HERE, 'world-data.json'), encoding='utf-8'))
 BLOCKS = D['blocks']
 LOC = D['locations']
@@ -142,11 +142,45 @@ def appearances():
                        'Untick <b>Move everyone automatically</b> if you want to run a block by hand.'))
     out.append(('h2', 'Quests on offer'))
     out.append(('p', 'A quest is on offer from its first block to its last. While it is, the person giving it shows a little scroll on the TV, '
-                     'and the Day &amp; class tab has a <b>Give</b> button for it.'))
+                     'and the Day &amp; class tab has a <b>Give</b> button for it. On its last block it is marked <b>Last chance</b>. '
+                     'If nobody takes it, it arrives by <b>Owl Post</b> at the start of the next block, and the quest goes straight onto their phones.'))
     rows = [[D['quests'][o['quest']]['title'] + (' (secret)' if D['quests'][o['quest']]['hidden'] else ''),
-             PEOPLE.get(o['npc'], '') if o.get('npc') else (o.get('when') or ''), slot_label(o['from']), slot_label(o['to'])] for o in D['offers']]
-    out.append(('table', ['Quest', 'Given by', 'From', 'Until'], rows, [44, 52, 37, 37]))
+             PEOPLE.get(o['npc'], '') if o.get('npc') else (o.get('when') or ''), slot_label(o['from']), slot_label(o['to']),
+             missed_label(o)] for o in D['offers']]
+    out.append(('table', ['Quest', 'Given by', 'From', 'Until', 'If missed'], rows, [34, 40, 28, 28, 40]))
+    out.append(('h2', 'The owl letters'))
+    out.append(('p', 'What each missed-quest owl says. The players read it on their phones; the TV only shows that an owl arrived.'))
+    for o in D['offers']:
+        if o.get('owl'):
+            out.append(('read', [f'<b>{D["quests"][o["quest"]]["title"]}</b>  <font size="9">(from {o["owl"]["from"]}, {who_label(o["owl"])})</font>',
+                                 o['owl']['text']]))
     return out
+
+
+def next_slot(key):
+    d, b = key.split('-', 1)
+    if d == '0':
+        return f'0-{int(b) + 1}' if int(b) + 1 < len(D['prologue']) else f'1-{BLOCKS[0]}'
+    i = BLOCKS.index(b)
+    return f'{d}-{BLOCKS[i + 1]}' if i + 1 < len(BLOCKS) else f'{int(d) + 1}-{BLOCKS[0]}'
+
+
+def who_label(owl):
+    to = owl.get('to')
+    if to == 'one':
+        return 'to one student, chosen at random'
+    if to and to.startswith('family:'):
+        return f'to the {to[7:].title()} student'
+    return 'to everyone'
+
+
+def missed_label(o):
+    if not o.get('owl'):
+        return 'No owl: this is the finale.'
+    d = next_slot(o['to'])
+    if int(d.split('-')[0]) > D['days']:
+        return 'Too late.'
+    return f'Owl from {o["owl"]["from"]}, {slot_label(d)}'
 
 
 GROUPS = [
@@ -223,6 +257,27 @@ def build(path):
                  '<b>Quests on offer</b> appear in the same panel with a Give button, and the person shows a little scroll on the TV.',
                  'On the <b>Table</b> tab, tap any person on the map to see what they can say today, with buttons to pin clues and give quests.',
                  'You can still move anyone by hand. They stay where you put them until their next scheduled move.',
+                 '<b>Missed quests arrive by owl.</b> If a quest’s window closes and nobody took it, the person who would have given it '
+                 'writes instead. See the end of Part 2.',
+                 '<b>The scene counter</b> shows on the TV how much time is left this block: 2 things at lunch, 3 in free time, 2 at curfew, '
+                 'none in class. Press <b>Scene done</b> after each thing the players do.',
+             ]),
+             ('h2', 'How much can they do in one block?'),
+             ('p', 'One <b>scene</b> is going somewhere and doing one meaningful thing there: a proper conversation with one person, '
+                   'searching a room, opening a chest, shopping, a fight, a puzzle, or sneaking somewhere. Walking through a place on the way is free.'),
+             ('table', ['Block', 'Scenes', 'Feel', 'Real time'], [
+                 ['Morning / Afternoon class', 'The class', 'Structured. Skipping class gives one free scene, but they miss the lesson.', '10 to 15 min'],
+                 ['Lunch', '2', 'Quick: eat, gossip, one errand.', 'About 10 min'],
+                 ['Free time', '3', 'The big exploring block. Quests and clues live here.', '20 to 30 min'],
+                 ['Curfew', '2', 'Tense. Every move spins Out after curfew. Getting caught ends their curfew.', '10 to 15 min'],
+                 ['No-class days (Hogsmeade, lockdown)', '3', 'Like free time.', '20 min'],
+             ], [44, 18, 78, 30]),
+             ('list', [
+                 '<b>Say the budget out loud</b> at the start of the block. Choosing what to skip is the fun.',
+                 '<b>Distance matters.</b> Next door is one scene. Somewhere far (the Forbidden Forest, the Astronomy Tower) takes a scene just to get there.',
+                 '<b>Fights and puzzles end the block.</b> When they finish, the bell rings.',
+                 '<b>Split party:</b> each group gets its own budget. Alternate one scene at a time between groups.',
+                 '<b>Generous is fine.</b> The <b>+1</b> button gives one more scene when a moment deserves it.',
              ]),
              ('tip', 'Players lead. The schedule only says where people are; the players decide who to talk to. '
                      'If they miss someone important, a ghost, a portrait or an owl can nudge them.')]
