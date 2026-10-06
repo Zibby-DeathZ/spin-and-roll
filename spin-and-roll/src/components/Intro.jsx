@@ -150,8 +150,16 @@ function Storybook({ intro, data, claims, st }) {
 
 // ---------- Your own opening video (public/video/intro.mp4) ----------
 function IntroVideo({ onDone, onMissing }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const v = ref.current;
+    if (!v) return;
+    // Browsers may block a video with sound until someone has clicked the page. Fall back to muted.
+    v.play().catch(() => { v.muted = true; v.play().catch(() => onMissing?.()); });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
-    <video className="intro-video" src={`${BASE}video/intro.mp4`} autoPlay playsInline
+    <video ref={ref} className="intro-video" src={`${BASE}video/intro.mp4`} playsInline preload="auto"
       onEnded={onDone} onError={onMissing} />
   );
 }
@@ -162,13 +170,14 @@ export default function TVIntro({ intro, data, st, claims, onVideoDone, onVideoM
   const [, tick] = useState(0);
   const [video, setVideo] = useState('try'); // 'try' | 'done' | 'missing'
   useEffect(() => { const t = setInterval(() => tick((x) => x + 1), 250); return () => clearInterval(t); }, []);
-  useEffect(() => { setVideo('try'); }, [st.at]);
+  // A fresh start (or "Replay from the start") tries the video again; skipping never does.
+  useEffect(() => { if (!st.skipped) setVideo('try'); }, [st.at, st.skipped]);
   const since = Date.now() - (st.at ?? 0);
-  const opening = st.stage === 'opening' && st.page === 0;
+  const opening = st.stage === 'opening' && st.page === 0 && !st.skipped;
   if (opening && video === 'try' && since < 10 * 60 * 1000) {
     return <IntroVideo onDone={() => { setVideo('done'); onVideoDone?.(); }} onMissing={() => { setVideo('missing'); onVideoMissing?.(); }} />;
   }
-  if (video === 'missing' && st.stage === 'opening' && since < IDENT_MS) return <StudioIdent studio={intro.studio} />;
-  if (video === 'missing' && st.stage === 'opening' && since < IDENT_MS + TITLE_MS) return <TitleCard title={intro.title} />;
+  if (video === 'missing' && opening && since < IDENT_MS) return <StudioIdent studio={intro.studio} />;
+  if (video === 'missing' && opening && since < IDENT_MS + TITLE_MS) return <TitleCard title={intro.title} />;
   return <Storybook intro={intro} data={data} claims={claims} st={st} />;
 }

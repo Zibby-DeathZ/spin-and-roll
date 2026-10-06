@@ -17,7 +17,7 @@ import MainEventLock from '../components/MainEventLock';
 import JumpScare from '../components/JumpScare';
 import { OwlArchive, OwlArrival } from '../components/OwlPost';
 import { useMyOwls } from '../lib/owls';
-import { mainEvent } from '../lib/intro';
+import { canChooseFamily, mainEvent } from '../lib/intro';
 import { LessonScreen } from '../minigames';
 import { useLessonResults } from '../lib/lessons';
 import { HouseBoard, PlayerQuiz } from '../components/Ceremony';
@@ -279,6 +279,9 @@ export default function PlayerScreen() {
   const locked = mainEvent(session);
   if (!me && data.families && session.status !== 'won' && session.status !== 'lost') {
     if (locked) return <MainEventLock />;
+    if (!canChooseFamily(session, data)) {
+      return <MainEventLock title="The story is about to begin" sub="Watch the TV. You’ll choose your family soon." />;
+    }
     return <FamilyPicker sid={sid} uid={user.uid} data={data} claims={claims} title={campaign?.title} />;
   }
 

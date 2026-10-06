@@ -1,4 +1,4 @@
-import { IDENT_MS, TITLE_MS, introPage, introStage, skipToBook, startIntro } from '../lib/intro';
+import { IDENT_MS, TITLE_MS, introPage, introStage, skipIntro, skipToBook, startIntro } from '../lib/intro';
 
 // Shown at the top of the GM screen while the opening cutscene runs.
 export function GMIntro({ sid, data, session, claims }) {
@@ -43,7 +43,13 @@ export function GMIntro({ sid, data, session, claims }) {
         </>
       )}
       {st.stage === 'closing' && <p>The book is closing…</p>}
-      <p className="muted small"><button className="linkish" onClick={() => startIntro(sid)}>Replay from the start</button></p>
+      <p className="muted small">
+        <button className="linkish" onClick={() => startIntro(sid)}>Replay from the start</button>
+        {' · '}
+        <button className="linkish" onClick={() => confirm('Skip the whole opening? Players can choose their families straight away.') && skipIntro(sid)}>
+          Skip the intro
+        </button>
+      </p>
     </section>
   );
 }

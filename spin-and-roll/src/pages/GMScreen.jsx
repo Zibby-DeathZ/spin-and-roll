@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getCampaign, getCampaignData } from '../campaigns';
 import { useProfiles, useSession } from '../lib/sessions';
@@ -26,7 +26,7 @@ import { saveHeroes } from '../lib/heroes';
 import { sendOwl } from '../lib/owls';
 import { sendToDetention } from '../lib/world';
 import { GMIntro, GMMusic } from '../components/GMIntro';
-import { introActive, setLock, setMusicState, startIntro } from '../lib/intro';
+import { introActive, setLock, setMusicState, skipIntro, startIntro } from '../lib/intro';
 import { useClaims } from '../lib/game';
 import { useLessonEngine } from '../lib/lessons';
 import { setExpelled, teachForbidden } from '../lib/combat';
@@ -227,6 +227,15 @@ export default function GMScreen() {
   const data = session ? getCampaignData(session.campaignId) : null;
   useGameEngine(sid, data); // carries out claims, purchases, trades and item uses while open
   const lessonResults = useLessonEngine(sid, data, session?.state?.lesson);
+  // If a game was started without its opening (for example from an old, un-refreshed dashboard tab),
+  // start it now, as long as nobody has chosen a family yet.
+  const autoIntro = useRef(false);
+  useEffect(() => {
+    if (autoIntro.current || !session || !data?.intro || session.status !== 'active') return;
+    if (session.state?.intro || Object.keys(claims ?? {}).length || Object.keys(chars ?? {}).length) return;
+    autoIntro.current = true;
+    startIntro(sid);
+  }, [sid, session, data, claims, chars]);
   const [tab, setTab] = useState('table');
   const [feedOpen, setFeedOpen] = useState(false);
   const [pointsOpen, setPointsOpen] = useState(false);
@@ -283,9 +292,13 @@ export default function GMScreen() {
       </nav>
 
       {data.intro && introActive(session) && <GMIntro sid={sid} data={data} session={session} claims={claims} />}
-      {data.intro && !session.state?.intro && session.status === 'active' && !Object.keys(chars).length && (
+      {data.intro && !session.state?.intro && session.status === 'active' && (
         <section className="gm-intro">
-          <p>The opening cutscene hasn’t played. <button className="btn small gold" onClick={() => startIntro(sid)}>🎬 Play the intro</button></p>
+          <p>
+            The opening cutscene hasn’t played.{' '}
+            <button className="btn small gold" onClick={() => startIntro(sid)}>🎬 Play the intro</button>{' '}
+            <button className="btn small ghost" onClick={() => skipIntro(sid)}>Skip it and let them choose</button>
+          </p>
         </section>
       )}
       {pointsOpen && <GMPoints sid={sid} session={session} chars={chars} onClose={() => setPointsOpen(false)} />}
