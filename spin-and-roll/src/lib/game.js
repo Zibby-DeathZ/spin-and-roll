@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { db } from '../firebase';
 import { applyAttack } from './combat';
 import { applyOpenChest, applyPickup, sendToDetention } from './world';
+import { applyWorld } from './schedule';
 
 // ---------- Rules of the game ----------
 
@@ -336,6 +337,7 @@ export async function moveClock(sid, data, clk, dir) {
   const next = { day, block, dawn };
   await updateDoc(doc(db, 'sessions', sid), { 'state.clock': next });
   if (newDawn) await restEveryone(sid);
+  await applyWorld(sid, data, next).catch(console.error);
   if (dir > 0) {
     const info = clockInfo(data, next);
     await logEvent(sid, {
@@ -345,7 +347,7 @@ export async function moveClock(sid, data, clk, dir) {
   }
 }
 
-export async function turnBackTime(sid, clk) {
+export async function turnBackTime(sid, clk, data = null) {
   await updateDoc(doc(db, 'sessions', sid), {
     'state.clock': { day: 1, block: 0, dawn: clk.dawn + 1 },
     'state.timeTurnerUsed': true,
@@ -353,6 +355,7 @@ export async function turnBackTime(sid, clk) {
   });
   await restEveryone(sid);
   await logEvent(sid, { type: 'time_turner' });
+  if (data) await applyWorld(sid, data, { day: 1, block: 0, dawn: clk.dawn + 1 }).catch(console.error);
 }
 
 // Gives one student what a lesson teaches, plus class XP.

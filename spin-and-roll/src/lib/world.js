@@ -3,6 +3,7 @@ import { arrayUnion, collection, deleteField, doc, getDoc, getDocs, runTransacti
 import { db } from '../firebase';
 import { adjust, awardPoints, giveItem, logEvent } from './game';
 import { springMimic } from './mimic';
+import { offersNow } from './schedule';
 
 const sessionRef = (sid) => doc(db, 'sessions', sid);
 const charRef = (sid, uid) => doc(db, 'sessions', sid, 'characters', uid);
@@ -38,11 +39,15 @@ export function actionsAt(data, session, locId) {
   if (!loc) return { paths: [], things: [], extras: [] };
   const tokens = Object.values(session?.state?.tokens ?? {}).filter((t) => t.loc === locId);
   const things = [];
+  const offerBy = new Set(offersNow(data, session).map((o) => o.npc).filter(Boolean));
   for (const t of tokens) {
     if (t.kind === 'chest') { if (!t.opened) things.push({ icon: t.icon, text: `Open the ${t.name.toLowerCase()}` }); }
     else if (t.kind === 'item') things.push({ icon: t.icon, text: `Pick up the ${t.name}` });
     else if (t.kind === 'hazard') { if (!t.used) things.push({ icon: t.icon, text: t.action, hazard: true }); }
-    else if (t.npc) things.push({ icon: t.icon, text: `Talk to ${t.name}` });
+    else if (t.npc) {
+      const offer = offerBy.has(t.kind) && !t.mimic;
+      things.push({ icon: offer ? '📜' : t.icon, text: `Talk to ${t.name}${offer ? ' (has a quest)' : ''}` });
+    }
     else if (t.hp > 0) things.push({ icon: '⚔️', text: `Fight the ${t.name}`, danger: true });
   }
   return {

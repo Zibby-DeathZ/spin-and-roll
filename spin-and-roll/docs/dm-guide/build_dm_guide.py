@@ -27,8 +27,8 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
 sys.path.insert(0, os.path.dirname(__file__))
-VERSION = '2.0'
-VERSION_NOTE = 'Final edition for Year 1. Matches the complete app, October 2026.'
+VERSION = '2.1'
+VERSION_NOTE = 'Year 1 with the living castle. Matches the complete app, October 2026.'
 
 # ---------- Fonts (fall back to built-ins if the TTFs aren't on this machine) ----------
 SERIF, SERIF_B, SERIF_I, SERIF_BI, SANS, SANS_B = 'Times-Roman', 'Times-Bold', 'Times-Italic', 'Times-BoldItalic', 'Helvetica', 'Helvetica-Bold'

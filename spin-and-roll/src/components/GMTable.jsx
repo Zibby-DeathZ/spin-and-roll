@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import MapView, { isMonster } from './MapView';
+import { Conversation } from './GMWorld';
 import { defenceOf } from '../lib/game';
 import {
   addToken, endFight, monsterAttack, moveToken, nextTurn, placeToken, removeToken, setTokenHp, startFight,
@@ -123,6 +124,12 @@ export default function GMTable({ sid, data, session, chars }) {
                   <button className="btn small ember" disabled={!target || t.hp <= 0} onClick={() => monsterAttack(sid, data, sel, target)}>Attack</button>
                 </span>
               </>
+            )}
+            {t?.npc && !t.mimic && data.talk?.[t.kind] && (
+              <details className="token-talk" open>
+                <summary>💬 What {t.name} can say today</summary>
+                <Conversation sid={sid} data={data} session={session} chars={chars} npcId={t.kind} name={t.name} />
+              </details>
             )}
             {t && <button className="btn small ghost" onClick={() => { removeToken(sid, sel); setSel(null); }}>Remove</button>}
             <button className="btn small ghost" onClick={() => setSel(null)}>Deselect</button>

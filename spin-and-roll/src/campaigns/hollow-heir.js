@@ -1,3 +1,5 @@
+import { extraNpcs, offers, routines, schedule, talk } from './hollow-heir-world.js';
+
 // The Hollow Heir: campaign data the engine reads.
 
 const items = {
@@ -26,6 +28,8 @@ const items = {
 };
 
 export const hollowHeir = {
+  // The living castle: positions, appearances, quest offers and conversations.
+  routines, schedule, offers, talk,
   // Part of the Hogwarts series. Characters are saved to player profiles and carry into the next year.
   series: 'hogwarts', seriesName: 'Hogwarts', year: 1, levelFloor: 1, levelCap: 5,
 
@@ -389,6 +393,7 @@ export const hollowHeir = {
     'sinclair-prefect': { name: 'Prefect Sinclair', icon: '🎖️', npc: true },
     painting: { name: 'The covered painting', icon: '🖼️', npc: true },
     rival: { name: 'Cassius Thorne', icon: '😏', npc: true },
+    ...extraNpcs,
   },
 
   // Where each member of staff belongs. "Staff to their rooms" on the GM screen puts them there.

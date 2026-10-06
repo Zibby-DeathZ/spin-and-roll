@@ -12,3 +12,16 @@ log at the end of `content_5.py`, and the PDF is rebuilt:
 
 When asking Claude to update the book, upload this folder (or the whole repo) so
 the latest content is the starting point.
+
+## Conversation Book
+
+`Conversation-Book.pdf` is the companion book: where every person is in all
+35 blocks of the week (plus the prologue), what appears when, which quests are
+on offer, and every conversation topic for every NPC. It is built from the
+same data the app uses (`src/campaigns/hollow-heir-world.js`), so it always
+matches the game:
+
+    node export_world.mjs        # writes world-data.json from the app's data
+    python3 build_talk_book.py   # builds Conversation-Book.pdf
+
+Run both whenever the timetable or conversations change.

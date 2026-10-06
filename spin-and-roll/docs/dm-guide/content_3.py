@@ -154,6 +154,16 @@ BLOCKS = [
     ], [22, 50, 52, 46]),
     ('p', 'When a student taps their ability on the phone, the TV announces it. You decide what they learn. Abilities recharge each morning.'),
 
+    ('h2', 'The living castle'),
+    ('p', 'Everyone in the castle keeps a timetable: the staff, prefects, Filch, Peeves, the ghost, the centaur, even the covered painting. There are 7 days with 5 blocks each, and every person has a set place in every one. When you press <b>Advance time</b>, the app moves them all there for you and puts out that block’s clues, chests, items, hazards and monsters. Passing monsters disappear when the block ends unless a fight is still going.'),
+    ('list', [
+        '<b>The castle this block</b> panel sits under the clock on the Day &amp; class tab. It lists who is where, what just appeared, and which quests are on offer right now.',
+        '<b>Quests on offer:</b> press <b>Give to everyone</b> once the players actually talk to that person. On the TV, people with a quest show a little scroll.',
+        '<b>Conversations:</b> tap any person in the panel, or their token on the map, to see their voice, what they want and what they can say today. Pin a clue or give a quest straight from there.',
+        '<b>Moving people yourself</b> still works. They stay put until their next scheduled move. Untick <b>Move everyone automatically</b> to run a block entirely by hand, and press <b>Put everyone in place now</b> to snap back to the timetable.',
+        'The Time-Turner resets the castle to Day 1 morning along with everything else.',
+    ]),
+    ('tip', 'The full timetable and every conversation are printed in the companion <b>Conversation Book</b>. Keep it open beside this one: this book tells you the story, that one tells you who is where and what they will say.'),
     ('h2', 'Sound, music and the main event'),
     ('list', [
         '<b>Sound effects</b> play on the TV by themselves: spells, hits, natural 20s, house points, level-ups, the wheel ticking, chests, page turns, the clock bell at dawn.',

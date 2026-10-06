@@ -1177,3 +1177,27 @@ select.wide { width: 100%; background: var(--ink); color: var(--bone); border: 1
 .check-group code { font-size: .75rem; color: var(--muted); }
 .check-group li { font: 500 .85rem/1.35 var(--body); }
 .check-group code { font: 500 .72rem var(--body); }
+
+/* ---------- The living castle ---------- */
+.gm-world { margin-top: 1rem; background: var(--ink); border-radius: 12px; padding: .8rem 1rem; }
+.gm-world h3 { font: 700 1.05rem var(--body); color: var(--gold); margin: 0; }
+.gm-world .announce { margin: 0; }
+.world-offers { margin: .6rem 0; padding: .6rem .8rem; border-left: 3px solid var(--gold); background: var(--panel); border-radius: 8px; }
+.world-offers p { margin: 0 0 .3rem; }
+.offer-row { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; padding: .3rem 0; border-bottom: 1px solid var(--line); }
+.offer-row .muted { flex: 1; }
+.world-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: .5rem; margin-top: .6rem; }
+.world-loc { background: var(--panel); border-radius: 10px; padding: .5rem .6rem; }
+.world-loc-name { margin: 0 0 .3rem; font-weight: 700; font-size: .88rem; }
+.world-npc { display: block; width: 100%; text-align: left; background: none; border: 1px solid transparent; color: var(--bone); border-radius: 8px; padding: .2rem .4rem; font: 500 .88rem var(--body); cursor: pointer; }
+.world-npc:hover, .world-npc.on { border-color: var(--gold); }
+.world-talk { margin-top: .8rem; background: var(--panel); border-radius: 10px; padding: .7rem .9rem; border-left: 3px solid var(--violet); }
+.talk-voice { margin: 0 0 .25rem; font-size: .88rem; color: var(--muted); }
+.talk-voice strong { color: var(--bone); }
+.talk-topics { list-style: none; padding: 0; margin: .5rem 0 0; }
+.talk-topics li { padding: .5rem 0; border-top: 1px solid var(--line); }
+.talk-q { margin: 0; font-weight: 700; color: var(--gold); }
+.talk-a { margin: .2rem 0; font: italic 1.02rem/1.45 'Grenze', Georgia, serif; }
+.talk-note { margin: .2rem 0; font-size: .82rem; color: var(--teal); }
+.token-talk { width: 100%; margin-top: .3rem; }
+.token-talk summary { cursor: pointer; font-weight: 700; color: var(--gold); }

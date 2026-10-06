@@ -16,6 +16,11 @@
 - **Shopping and equipment:** wands, robes (Defence), familiars (buffs), cauldrons, books, extras.
 - **7-day clock:** Morning class, Lunch, Afternoon class, Free time, Curfew. New mornings restore everyone.
   Story beats on the GM screen at the right moment. One-use Time-Turner.
+- **Living castle:** every person has a set place for all 35 blocks of the week (plus the prologue).
+  Advance time moves them all, and drops that block's clues, chests, hazards and monsters on the map;
+  passing monsters leave when the block ends. Quests on offer show a scroll on the TV and a Give button for the GM.
+- **Conversations:** tap anyone on the GM map (or in the castle panel) for their voice, wants and today's topics,
+  with buttons to pin clues and give quests. Printed as `docs/dm-guide/Conversation-Book.pdf`.
 - **Classes:** seven minigames on phones, two attempts, harder through the week. Professors and students
   move into the right classroom automatically.
 - **House points:** ⏳ Points button in the GM header, with an optional reason that shows on the TV.

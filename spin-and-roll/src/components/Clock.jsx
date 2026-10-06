@@ -4,6 +4,7 @@ import {
 } from '../lib/game';
 import { endLesson, startLesson } from '../lib/lessons';
 import { LessonBoard } from '../minigames';
+import GMWorld from './GMWorld';
 
 // ---------- GM: the clock, today's class, and the story beat ----------
 export function GMClock({ sid, data, session, clk, chars, lessonResults }) {
@@ -45,6 +46,7 @@ export function GMClock({ sid, data, session, clk, chars, lessonResults }) {
       </div>
 
       {beat && <p className="beat"><strong>Story beat:</strong> {beat}</p>}
+      {data.routines && <GMWorld sid={sid} data={data} session={session} chars={chars} />}
       {info.last && (
         <p className="beat danger">
           This is the final block. If the party hasn’t stopped Vale, record the loss from the dashboard.
@@ -91,7 +93,7 @@ export function GMClock({ sid, data, session, clk, chars, lessonResults }) {
         <button className="btn small" disabled={busy || turnerUsed || clk.day === 0}
           onClick={() => {
             if (confirm('Use the Time-Turner? Everyone returns to Day 1 morning, keeping XP, spells and items. It can only happen once.')) {
-              go(() => turnBackTime(sid, clk));
+              go(() => turnBackTime(sid, clk, data));
             }
           }}>
           ⌛ {turnerUsed ? 'Time-Turner broken' : 'Use the Time-Turner'}
