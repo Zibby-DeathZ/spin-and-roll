@@ -1,0 +1,193 @@
+<title>Hollow Heir Art Prompts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&family=IM+Fell+English:ital@0;1&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a working shot list. Sticky control bar, then one section per folder with a two-column grid of prompt cards. */
+:root {
+  --bg: #f3ecdc; --panel: #fbf7ee; --ink: #2a2140; --muted: #6c6280; --line: #d9ccb0;
+  --gold: #9a6b12; --gold-soft: #f0dfb4; --done: #2f7a55; --done-soft: #d7ecdf; --chip: #ebe1c9;
+  --display: 'IM Fell English SC', 'IM Fell English', Georgia, serif;
+  --serif: 'IM Fell English', Georgia, serif;
+  --body: 'Atkinson Hyperlegible', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #15122a; --panel: #1f1a38; --ink: #ece4d3; --muted: #a49cbc; --line: #352d58;
+  --gold: #e8b94c; --gold-soft: #3a2f1c; --done: #6fcf97; --done-soft: #1d3a2c; --chip: #2a2348; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #15122a; --panel: #1f1a38; --ink: #ece4d3; --muted: #a49cbc; --line: #352d58;
+  --gold: #e8b94c; --gold-soft: #3a2f1c; --done: #6fcf97; --done-soft: #1d3a2c; --chip: #2a2348; color-scheme: dark; }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 16px/1.55 var(--body); padding: 0 16px 64px; }
+.wrap { max-width: 1120px; margin: 0 auto; }
+header.top { padding-block: 32px 8px; display: grid; gap: 10px; }
+.eyebrow { font: 600 12px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--gold); margin: 0; }
+h1 { font: 400 clamp(2rem, 5vw, 3.2rem)/1.05 var(--display); margin: 0; text-wrap: balance; }
+.lede { margin: 0; max-width: 64ch; color: var(--muted); }
+.lede b { color: var(--ink); }
+
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 12px; border-bottom: 1px solid var(--line); display: grid; gap: 10px; }
+.bar-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.search { flex: 1 1 240px; min-width: 0; font: inherit; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { font: 600 13px var(--body); padding: 8px 11px; border: 0; background: var(--panel); color: var(--muted); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--gold); color: var(--bg); }
+.seg-label { font-size: 13px; color: var(--muted); }
+.progress { display: flex; align-items: center; gap: 10px; font: 600 13px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.meter { width: 120px; height: 6px; border-radius: 3px; background: var(--chip); overflow: hidden; }
+.meter i { display: block; height: 100%; background: var(--done); width: 0; transition: width .3s; }
+nav.chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: thin; }
+nav.chips a { flex: none; font: 600 13px var(--body); color: var(--ink); text-decoration: none; padding: 5px 10px; border-radius: 999px; background: var(--chip); white-space: nowrap; }
+nav.chips a span { color: var(--muted); font: 500 12px var(--mono); margin-left: 4px; font-variant-numeric: tabular-nums; }
+nav.chips a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+section.group { padding-top: 36px; scroll-margin-top: 130px; }
+.group-head { display: grid; gap: 4px; margin-bottom: 14px; }
+.group-head h2 { font: 400 1.9rem/1.1 var(--display); margin: 0; }
+.group-head p { margin: 0; color: var(--muted); max-width: 70ch; }
+.spec { display: flex; flex-wrap: wrap; gap: 6px 16px; font: 13px var(--mono); color: var(--muted); }
+.spec b { color: var(--ink); font-weight: 600; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr)); gap: 12px; }
+
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; display: grid; gap: 8px; min-width: 0; }
+.card.done { border-color: var(--done); background: linear-gradient(var(--done-soft), var(--done-soft)) top / 100% 4px no-repeat, var(--panel); }
+.card-head { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+.card h3 { margin: 0; font: italic 400 1.25rem/1.2 var(--serif); }
+.file { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.file code { font: 12.5px var(--mono); color: var(--gold); background: var(--gold-soft); padding: 2px 6px; border-radius: 4px; overflow-wrap: anywhere; }
+.prompt { margin: 0; font-size: 14.5px; line-height: 1.55; overflow-wrap: anywhere; }
+.prompt .style { color: var(--muted); }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.btn { font: 700 13px var(--body); padding: 7px 12px; border-radius: 7px; border: 1px solid var(--gold); background: var(--gold); color: var(--bg); cursor: pointer; }
+.btn.ghost { background: transparent; color: var(--gold); }
+.btn.copied { background: var(--done); border-color: var(--done); color: var(--bg); }
+label.made { margin-left: auto; display: inline-flex; gap: 6px; align-items: center; font-size: 13px; color: var(--muted); cursor: pointer; }
+label.made input { width: 16px; height: 16px; accent-color: var(--done); }
+.empty { color: var(--muted); font-style: italic; }
+.how { margin-top: 40px; padding: 16px 18px; border: 1px dashed var(--line); border-radius: 10px; color: var(--muted); max-width: 80ch; }
+.how h2 { font: 400 1.4rem var(--display); color: var(--ink); margin: 0 0 6px; }
+.how ol { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; }
+@media (prefers-reduced-motion: reduce) { .meter i { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <p class="eyebrow">Spin &amp; Roll · The Hollow Heir</p>
+    <h1>Art prompts</h1>
+    <p class="lede">Every picture the players see: <b>{{TOTAL}} prompts</b>. Copy one into your image tool, save the picture with the <b>exact file name</b> shown, and drop it in that folder inside <code>spin-and-roll</code>. Anything without a picture keeps its emoji, so make them in any order.</p>
+  </header>
+
+  <div class="bar">
+    <div class="bar-row">
+      <input id="q" class="search" type="search" placeholder="Find a prompt (e.g. Flitwick, potion, forest)" aria-label="Find a prompt">
+      <span class="seg-label" id="seg-label">Family portraits:</span>
+      <div class="seg" role="group" aria-labelledby="seg-label">
+        <button type="button" data-g="[boy/girl]" aria-pressed="true">Boy or girl</button>
+        <button type="button" data-g="boy" aria-pressed="false">Boy</button>
+        <button type="button" data-g="girl" aria-pressed="false">Girl</button>
+      </div>
+      <div class="progress"><span class="meter"><i id="meter"></i></span><span id="count">0 / {{TOTAL}} made</span></div>
+    </div>
+    <nav class="chips" id="chips" aria-label="Sections"></nav>
+  </div>
+
+  <main id="main"></main>
+
+  <aside class="how">
+    <h2>Getting them into the game</h2>
+    <ol>
+      <li>Save each picture with the exact name shown (lower case, dashes). PNG for people, monsters and items; JPG for maps, portraits, the storybook and the puzzle.</li>
+      <li>Put it in that folder inside your <code>spin-and-roll\spin-and-roll</code> project. The <code>art</code> folders are new; create them if they aren't there.</li>
+      <li>Commit and push in GitHub Desktop. After the deploy, press Ctrl+F5.</li>
+      <li>On the GM screen, the <b>Media</b> tab lists every file and ticks off the ones it finds.</li>
+    </ol>
+  </aside>
+</div>
+
+<script>
+const DATA = /*DATA*/null;
+const STYLE_START = 'Painted storybook fantasy illustration';
+let gender = '[boy/girl]';
+let made = {};
+try { made = JSON.parse(localStorage.getItem('hh-art-made') || '{}'); } catch (e) { made = {}; }
+const save = () => { try { localStorage.setItem('hh-art-made', JSON.stringify(made)); } catch (e) {} };
+const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const textOf = (it) => it.prompt.replaceAll('[boy/girl]', gender);
+const total = DATA.reduce((n, s) => n + s.items.length, 0);
+
+function render() {
+  const q = document.getElementById('q').value.trim().toLowerCase();
+  const main = document.getElementById('main');
+  const chips = document.getElementById('chips');
+  main.innerHTML = ''; chips.innerHTML = '';
+  for (const s of DATA) {
+    const items = s.items.filter((it) => !q || (it.name + ' ' + it.file + ' ' + it.prompt).toLowerCase().includes(q));
+    const doneN = s.items.filter((it) => made[it.file]).length;
+    const a = document.createElement('a');
+    a.href = '#' + s.key; a.innerHTML = `${esc(s.title)}<span>${doneN}/${s.items.length}</span>`;
+    chips.appendChild(a);
+    if (!items.length) continue;
+    const sec = document.createElement('section');
+    sec.className = 'group'; sec.id = s.key;
+    sec.innerHTML = `<div class="group-head"><h2>${esc(s.title)}</h2><p>${esc(s.blurb)}</p>
+      <div class="spec"><span>Folder <b>${esc(s.folder)}/</b></span><span>Size <b>${esc(s.size)}</b></span></div></div>`;
+    const grid = document.createElement('div'); grid.className = 'grid';
+    for (const it of items) {
+      const full = textOf(it);
+      const cut = full.indexOf(STYLE_START);
+      const main_ = cut > 0 ? full.slice(0, cut) : full;
+      const style = cut > 0 ? full.slice(cut) : '';
+      const card = document.createElement('article');
+      card.className = 'card' + (made[it.file] ? ' done' : '');
+      const cid = 'm-' + it.file.replace(/[^a-z0-9]/gi, '-');
+      card.innerHTML = `<div class="card-head"><h3>${esc(it.name)}</h3></div>
+        <div class="file"><code>${esc(it.file)}</code></div>
+        <p class="prompt">${esc(main_)}<span class="style">${esc(style)}</span></p>
+        <div class="actions">
+          <button type="button" class="btn" data-copy="prompt">Copy prompt</button>
+          <button type="button" class="btn ghost" data-copy="name">Copy file name</button>
+          <label class="made" for="${cid}"><input id="${cid}" type="checkbox" ${made[it.file] ? 'checked' : ''}> Made it</label>
+        </div>`;
+      card.querySelector('[data-copy="prompt"]').addEventListener('click', (e) => copy(e.currentTarget, textOf(it)));
+      card.querySelector('[data-copy="name"]').addEventListener('click', (e) => copy(e.currentTarget, it.file.split('/').pop()));
+      card.querySelector('input').addEventListener('change', (e) => {
+        if (e.target.checked) made[it.file] = 1; else delete made[it.file];
+        save(); card.classList.toggle('done', e.target.checked); tally();
+      });
+      grid.appendChild(card);
+    }
+    sec.appendChild(grid); main.appendChild(sec);
+  }
+  if (!main.children.length) main.innerHTML = '<p class="empty">Nothing matches that. Try a shorter word.</p>';
+  tally();
+}
+
+function tally() {
+  const n = Object.keys(made).length;
+  document.getElementById('count').textContent = `${n} / ${total} made`;
+  document.getElementById('meter').style.width = (n / total * 100) + '%';
+  document.querySelectorAll('#chips a').forEach((a, i) => {
+    const s = DATA[i]; a.querySelector('span').textContent = `${s.items.filter((it) => made[it.file]).length}/${s.items.length}`;
+  });
+}
+
+function copy(btn, text) {
+  const done = () => { const t = btn.textContent; btn.textContent = 'Copied'; btn.classList.add('copied'); setTimeout(() => { btn.textContent = t; btn.classList.remove('copied'); }, 1400); };
+  const fallback = () => {
+    const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) { btn.textContent = 'Select and copy the text'; }
+    ta.remove();
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fallback); else fallback();
+}
+
+document.getElementById('q').addEventListener('input', render);
+document.querySelectorAll('.seg button').forEach((b) => b.addEventListener('click', () => {
+  gender = b.dataset.g;
+  document.querySelectorAll('.seg button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+  render();
+}));
+render();
+</script>

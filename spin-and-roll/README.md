@@ -45,7 +45,8 @@ Your site: `https://<username>.github.io/<repo-name>/`
    every player's history, and a win drops the campaign trophy into their cabinet.
 
 For the DM: `docs/dm-guide/DM-Guide.pdf` tells the story; `docs/dm-guide/Conversation-Book.pdf`
-says who is where every block and what each person will say.
+says who is where every block and what each person will say. `docs/art/art-prompts.md` has an image
+prompt for every picture the players see.
 
 ## Map images
 Put one image per location in `public/maps/`, named after the location id (see the

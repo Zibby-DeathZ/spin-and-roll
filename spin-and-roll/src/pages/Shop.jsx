@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { bonusText, buy, shopEntry } from '../lib/game';
+import Art, { itemArt } from '../components/Art';
 
 export default function Shop({ sid, c, data, open }) {
   const [pending, setPending] = useState(null);
@@ -51,7 +52,7 @@ export default function Shop({ sid, c, data, open }) {
             const broke = c.gold < e.price;
             return (
               <div key={e.id} className="shop-item">
-                <span className="item-icon">{e.icon}</span>
+                <Art path={itemArt(e.id)} icon={e.icon} className="item-icon" />
                 <span className="shop-info">
                   <strong>{e.name}</strong>
                   <span className="muted small">{e.desc ?? e.note ?? bonusText(e.effect)}</span>

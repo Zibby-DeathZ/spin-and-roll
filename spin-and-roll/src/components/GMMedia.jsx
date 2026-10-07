@@ -21,6 +21,22 @@ async function anyOf(paths) {
   return null;
 }
 
+// Every picture that can replace an emoji (public/art/<folder>/<id>.png).
+function artGroups(data) {
+  const art = (base) => anyOf(['png', 'webp', 'jpg'].map((e) => `art/${base}.${e}`));
+  const rows = (folder, entries) => entries.map(([id, name]) => [name, `art/${folder}/${id}.png`, art(`${folder}/${id}`)]);
+  const B = Object.entries(data.bestiary ?? {});
+  const shop = (data.shops ?? []).flatMap((s) => s.stock.map((x) => [x.id, x.name ?? x.id]));
+  return {
+    'Art: people': rows('people', B.filter(([, b]) => b.npc).map(([id, b]) => [id, b.name])),
+    'Art: monsters': rows('monsters', B.filter(([, b]) => !b.npc).map(([id, b]) => [id, b.name])),
+    'Art: items': rows('items', [['wand', 'Wand (every wand)'], ...Object.entries(data.items ?? {}).map(([id, i]) => [id, i.name]), ...shop]),
+    'Art: chests': rows('chests', Object.entries(data.chests ?? {}).map(([id, c]) => [id, c.name])),
+    'Art: hazards': rows('hazards', Object.entries(data.hazards ?? {}).map(([id, h]) => [id, h.name])),
+    'Art: mimics (revealed)': rows('mimics', Object.entries(data.mimics ?? {}).map(([id, m]) => [id, m.name])),
+  };
+}
+
 // ---------- Full-screen previews (local only: nothing reaches the TV or phones) ----------
 function IntroPreview({ data, onClose }) {
   const intro = data.intro;
@@ -117,6 +133,7 @@ export default function GMMedia({ data, session }) {
         Portraits: (data.families ?? []).map((f) => [f.name, `portraits/${f.id}.jpg`, img(`portraits/${f.id}`)]),
         Maps: (data.locations ?? []).map((l) => [l.name, `maps/${l.id}.jpg`, img(`maps/${l.id}`)]),
         Puzzles: [['Scrambled Portrait', 'puzzles/portrait.jpg', exists('puzzles/portrait.jpg')]],
+        ...artGroups(data),
       };
       const out = {};
       for (const [g, rows] of Object.entries(groups)) {

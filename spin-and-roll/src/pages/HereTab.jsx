@@ -3,6 +3,7 @@ import { isMonster } from '../components/MapView';
 import { fmtMod, mod, statOf } from '../lib/game';
 import { rollD20 } from '../lib/dice';
 import { exitsOf, locOf, pcsAt, rewardText, sendOpenChest, sendPickup } from '../lib/world';
+import Art, { tokenArt } from '../components/Art';
 
 function ChestRoll({ sid, c, id, t, onClose }) {
   const knowsAlohomora = (c.spells ?? []).some((s) => s.id === 'alohomora');
@@ -23,7 +24,7 @@ function ChestRoll({ sid, c, id, t, onClose }) {
   return (
     <div className="sheet-overlay" role="dialog" aria-label={`Open ${t.name}`}>
       <div className="sheet-panel">
-        <h3>{t.icon} {t.name}</h3>
+        <h3 className="here-thing"><Art path={tokenArt(t)} icon={t.icon} className="here-icon big" /> {t.name}</h3>
         <p>Roll d20 {fmtMod(bonus)} ({t.stat.toUpperCase()}) to open it. You only get one try.</p>
         {knowsAlohomora && <p className="small hit">🔓 You know Alohomora: roll with advantage.</p>}
         {roll ? (
@@ -85,7 +86,7 @@ export default function HereTab({ sid, c, data, session, chars }) {
                 const tried = (t.tried ?? []).includes(c.uid);
                 return (
                   <li key={id}>
-                    <span>{t.icon} {t.name}</span>
+                    <span className="here-thing"><Art path={tokenArt(t)} icon={t.icon} className="here-icon" /> {t.name}</span>
                     {t.opened ? <span className="muted small">Empty</span>
                       : tried ? <span className="muted small">You couldn’t open it</span>
                         : <button className="btn small gold" onClick={() => setChest(id)}>Open</button>}
@@ -95,23 +96,23 @@ export default function HereTab({ sid, c, data, session, chars }) {
               if (t.kind === 'item') {
                 return (
                   <li key={id}>
-                    <span>{t.icon} {t.name}</span>
+                    <span className="here-thing"><Art path={tokenArt(t)} icon={t.icon} className="here-icon" /> {t.name}</span>
                     <button className="btn small teal" onClick={() => sendPickup(sid, c.uid, id)}>Pick up</button>
                   </li>
                 );
               }
               if (t.kind === 'hazard') {
-                return <li key={id}><span>{t.icon} {t.name}</span><span className="muted small">{t.used ? 'Used' : 'Tell the DM if you want to use it'}</span></li>;
+                return <li key={id}><span className="here-thing"><Art path={tokenArt(t)} icon={t.icon} className="here-icon" /> {t.name}</span><span className="muted small">{t.used ? 'Used' : 'Tell the DM if you want to use it'}</span></li>;
               }
               if (isMonster(t)) {
                 return (
                   <li key={id} className={t.hp <= 0 ? 'muted' : ''}>
-                    <span>{t.icon} {t.name}</span>
+                    <span className="here-thing"><Art path={tokenArt(t)} icon={t.icon} className="here-icon" /> {t.name}</span>
                     <span className="small">{t.hp <= 0 ? 'Defeated' : `${t.hp}/${t.maxHp} HP`}</span>
                   </li>
                 );
               }
-              return <li key={id}><span>{t.icon} {t.name}</span><span className="muted small">Here</span></li>;
+              return <li key={id}><span className="here-thing"><Art path={tokenArt(t)} icon={t.icon} className="here-icon" /> {t.name}</span><span className="muted small">Here</span></li>;
             })}
           </ul>
         </section>

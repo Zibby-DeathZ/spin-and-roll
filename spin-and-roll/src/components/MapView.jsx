@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Art, { tokenArt } from './Art';
 import Portrait from './Portrait';
 
 const EXTS = ['jpg', 'png', 'webp'];
@@ -37,7 +38,7 @@ export default function MapView({ loc, tokens = {}, pcs = [], encounter, selecte
             className={`token ${cls} ${down ? 'down' : ''} ${selected === id ? 'sel' : ''} ${current?.id === id ? 'turn' : ''}`}
             style={{ left: `${t.x}%`, top: `${t.y}%`, ...(t.scale ? { transform: `translate(-50%, -50%) scale(${t.scale})` } : {}) }}
             onClick={pick(id)} aria-label={t.name} tabIndex={onSelect ? 0 : -1}>
-            <span className={`token-icon ${t.revealed ? 'mimic-icon' : ''}`}>{t.icon}</span>
+            <Art path={tokenArt(t)} icon={t.icon} className={`token-icon ${t.revealed ? 'mimic-icon' : ''}`} />
             {!small && <span className="token-name">{t.name}</span>}
             {mon && <span className="token-hp"><span style={{ width: `${Math.max(0, (t.hp / t.maxHp) * 100)}%` }} /></span>}
           </button>

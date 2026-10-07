@@ -13,6 +13,7 @@ import DiceTab from './DiceTab';
 import HereTab from './HereTab';
 import { locOf } from '../lib/world';
 import Portrait from '../components/Portrait';
+import Art, { itemArt } from '../components/Art';
 import MainEventLock from '../components/MainEventLock';
 import JumpScare from '../components/JumpScare';
 import { OwlArchive, OwlArrival } from '../components/OwlPost';
@@ -133,7 +134,7 @@ function Bag({ c, sid, others, onGive }) {
             {eq.map(([slot, val]) => (
               <li key={slot} className="item-row">
                 <span className="item-name">
-                  <span className="item-icon">{val.icon}</span>
+                  <Art path={itemArt(val.id, slot)} icon={val.icon} className="item-icon" />
                   <span>{val.name}<br /><span className="muted small">{bonusText(val.bonus) || val.desc}</span></span>
                 </span>
                 <span className="muted small cap">{slot}</span>
@@ -148,7 +149,7 @@ function Bag({ c, sid, others, onGive }) {
         {(c.inventory ?? []).map((i) => (
           <li key={i.id} className="item-row">
             <span className="item-name">
-              <span className="item-icon">{i.icon}</span>
+              <Art path={itemArt(i.id)} icon={i.icon} className="item-icon" />
               {i.name} <span className="muted">×{i.qty}</span>
             </span>
             <span className="item-actions">
