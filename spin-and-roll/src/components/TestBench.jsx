@@ -7,6 +7,7 @@ const KITS = [
   ['level', '⭐ Top level for this year'],
   ['spells', '✨ Every spell (locked ones too)'],
   ['items', '🎒 One of every item (both map halves too)'],
+  ['clues', '📜 Every clue (all three diary pages)'],
   ['mana', '🔮 Lots of mana'],
   ['refill', '❤️ Full HP and mana, clear statuses'],
   ['gold', '🪙 +500 Galleons'],

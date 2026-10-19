@@ -25,15 +25,37 @@ const items = {
   'mandrake-leaf': { name: 'Mandrake leaf', icon: '🌱', note: 'Key ingredient in the draught that restores drained students', kind: 'key', usableAt: ['greenhouses', 'dungeons'] },
   'creature-treats': { name: 'Creature treats', icon: '🦴', note: 'Calms one magical creature instantly', kind: 'consumable' },
   'serpent-key': { name: 'Serpent key', icon: '🗝️', note: 'Opens the door beneath Hogwarts. Only a Parseltongue can turn it', kind: 'key', usableAt: ['dungeons', 'undercroft'], keep: true },
-  'map-half': { name: 'Half of the Marauder’s Map', icon: '📜', note: 'Torn down the middle. It wakes only for the right words', opensMap: true, kind: 'key', keep: true },
+  'map-half': {
+    name: 'Half of the Marauder’s Map', icon: '📜', note: 'Torn down the middle. It wakes only for the right words', opensMap: true, kind: 'key', keep: true,
+    read: {
+      style: 'runes', heading: 'Scratched along the torn edge',
+      pages: ['I SOLEMNLY SWEAR THAT I AM UP TO NO GOOD'],
+      footer: 'Tiny runes in faded ink. Ask the DM to put them on the TV so you can work them out together.',
+    },
+  },
   'map-other-half': { name: 'The other half of the Marauder’s Map', icon: '📜', note: 'Its torn edge matches the Fenwick half exactly', opensMap: true, kind: 'key', keep: true },
-  'vale-page': { name: 'Torn page about Corvin Vale', icon: '📄', note: 'A painter who wanted to live forever', kind: 'clue' },
+  'vale-page': {
+    name: 'Torn page about Corvin Vale', icon: '📄', note: 'A painter who wanted to live forever', kind: 'clue',
+    read: {
+      style: 'book', heading: 'Painters of the Enchanted Canvas, page 212',
+      text: '…Corvin Vale, whose portraits were said to breathe. His patrons swore the painted eyes followed them home. In his last years Vale grew terribly afraid of dying, and began a self-portrait he vowed he would never finish, “for a finished thing can end.” He was last seen at the castle that paid for his final work. That portrait was never found. Some say he did not die at all, but simply stepped insi—',
+      footer: 'The rest of the page is torn away.',
+    },
+  },
   'restorative-draught': { name: 'Restorative Draught', icon: '⚗️', note: 'Wakes one drained student', kind: 'key', usableAt: ['hospital-wing'] },
   'frog-card': { name: 'Rare Chocolate Frog card', icon: '🃏', note: 'A collector would love this', kind: 'key', usableAt: ['library'] },
-  'ring-clue-serpent': { name: 'Scratched note (first ring)', icon: '🗒️', note: '“The first ring remembers what sleeps beneath the castle.”', kind: 'clue' },
-  'ring-clue-moon': { name: 'Star chart (second ring)', icon: '🗺️', note: '“The second ring follows the lamp of the night.”', kind: 'clue' },
-  'ring-clue-owl': { name: 'Feathered card (last ring)', icon: '🪶', note: '“The last ring belongs to the one who carries every letter.”', kind: 'clue' },
-  'diary-page': { name: 'Page of Vale’s diary', icon: '📓', note: 'Written in runes. Collect all three.', kind: 'clue' },
+  'ring-clue-serpent': { name: 'Scratched note (first ring)', icon: '🗒️', note: '“The first ring remembers what sleeps beneath the castle.”', kind: 'clue', read: { style: 'note', text: '“The first ring remembers what sleeps beneath the castle.”' } },
+  'ring-clue-moon': { name: 'Star chart (second ring)', icon: '🗺️', note: '“The second ring follows the lamp of the night.”', kind: 'clue', read: { style: 'note', text: '“The second ring follows the lamp of the night.”' } },
+  'ring-clue-owl': { name: 'Feathered card (last ring)', icon: '🪶', note: '“The last ring belongs to the one who carries every letter.”', kind: 'clue', read: { style: 'note', text: '“The last ring belongs to the one who carries every letter.”' } },
+  'diary-page': {
+    name: 'Page of Vale’s diary', icon: '📓', note: 'Written in runes. Collect all three.', kind: 'clue',
+    // Each page you hold shows its part of the diary, in runes. All three together are the TV puzzle Vale’s Diary.
+    read: {
+      style: 'runes', heading: 'Pages of a diary, in a spiky hand',
+      pages: ['ONLY THE ONE WHO STANDS ALONE', 'MAY LEARN THE CURSE', 'THAT CANNOT BE BLOCKED'],
+      footer: 'Each rune is always the same letter. With all three pages, show the DM: the whole diary goes up on the TV.',
+    },
+  },
   'stolen-jars': { name: 'Stolen ingredient jars', icon: '🫙', note: 'Labelled in Grimsby’s spiky handwriting', kind: 'key', usableAt: ['dungeons'] },
 };
 

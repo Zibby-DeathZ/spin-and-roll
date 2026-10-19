@@ -49,6 +49,18 @@ export async function testKit(sid, data, session, uid, kit) {
       const add = Object.entries(data.items ?? {}).filter(([id]) => !have.has(id)).map(([id, it]) => ({ id, ...it, qty: 1 }));
       upd.inventory = [...(c.inventory ?? []), ...add];
     }
+    if (kit === 'clues') {
+      // Every clue, with all three diary pages so the whole diary can be read.
+      const inv = [...(c.inventory ?? [])];
+      for (const [id, it] of Object.entries(data.items ?? {})) {
+        if (it.kind !== 'clue') continue;
+        const want = it.read?.pages?.length ?? 1;
+        const at = inv.findIndex((i) => i.id === id);
+        if (at >= 0) inv[at] = { ...inv[at], qty: Math.max(inv[at].qty ?? 1, want) };
+        else inv.push({ id, ...it, qty: want });
+      }
+      upd.inventory = inv;
+    }
     if (kit === 'once') upd.abilityDawn = null;
     if (Object.keys(upd).length) tx.update(snap.ref, upd);
   });

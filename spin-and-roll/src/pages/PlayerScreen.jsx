@@ -34,6 +34,7 @@ import { PlayerDuel, duelNeedsMe } from '../components/Duel';
 import { PlayerMapScreen } from '../components/Marauders';
 import HouseCrest from '../components/HouseCrest';
 import Info from '../components/Info';
+import ClueReader from '../components/ClueReader';
 
 function AbilityCard({ sid, c, ability, dawn }) {
   const [used, setUsed] = useState(false);
@@ -145,7 +146,7 @@ const STAT_INFO = {
 const KINDS = [
   ['consumable', 'Consumables', 'Used up when you use them. Work anywhere.'],
   ['key', 'Key items', 'Only work in the right place. If there’s nothing to use it on here, the button stays dark.'],
-  ['clue', 'Clues and keepsakes', 'Nothing to use: read them, show them, trade them.'],
+  ['clue', 'Clues and keepsakes', 'Nothing to use: tap Read to look at them, show them to the others, or trade them.'],
 ];
 // Old saved items may not have a kind yet: anything with an effect or a wheel is a consumable.
 const kindOf = (data, i) => data?.items?.[i.id]?.kind ?? (i.effect || i.wheel ? 'consumable' : 'clue');
@@ -165,6 +166,7 @@ function itemInfo(def, i, kind) {
 
 function Bag({ c, sid, others, data, onGive, onOpenMap, here }) {
   const [used, setUsed] = useState(null);
+  const [reading, setReading] = useState(null);
   const use = async (item) => {
     setUsed(item.id);
     try { await consumeItem(sid, c.uid, item.id); } finally { setTimeout(() => setUsed(null), 1200); }
@@ -209,6 +211,7 @@ function Bag({ c, sid, others, data, onGive, onOpenMap, here }) {
                       <span>{i.name} {i.qty > 1 && <span className="muted">×{i.qty}</span>} <Info title={i.name}>{itemInfo(def, i, k)}</Info></span>
                     </span>
                     <span className="item-actions">
+                      {(k === 'clue' || def.read) && <button className="btn small" onClick={() => setReading(i)}>Read</button>}
                       {def.opensMap ? (
                         <button className="btn small gold" onClick={onOpenMap}>Open</button>
                       ) : k === 'clue' ? null : k === 'key' && !canUse ? (
@@ -227,6 +230,7 @@ function Bag({ c, sid, others, data, onGive, onOpenMap, here }) {
           </section>
         );
       })}
+      {reading && <ClueReader item={reading} def={data?.items?.[reading.id] ?? {}} qty={reading.qty} onClose={() => setReading(null)} />}
     </>
   );
 }

@@ -1661,3 +1661,23 @@ button.status-chip.removable:hover { background: rgba(200, 60, 80, 0.3); }
 .toasts-big .toast.older { opacity: .55; transform: scale(.88); }
 @keyframes ribbon-in { from { opacity: 0; transform: scaleX(.3); filter: blur(4px); } to { opacity: 1; transform: none; filter: none; } }
 @media (prefers-reduced-motion: reduce) { .toasts-big .toast { animation: none; } }
+
+/* ---------- Reading a clue ---------- */
+.clue-overlay { position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; padding: 16px;
+  background: radial-gradient(circle at 50% 40%, rgb(40 26 14 / .75), rgb(8 6 16 / .9)); animation: duel-in .2s ease-out; }
+.clue-sheet { width: min(420px, 100%); max-height: 86dvh; overflow: auto; padding: 22px 20px 16px; border-radius: 4px; color: #3b2414;
+  background: radial-gradient(circle at 50% 35%, #f6ead0, #d9bf8a); box-shadow: inset 0 0 40px rgb(110 70 20 / .5), 0 18px 50px rgb(0 0 0 / .6);
+  animation: unroll .45s cubic-bezier(.2, 1.1, .4, 1); transform-origin: top center; }
+@keyframes unroll { from { transform: scaleY(.1); opacity: 0; } to { transform: none; opacity: 1; } }
+.clue-title { margin: 0; font: 1.15rem 'IM Fell English SC', Georgia, serif; text-align: center; }
+.clue-heading { margin: .3rem 0 .8rem; font: italic .95rem 'IM Fell English', Georgia, serif; text-align: center; color: #6b4a2a; }
+.clue-text { font: italic 1.2rem/1.5 'IM Fell English', Georgia, serif; margin: .6rem 0; }
+.clue-book .clue-text { font-style: normal; font-size: 1.05rem; text-align: justify; }
+.clue-note .clue-text { text-align: center; font-size: 1.3rem; }
+.clue-page { position: relative; margin: .5rem 0; padding: .7rem .6rem; border-top: 1px solid rgb(110 70 20 / .3); }
+.clue-page-n { position: absolute; top: -.65rem; left: 50%; transform: translateX(-50%); padding: 0 .5rem; font: italic .8rem 'IM Fell English', Georgia, serif; background: #ecdcb6; }
+.clue-runes { display: flex; flex-wrap: wrap; justify-content: center; gap: .3rem .9rem; margin: 0; font-size: 1.8rem; line-height: 1.2; color: #2a1a0e; }
+.clue-count { text-align: center; font: italic .9rem 'IM Fell English', Georgia, serif; margin: .4rem 0; }
+.clue-footer { font: italic .9rem/1.4 'IM Fell English', Georgia, serif; color: #6b4a2a; text-align: center; margin: .8rem 0 .4rem; }
+.clue-close { display: block; margin: .6rem auto 0; color: #3b2414; border-color: #8a6a3d; }
+@media (prefers-reduced-motion: reduce) { .clue-sheet { animation: none; } }

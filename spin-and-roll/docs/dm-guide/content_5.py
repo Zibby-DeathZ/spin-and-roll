@@ -145,7 +145,7 @@ BLOCKS = [
     ('list', [
         '<b>Add it:</b> start a practice game, go to the <b>Players</b> tab, open <b>Test student</b>, pick a family and press <b>Add a test student</b>. It appears where the party is, already sorted and with its vault open.',
         '<b>Play it:</b> press <b>player screen</b> to open the phone view in a new tab, or open the game on your phone signed in as you. Keep the GM screen open too: it is what carries out everything the student does.',
-        '<b>Kits:</b> one tap each for top level, every spell (locked dark spells too), one of every item (both halves of the Marauder’s Map too), lots of mana, a full refill, Galleons, and resetting the once-a-day things (the family ability, the map, a duel reaction).',
+        '<b>Kits:</b> one tap each for top level, every spell (locked dark spells too), one of every item (both halves of the Marauder’s Map too), every clue (all three diary pages), lots of mana, a full refill, Galleons, and resetting the once-a-day things (the family ability, the map, a duel reaction).',
         '<b>Good things to try:</b> the Marauder’s Map by voice, a reaction duel against Corvin Vale, dark spells and status effects, a class mini-game, a chest, the shop.',
         '<b>Two-player things</b> (Protego saves, the Painted Double, votes) need a second account: sign in with another Google account in a private window or on a second phone and join with the code.',
         '<b>Before game night:</b> press <b>Remove the test student</b>, or just start a fresh game. A test student is never saved to a profile and never gets a trophy.',
@@ -159,6 +159,7 @@ BLOCKS = [
     ]),
     ('h2', 'Version log'),
     ('table', ['Version', 'Date', 'Changes'], [
+        ['3.3', 'October 2026', 'Read button for clues: diary pages show their runes, the torn page about Vale has its own text, the map half shows the runes on its edge. Test kit for every clue.'],
         ['3.2', 'October 2026', 'Item types: consumables, key items that only work in the right place, and clues. Info buttons on every item and stat. Slimmer TV announcements.'],
         ['3.1', 'October 2026', 'New look: house crests (on the points board, phones, TV and a big Sorting reveal), redrawn class mini-games and TV puzzles. The Defence game now uses the same colours and buttons as the boss duel.'],
         ['3.0', 'October 2026', 'Test student: play a character on your own account to try everything, with one-tap kits for spells, items, levels and resets.'],
