@@ -9,6 +9,9 @@ Anything without a picture keeps its emoji, so add them in any order.
     art/items/<id>.png      items, shop goods, and items/wand.png for every wand
     art/chests/<id>.png     chests
     art/hazards/<id>.png    finale hazards
+    art/houses/<house>.png  house crests (gryffindor, slytherin, ravenclaw, hufflepuff); the game draws its own until then
+    art/creatures/<id>.png  creatures in the Befriend the Beast class game
+    art/puzzles/<id>.png    puzzle parts: chess pieces and stone, the Turning Lock dial, the seven bottles, staircase tiles
 
 PNG, WebP or JPG all work. Square, 1024 × 1024 is plenty.
 The full list of names, with a prompt for each, is in docs/art/art-prompts.md.

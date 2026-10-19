@@ -627,7 +627,18 @@ export async function applyItemUse(sid, eid, data) {
       tx.update(eRef, { processed: true, payload: base });
       return;
     }
-    const [inv] = takeItems(c.inventory, item.id, 1);
+    // Clues can't be used, and key items only work in the right place.
+    const def = data?.items?.[item.id] ?? {};
+    if (def.kind === 'clue') { tx.update(eRef, { processed: true, failed: true, payload: { ...e.payload, reason: 'clue' } }); return; }
+    if (def.usableAt?.length) {
+      const sess = (await tx.get(doc(db, 'sessions', sid))).data();
+      const here = sess?.state?.pcPos?.[e.actorUid]?.loc ?? sess?.state?.map?.loc;
+      if (!def.usableAt.includes(here)) {
+        tx.update(eRef, { processed: true, failed: true, payload: { ...e.payload, name: item.name, icon: item.icon, reason: 'wrong-place' } });
+        return;
+      }
+    }
+    const [inv] = def.keep ? [c.inventory] : takeItems(c.inventory, item.id, 1);
     const fx = item.effect ?? {};
     tx.update(cSnap.ref, {
       inventory: inv,

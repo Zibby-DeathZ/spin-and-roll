@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import HouseCrest from './HouseCrest';
 import {
   answerKey, assignWand, endQuiz, hatVerdict, saveAnswers, scoreQuiz, sortInto, wandVerdict,
 } from '../lib/game';
@@ -149,7 +150,7 @@ export function HouseBoard({ points = {}, compact = false }) {
     <ul className={`houseboard ${compact ? 'compact' : ''}`}>
       {rows.map(([h, p]) => (
         <li key={h} className={`hb-${h.toLowerCase()}`}>
-          <span>{h}</span><strong>{p}</strong>
+          <HouseCrest house={h} /><span>{h}</span><strong>{p}</strong>
         </li>
       ))}
     </ul>

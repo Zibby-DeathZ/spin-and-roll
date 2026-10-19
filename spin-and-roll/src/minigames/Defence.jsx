@@ -51,14 +51,19 @@ export default function Defence({ diff, onFinish }) {
   return (
     <div className={`mg duel ${flash ?? ''}`}>
       <p className="mg-status">Spell {round} of {ROUNDS}. Mistakes {wrong} / {MISTAKES}</p>
-      <div className={`bolt bolt-${spell.color}`}>
-        <span>{spell.fake ?? spell.name}</span>
+      <div className="duel-arena">
+        {/* The spell flies at you: it grows as the time runs out. */}
+        <div key={round} className={`duel-orb c-${spell.color} incoming`} style={{ '--near': 0.45 + 0.75 * (1 - Math.max(0, left) / limit) }}>
+          <span>{spell.color === 'red' ? '🔥' : spell.color === 'blue' ? '❄️' : '⚡'}</span>
+        </div>
+        <p className="duel-spellname">{spell.fake ?? spell.name}</p>
+        {flash && <p className={`duel-verdict ${flash}`}>{flash === 'good' ? 'Blocked!' : 'Hit!'}</p>}
       </div>
-      <div className="timer"><span style={{ width: `${Math.max(0, (left / limit) * 100)}%` }} /></div>
-      <div className="duel-btns">
-        <button className="btn big red" onClick={() => answer('shield')}>🛡️ Shield</button>
-        <button className="btn big blue" onClick={() => answer('dodge')}>💨 Dodge</button>
-        <button className="btn big goldb" onClick={() => answer('counter')}>⚡ Counter</button>
+      <div className="duel-timer"><span style={{ width: `${Math.max(0, (left / limit) * 100)}%` }} /></div>
+      <div className="duel-btns mg-duel-btns">
+        <button className="duel-btn c-red" onClick={() => answer('shield')}>🛡️ Shield</button>
+        <button className="duel-btn c-blue" onClick={() => answer('dodge')}>💨 Dodge</button>
+        <button className="duel-btn c-gold" onClick={() => answer('counter')}>⚡ Counter</button>
       </div>
     </div>
   );

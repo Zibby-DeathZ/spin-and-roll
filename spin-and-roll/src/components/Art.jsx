@@ -38,6 +38,21 @@ export function tokenArt(t) {
 // Which picture an inventory, equipment or shop entry uses.
 export const itemArt = (id, slot) => (slot === 'wand' ? 'items/wand' : `items/${id}`);
 
+// The URL of a picture if it exists, or null (for backgrounds and SVG images).
+export function useArtUrl(path) {
+  const cached = found.get(path);
+  const [ext, setExt] = useState(typeof cached === 'string' || cached === null ? cached : undefined);
+  useEffect(() => {
+    let alive = true;
+    if (!path) return undefined;
+    const c = found.get(path);
+    if (typeof c === 'string' || c === null) { setExt(c); return undefined; }
+    probe(path).then((e) => alive && setExt(e));
+    return () => { alive = false; };
+  }, [path]);
+  return path && ext ? `${import.meta.env.BASE_URL}art/${path}.${ext}` : null;
+}
+
 export default function Art({ path, icon, className = '', as: Tag = 'span' }) {
   const cached = found.get(path);
   const [ext, setExt] = useState(typeof cached === 'string' || cached === null ? cached : undefined);

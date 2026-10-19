@@ -50,8 +50,15 @@ export default function Transfiguration({ diff, onFinish }) {
         {cards.map((c, i) => {
           const show = open.includes(i) || matched.includes(c.pair);
           return (
-            <button key={i} className={`card ${show ? 'show' : ''} ${matched.includes(c.pair) ? 'matched' : ''}`} onClick={() => flip(i)}>
-              {show ? c.text : '✦'}
+            <button key={i} className={`card ${show ? 'show' : ''} ${matched.includes(c.pair) ? 'matched' : ''}`} onClick={() => flip(i)}
+              aria-label={show ? c.text : 'Face-down card'}>
+              <span className="card-inner">
+                <span className="card-back" aria-hidden="true"><span>✦</span></span>
+                <span className="card-front">
+                  <span className="card-icon">{[...c.text][0]}</span>
+                  <span className="card-word">{c.text.replace(/^\S+\s/, '')}</span>
+                </span>
+              </span>
             </button>
           );
         })}

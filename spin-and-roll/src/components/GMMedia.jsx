@@ -34,6 +34,14 @@ function artGroups(data) {
     'Art: chests': rows('chests', Object.entries(data.chests ?? {}).map(([id, c]) => [id, c.name])),
     'Art: hazards': rows('hazards', Object.entries(data.hazards ?? {}).map(([id, h]) => [id, h.name])),
     'Art: mimics (revealed)': rows('mimics', Object.entries(data.mimics ?? {}).map(([id, m]) => [id, m.name])),
+    'Art: house crests (optional, drawn ones show until then)': rows('houses', (data.houses ?? []).filter((h) => h !== 'Unsorted').map((h) => [h.toLowerCase(), h])),
+    'Art: puzzle parts (optional, drawn ones show until then)': rows('puzzles', [
+      ['chess-light', 'Chessboard light stone'], ['chess-dark', 'Chessboard dark stone'],
+      ...['white', 'black'].flatMap((c) => ['king', 'queen', 'rook', 'bishop', 'knight', 'pawn'].map((k) => [`chess-${c}-${k}`, `${c} ${k}`])),
+      ['lock-dial', 'Turning Lock dial'], ...[1, 2, 3, 4, 5, 6, 7].map((n) => [`bottle-${n}`, `Bottle ${n}`]),
+      ['stairs-straight', 'Staircase: straight'], ['stairs-corner', 'Staircase: corner'], ['stairs-tee', 'Staircase: T-junction'],
+    ]),
+    'Art: creatures (Befriend the Beast)': rows('creatures', [['hippogriff', 'Hippogriff'], ['bowtruckle', 'Bowtruckle'], ['niffler', 'Niffler'], ['puffskein', 'Puffskein'], ['kneazle', 'Kneazle'], ['fwooper', 'Fwooper'], ['occamy', 'Occamy'], ['demiguise', 'Demiguise'], ['erumpent', 'Erumpent'], ['thestral', 'Thestral'], ['murtlap', 'Murtlap']]),
   };
 }
 

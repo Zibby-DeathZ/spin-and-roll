@@ -37,6 +37,7 @@ import { useLessonEngine } from '../lib/lessons';
 import { setExpelled, teachForbidden } from '../lib/combat';
 import { Corruption, StatusEditor } from '../components/Status';
 import TestBench from '../components/TestBench';
+import HouseCrest from '../components/HouseCrest';
 
 function Buttons({ sid, uid, field, steps }) {
   return (
@@ -110,6 +111,7 @@ function CharacterControls({ sid, c, data, playerName, quizBusy, forbiddenLearne
           {c.test && <span className="tag">🧪 Test</span>}
           {forbiddenLearner === c.uid && <span className="tag tag-green">Knows the Killing Curse</span>}
         </div>
+        {data.houses.length > 0 && <HouseCrest house={c.house} />}
         {data.houses.length > 0 && (
           <select value={c.house} onChange={(e) => setField(sid, c.uid, 'house', e.target.value)} aria-label="House">
             {data.houses.map((h) => <option key={h}>{h}</option>)}

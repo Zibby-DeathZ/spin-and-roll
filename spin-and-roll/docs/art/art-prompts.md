@@ -718,6 +718,224 @@ A painting wrapped in grey cloth being loaded onto a scarlet steam train at nigh
 
 Six sealed letters with wax seals flying through the sky towards six different houses, a castle on a hill in the distance. Storybook page illustration with warm parchment tones and a soft vignette, like an old hand-painted fairy-tale book. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
 
+## Puzzle parts (25)
+
+Pictures for the TV puzzles. The game moves these pieces itself, so each one is a separate picture. Until you add them, the game draws its own.
+
+Folder: `public/art/puzzles/`  ·  Size: 1024 × 1024, PNG (transparent background where it says so)
+
+### Chessboard light stone
+`public/art/puzzles/chess-light.png`
+
+A seamless top-down texture of a huge pale cream flagstone floor, worn smooth, faint cracks and chalky dust, one continuous slab with no grid lines or squares drawn on it. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Chessboard dark stone
+`public/art/puzzles/chess-dark.png`
+
+A seamless top-down texture of a huge dark charcoal-grey flagstone floor, worn smooth, faint cracks, one continuous slab with no grid lines or squares drawn on it. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### White king
+`public/art/puzzles/chess-white-king.png`
+
+A giant enchanted chess piece carved from pale white marble with faint grey veins: a tall crowned king with a long cloak and a sword held point-down. Full figure from base to top, standing upright, front three-quarter view, slightly battered as if it has fought. Transparent background. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### White queen
+`public/art/puzzles/chess-white-queen.png`
+
+A giant enchanted chess piece carved from pale white marble with faint grey veins: a tall crowned queen in flowing robes holding a sceptre. Full figure from base to top, standing upright, front three-quarter view, slightly battered as if it has fought. Transparent background. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### White rook
+`public/art/puzzles/chess-white-rook.png`
+
+A giant enchanted chess piece carved from pale white marble with faint grey veins: a squat castle tower with battlements, carved stone blocks. Full figure from base to top, standing upright, front three-quarter view, slightly battered as if it has fought. Transparent background. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### White bishop
+`public/art/puzzles/chess-white-bishop.png`
+
+A giant enchanted chess piece carved from pale white marble with faint grey veins: a hooded robed priest-like figure with a tall pointed mitre and a staff. Full figure from base to top, standing upright, front three-quarter view, slightly battered as if it has fought. Transparent background. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### White knight
+`public/art/puzzles/chess-white-knight.png`
+
+A giant enchanted chess piece carved from pale white marble with faint grey veins: a rearing stone horse with a flowing carved mane. Full figure from base to top, standing upright, front three-quarter view, slightly battered as if it has fought. Transparent background. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### White pawn
+`public/art/puzzles/chess-white-pawn.png`
+
+A giant enchanted chess piece carved from pale white marble with faint grey veins: a small helmeted foot soldier holding a round shield and a short spear. Full figure from base to top, standing upright, front three-quarter view, slightly battered as if it has fought. Transparent background. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Black king
+`public/art/puzzles/chess-black-king.png`
+
+A giant enchanted chess piece carved from dark polished obsidian-black stone: a tall crowned king with a long cloak and a sword held point-down. Full figure from base to top, standing upright, front three-quarter view, slightly battered as if it has fought. Transparent background. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Black queen
+`public/art/puzzles/chess-black-queen.png`
+
+A giant enchanted chess piece carved from dark polished obsidian-black stone: a tall crowned queen in flowing robes holding a sceptre. Full figure from base to top, standing upright, front three-quarter view, slightly battered as if it has fought. Transparent background. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Black rook
+`public/art/puzzles/chess-black-rook.png`
+
+A giant enchanted chess piece carved from dark polished obsidian-black stone: a squat castle tower with battlements, carved stone blocks. Full figure from base to top, standing upright, front three-quarter view, slightly battered as if it has fought. Transparent background. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Black bishop
+`public/art/puzzles/chess-black-bishop.png`
+
+A giant enchanted chess piece carved from dark polished obsidian-black stone: a hooded robed priest-like figure with a tall pointed mitre and a staff. Full figure from base to top, standing upright, front three-quarter view, slightly battered as if it has fought. Transparent background. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Black knight
+`public/art/puzzles/chess-black-knight.png`
+
+A giant enchanted chess piece carved from dark polished obsidian-black stone: a rearing stone horse with a flowing carved mane. Full figure from base to top, standing upright, front three-quarter view, slightly battered as if it has fought. Transparent background. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Black pawn
+`public/art/puzzles/chess-black-pawn.png`
+
+A giant enchanted chess piece carved from dark polished obsidian-black stone: a small helmeted foot soldier holding a round shield and a short spear. Full figure from base to top, standing upright, front three-quarter view, slightly battered as if it has fought. Transparent background. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Turning Lock dial
+`public/art/puzzles/lock-dial.png`
+
+Seen straight from above: an ancient circular stone combination lock set in a dungeon wall. Three wide concentric carved stone rings, each a slightly different stone, separated by deep dark grooves, around a small round bronze plate with a keyhole in the very centre. The rings are blank: no symbols, letters or numbers. Moss and dust in the grooves. Perfectly round, filling the frame. Transparent background. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Bottle 1 (tall, green)
+`public/art/puzzles/bottle-1.png`
+
+A single tall slender glass potion bottle with a long neck and a cork, filled with glowing emerald-green liquid. Standing upright, front view, the whole bottle visible. Transparent background. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Bottle 2 (small, red)
+`public/art/puzzles/bottle-2.png`
+
+A single small squat glass potion bottle with a short neck and a cork, filled with glowing ruby-red liquid. Standing upright, front view, the whole bottle visible. Transparent background. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Bottle 3 (round, blue)
+`public/art/puzzles/bottle-3.png`
+
+A single round-bellied glass flask with a long narrow neck and a cork, filled with glowing sapphire-blue liquid. Standing upright, front view, the whole flask visible. Transparent background. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Bottle 4 (small, gold)
+`public/art/puzzles/bottle-4.png`
+
+A single small squat glass potion bottle with a short neck and a cork, filled with glowing liquid gold. Standing upright, front view, the whole bottle visible. Transparent background. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Bottle 5 (tall, purple)
+`public/art/puzzles/bottle-5.png`
+
+A single tall slender glass potion bottle with a long neck and a cork, filled with glowing violet-purple liquid. Standing upright, front view, the whole bottle visible. Transparent background. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Bottle 6 (round, green)
+`public/art/puzzles/bottle-6.png`
+
+A single round-bellied glass flask with a long narrow neck and a cork, filled with glowing emerald-green liquid. Standing upright, front view, the whole flask visible. Transparent background. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Bottle 7 (tiny, clear)
+`public/art/puzzles/bottle-7.png`
+
+A single tiny glass vial with a cork, filled with perfectly clear, faintly shimmering liquid like water. Standing upright, front view, the whole vial visible. Transparent background. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Staircase tile: straight
+`public/art/puzzles/stairs-straight.png`
+
+Seen straight from above: one square tile of a magical moving staircase. A narrow stone staircase with a carved balustrade runs straight from the middle of the TOP edge to the middle of the BOTTOM edge. Dark empty space on the left and right. Fills the square edge to edge. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Staircase tile: corner
+`public/art/puzzles/stairs-corner.png`
+
+Seen straight from above: one square tile of a magical moving staircase. A narrow stone staircase with a carved balustrade starts at the middle of the TOP edge, turns a right-angle corner in the centre, and leaves through the middle of the RIGHT edge. Dark empty space everywhere else. Fills the square edge to edge. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Staircase tile: T-junction
+`public/art/puzzles/stairs-tee.png`
+
+Seen straight from above: one square tile of a magical moving staircase. Three narrow stone staircases with carved balustrades meet on a small landing in the centre: one goes to the middle of the TOP edge, one to the middle of the RIGHT edge, one to the middle of the BOTTOM edge. Nothing goes to the left edge. Dark empty space in between. Fills the square edge to edge. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+## House crests (4)
+
+One crest per house, shown on the house points board, the phones, the TV and the big Sorting moment. Until you add these, the game draws its own.
+
+Folder: `public/art/houses/`  ·  Size: 1024 × 1024, PNG (transparent background if your tool allows)
+
+### Gryffindor crest
+`public/art/houses/gryffindor.png`
+
+A deep scarlet shield with a gold border; in the centre, a proud lion’s head with a great shaggy mane, worked in gold. A single heraldic shield crest, front-on, perfectly centred and symmetrical, filling the frame, crisp clean edges, enamel colours with polished metal trim, plain dark or transparent background. An original design, not copied from any existing school, film or book crest. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Slytherin crest
+`public/art/houses/slytherin.png`
+
+A deep emerald-green shield with a silver border; in the centre, a coiled silver serpent with its head raised. A single heraldic shield crest, front-on, perfectly centred and symmetrical, filling the frame, crisp clean edges, enamel colours with polished metal trim, plain dark or transparent background. An original design, not copied from any existing school, film or book crest. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Ravenclaw crest
+`public/art/houses/ravenclaw.png`
+
+A midnight-blue shield with a bronze border; in the centre, a bronze eagle with its wings spread wide. A single heraldic shield crest, front-on, perfectly centred and symmetrical, filling the frame, crisp clean edges, enamel colours with polished metal trim, plain dark or transparent background. An original design, not copied from any existing school, film or book crest. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Hufflepuff crest
+`public/art/houses/hufflepuff.png`
+
+A honey-yellow shield with a black border; in the centre, a badger’s head, cream face with two black stripes, looking straight out. A single heraldic shield crest, front-on, perfectly centred and symmetrical, filling the frame, crisp clean edges, enamel colours with polished metal trim, plain dark or transparent background. An original design, not copied from any existing school, film or book crest. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+## Creatures (Befriend the Beast) (11)
+
+Pictures for the Care of Magical Creatures class game. Until you add these, it shows an emoji.
+
+Folder: `public/art/creatures/`  ·  Size: 1024 × 1024, PNG
+
+### Hippogriff
+`public/art/creatures/hippogriff.png`
+
+A proud creature with the front half of a giant eagle and the back half of a grey horse, feathers ruffled, staring straight ahead. Square creature portrait for a bestiary page, the whole creature centred so it reads when cropped to a small circle, soft parchment-coloured background like an old natural-history book plate. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Bowtruckle
+`public/art/creatures/bowtruckle.png`
+
+A tiny stick-like tree guardian made of twigs and bark, two little brown eyes, clinging to a branch. Square creature portrait for a bestiary page, the whole creature centred so it reads when cropped to a small circle, soft parchment-coloured background like an old natural-history book plate. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Niffler
+`public/art/creatures/niffler.png`
+
+A small fluffy black creature like a platypus crossed with a mole, a long snout, sniffing hungrily at a gold coin. Square creature portrait for a bestiary page, the whole creature centred so it reads when cropped to a small circle, soft parchment-coloured background like an old natural-history book plate. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Puffskein
+`public/art/creatures/puffskein.png`
+
+A round, fluffy custard-coloured ball of fur with a long thin pink tongue, sleepy and cute. Square creature portrait for a bestiary page, the whole creature centred so it reads when cropped to a small circle, soft parchment-coloured background like an old natural-history book plate. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Kneazle
+`public/art/creatures/kneazle.png`
+
+A cat-like creature with big ears, a lion-like tufted tail and speckled fur, alert and suspicious. Square creature portrait for a bestiary page, the whole creature centred so it reads when cropped to a small circle, soft parchment-coloured background like an old natural-history book plate. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Fwooper
+`public/art/creatures/fwooper.png`
+
+A small bird with brilliant bright pink and orange plumage, beak open as if singing. Square creature portrait for a bestiary page, the whole creature centred so it reads when cropped to a small circle, soft parchment-coloured background like an old natural-history book plate. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Occamy
+`public/art/creatures/occamy.png`
+
+A plumed serpent with blue and purple feathers and small wings, coiled, scales shimmering. Square creature portrait for a bestiary page, the whole creature centred so it reads when cropped to a small circle, soft parchment-coloured background like an old natural-history book plate. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Demiguise
+`public/art/creatures/demiguise.png`
+
+A gentle ape-like creature with long silky silver hair and large sad black eyes, half fading into invisibility. Square creature portrait for a bestiary page, the whole creature centred so it reads when cropped to a small circle, soft parchment-coloured background like an old natural-history book plate. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Erumpent
+`public/art/creatures/erumpent.png`
+
+A huge grey rhinoceros-like beast with thick hide and a single glowing horn on its forehead. Square creature portrait for a bestiary page, the whole creature centred so it reads when cropped to a small circle, soft parchment-coloured background like an old natural-history book plate. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Thestral
+`public/art/creatures/thestral.png`
+
+A skeletal black winged horse with leathery bat-like wings and white eyes, eerie but gentle, among dark trees. Square creature portrait for a bestiary page, the whole creature centred so it reads when cropped to a small circle, soft parchment-coloured background like an old natural-history book plate. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Murtlap
+`public/art/creatures/murtlap.png`
+
+A small rat-like creature with a growth on its back that looks like a sea anemone, sitting on a rock. Square creature portrait for a bestiary page, the whole creature centred so it reads when cropped to a small circle, soft parchment-coloured background like an old natural-history book plate. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
 ## Puzzle picture (1)
 
 The Scrambled Portrait puzzle (file name portrait.jpg).

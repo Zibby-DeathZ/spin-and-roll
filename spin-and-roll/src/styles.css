@@ -1345,7 +1345,7 @@ button.status-chip.removable:hover { background: rgba(200, 60, 80, 0.3); }
 .duel-phone.helper { background: radial-gradient(circle at 50% 30%, rgb(20 50 90 / .45), var(--ink, #120f22) 70%); }
 .duel-phone h1 { margin: 4px 0; }
 .duel-eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: .85rem; color: #f3a0a0; margin: 0; }
-.duel-btns { display: grid; gap: 10px; margin-top: 8px; }
+.rduel-btns { display: grid; gap: 10px; margin-top: 8px; }
 .duel-btn { min-height: 64px; border-radius: 14px; border: 0; font: 700 1.3rem var(--body); color: #120f22; cursor: pointer;
   background: var(--duel); box-shadow: 0 4px 0 rgb(0 0 0 / .35); display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .duel-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 rgb(0 0 0 / .35); }
@@ -1408,3 +1408,256 @@ button.status-chip.removable:hover { background: rgba(200, 60, 80, 0.3); }
 .test-bench summary { cursor: pointer; font-weight: 700; }
 .test-bench select { background: var(--panel); color: var(--bone); border: 1.5px solid var(--line); border-radius: 8px; padding: .3rem .5rem; }
 .test-kits { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+
+/* ---------- House crests ---------- */
+.crest { display: inline-flex; width: 1.6em; height: 1.92em; vertical-align: middle; flex: none; }
+.crest .crest-svg, .crest img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 2px 3px rgb(0 0 0 / .45)); }
+.houseboard li { display: inline-flex; align-items: center; gap: .45rem; }
+.houseboard .crest { font-size: 1rem; }
+.houseboard.compact .crest { font-size: .8rem; }
+.sheet-crest { font-size: 1.6rem; margin-left: -.4rem; }
+.chip-crest { font-size: .8rem; margin-left: -.2rem; }
+.sort-reveal { position: fixed; inset: 0; z-index: 45; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: radial-gradient(circle at 50% 42%, var(--sort-glow, rgb(227 176 75 / .35)), rgb(8 6 16 / .92) 62%); animation: duel-in .3s ease-out; pointer-events: none; }
+.sort-reveal.house-gryffindor { --sort-glow: rgb(170 30 25 / .55); }
+.sort-reveal.house-slytherin { --sort-glow: rgb(30 110 60 / .55); }
+.sort-reveal.house-ravenclaw { --sort-glow: rgb(40 70 160 / .55); }
+.sort-reveal.house-hufflepuff { --sort-glow: rgb(230 180 50 / .5); }
+.sort-crest { font-size: 11rem; animation: sort-in 1s cubic-bezier(.2, 1.4, .4, 1) both; }
+.sort-name { font: 500 2.2rem var(--display); margin: 1.2rem 0 0; color: var(--bone); animation: sort-up .6s .5s both; }
+.sort-house { font: 700 5rem 'Cinzel Decorative', var(--display); letter-spacing: .08em; margin: 0; color: var(--gold); text-shadow: 0 0 30px rgb(0 0 0 / .6); animation: sort-up .6s .8s both; }
+@keyframes sort-in { from { transform: scale(.2) rotate(-12deg); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes sort-up { from { transform: translateY(20px); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .sort-crest, .sort-name, .sort-house { animation-duration: .01s; } }
+
+/* ================= Class mini-games, redrawn ================= */
+.lesson { background: radial-gradient(circle at 50% 0%, rgb(227 176 75 / .08), transparent 60%); }
+
+/* Charms: a glowing spell circle behind the wand pad */
+.charm-stage { position: relative; display: grid; place-items: center; width: 100%; padding: 14px 0; }
+.charm-circle { position: absolute; width: min(340px, 92vw); height: auto; fill: none; stroke: rgb(227 176 75 / .35); stroke-width: 1;
+  animation: charm-spin 40s linear infinite; }
+.charm-circle text { fill: rgb(227 176 75 / .55); stroke: none; font-size: 10px; letter-spacing: 2px; }
+.charm-stage.show .charm-circle { stroke: rgb(227 176 75 / .6); filter: drop-shadow(0 0 6px rgb(227 176 75 / .5)); }
+@keyframes charm-spin { to { transform: rotate(360deg); } }
+.charm-stage .dpad { position: relative; z-index: 1; }
+.charm-stage .dpad button { border-radius: 50%; border: 2px solid rgb(227 176 75 / .45);
+  background: radial-gradient(circle at 40% 35%, #3a3160, #17142a 75%); color: #f3dfa6; box-shadow: inset 0 0 12px rgb(0 0 0 / .6); }
+.charm-stage .dpad button.lit { background: radial-gradient(circle at 40% 35%, #fff6d6, #e3b04b 55%, #8a6420); color: #2a1d08;
+  box-shadow: 0 0 22px rgb(227 176 75 / .9), 0 0 50px rgb(227 176 75 / .5); transform: scale(1.1); }
+.charm-wand { display: inline-block; transition: transform .15s ease-out; filter: drop-shadow(0 0 6px rgb(255 230 160 / .8)); }
+
+/* Potions: a brass gauge over a bubbling cauldron */
+.stirbar { height: 52px; border-radius: 26px; border: 3px solid #a9813e; background: linear-gradient(#2a2016, #17110b);
+  box-shadow: inset 0 3px 8px rgb(0 0 0 / .7), 0 0 0 1px #5a4320; overflow: hidden; }
+.stir-ticks { position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent 0 9.5%, rgb(227 176 75 / .25) 9.5% 10%); }
+.stir-zone { background: linear-gradient(rgb(90 220 140 / .55), rgb(40 140 80 / .55)); border-color: #7cf0a0; box-shadow: 0 0 14px rgb(90 220 140 / .6); }
+.stir-needle { width: 4px; background: #e9e4f0; box-shadow: 0 0 10px #fff; }
+.stir-needle span { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 1.6rem; }
+.stirbar.good { border-color: #7cf0a0; box-shadow: 0 0 18px rgb(90 220 140 / .7); }
+.stirbar.bad { border-color: var(--ember); box-shadow: 0 0 18px rgb(226 91 74 / .7); }
+.cauldron { width: 220px; height: auto; overflow: visible; }
+.cauldron .brew { transition: fill .5s; }
+.cauldron.good .brew { filter: drop-shadow(0 0 10px #7cf0a0); }
+.cauldron.bad .brew { filter: drop-shadow(0 0 10px #c06aa0); }
+.cauldron .bubbles circle { animation: bubble 1.4s ease-in infinite; }
+@keyframes bubble { 0% { transform: translateY(0); opacity: .9; } 100% { transform: translateY(-22px); opacity: 0; } }
+.cauldron .steam path { fill: none; stroke: rgb(200 220 210 / .35); stroke-width: 4; stroke-linecap: round; animation: steam 2.4s ease-out infinite; opacity: 0; }
+@keyframes steam { 0% { transform: translateY(6px); opacity: 0; } 30% { opacity: .8; } 100% { transform: translateY(-14px); opacity: 0; } }
+.cauldron .fire { animation: fire .4s ease-in-out infinite alternate; }
+@keyframes fire { from { opacity: .4; } to { opacity: .9; } }
+
+/* Herbology: terracotta pots in a greenhouse */
+.pots { padding: 12px; border-radius: 16px; background: linear-gradient(rgb(120 170 140 / .14), rgb(40 60 50 / .3)),
+  repeating-linear-gradient(90deg, transparent 0 32%, rgb(200 230 210 / .08) 32% 33%); border: 2px solid #3f5b4a; }
+.pot { border: 0; background: transparent; padding: 0; overflow: visible; }
+.pot.up, .pot.scream { background: transparent; border: 0; animation: none; }
+.pot-svg { width: 100%; height: auto; overflow: visible; }
+.mandrake { transition: transform .12s ease-out; transform: translateY(18px); }
+.mandrake.up { transform: translateY(0); animation: wiggle .35s ease-in-out infinite alternate; }
+.mandrake.scream { transform: translateY(-4px); animation: shake .08s linear infinite; }
+@keyframes wiggle { from { transform: rotate(-4deg); } to { transform: rotate(4deg); } }
+@keyframes shake { 0% { transform: translate(-2px, -4px); } 50% { transform: translate(2px, -3px); } 100% { transform: translate(-1px, -5px); } }
+.mandrake { transform-origin: 50px 70px; }
+
+/* Defence: the same colours as the boss duel */
+.duel-arena { position: relative; width: 100%; height: 230px; border-radius: 18px; overflow: hidden; display: grid; place-items: center;
+  background: radial-gradient(ellipse at 50% 110%, #2b2547, #0e0c1a 70%), repeating-linear-gradient(0deg, transparent 0 38px, rgb(255 255 255 / .03) 38px 40px); border: 2px solid #34304e; }
+.duel-orb.incoming { margin: 0; width: 120px; height: 120px; font-size: 2.6rem; transform: scale(var(--near, .5)); transition: transform .05s linear; animation: none; }
+.duel-spellname { position: absolute; bottom: 10px; margin: 0; font: 700 1.5rem var(--display); color: var(--bone); text-shadow: 0 2px 8px #000; }
+.duel-verdict { position: absolute; top: 12px; margin: 0; font: 700 1.3rem var(--display); }
+.duel-verdict.good { color: #9fe0c8; } .duel-verdict.bad { color: #f3a0a0; }
+.mg.duel.good .duel-arena { box-shadow: 0 0 0 3px #4fb3a5; } .mg.duel.bad .duel-arena { box-shadow: 0 0 0 3px #e0474c; animation: shake .08s linear 4; }
+.mg-duel-btns { grid-template-columns: repeat(3, 1fr); }
+.mg-duel-btns .duel-btn { min-height: 70px; font-size: 1.05rem; }
+
+/* Transfiguration: cards that flip */
+.cards { perspective: 800px; }
+.card { position: relative; min-height: 86px; padding: 0; border: 0; background: transparent; }
+.card-inner { position: absolute; inset: 0; transition: transform .45s; transform-style: preserve-3d; }
+.card.show .card-inner { transform: rotateY(180deg); }
+.card-back, .card-front { position: absolute; inset: 0; border-radius: 12px; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.card-back { background: radial-gradient(circle, #3b2f66 0 30%, transparent 31%), repeating-conic-gradient(from 0deg, #2a2148 0 15deg, #231b3e 15deg 30deg);
+  border: 2px solid #e3b04b; box-shadow: inset 0 0 0 3px #231b3e, inset 0 0 0 4px rgb(227 176 75 / .5); color: #e3b04b; font-size: 1.4rem; }
+.card-front { transform: rotateY(180deg); background: linear-gradient(#f3e6c6, #dcc493); color: #3b2414; border: 2px solid #a9813e; }
+.card-icon { font-size: 1.8rem; line-height: 1; }
+.card-word { font: italic 500 .8rem 'IM Fell English', Georgia, serif; margin-top: 2px; }
+.card.matched .card-front { border-color: #4fb3a5; box-shadow: 0 0 14px rgb(79 179 165 / .7); }
+
+/* Creatures: a page from a bestiary */
+.bestiary-page { position: relative; width: 100%; padding: 18px 16px 14px; border-radius: 6px; text-align: center; color: #3b2414;
+  background: radial-gradient(circle at 50% 40%, #f6ead0, #dcc493); box-shadow: inset 0 0 30px rgb(120 80 30 / .4), 0 6px 18px rgb(0 0 0 / .4);
+  animation: page-in .35s ease-out; }
+@keyframes page-in { from { transform: rotateY(-30deg); opacity: 0; } to { transform: none; opacity: 1; } }
+.beast-portrait { display: grid; place-items: center; width: 110px; height: 110px; margin: 0 auto; border-radius: 50%; font-size: 3.8rem;
+  border: 3px double #8a6a3d; background: radial-gradient(circle, #fbf3df, #e7d4a6); overflow: hidden; }
+.beast-portrait img { width: 100%; height: 100%; object-fit: cover; }
+.beast-name { margin: 8px 0 0; font: 1.2rem 'IM Fell English SC', Georgia, serif; letter-spacing: .08em; }
+.bestiary-page .mg-scene { color: #3b2414; font: italic 1.15rem/1.3 'IM Fell English', Georgia, serif; }
+.hourglass { position: absolute; right: 12px; top: 12px; width: 10px; height: 60px; border-radius: 5px; background: rgb(59 36 20 / .2); overflow: hidden; display: flex; align-items: flex-end; }
+.hourglass span { width: 100%; background: #c08f55; transition: height 1s linear; }
+.beast-options { display: grid; gap: 8px; width: 100%; }
+.beast-opt { min-height: 54px; padding: .6rem .9rem; border-radius: 10px; border: 1.5px solid #8a6a3d; background: #f3e6c6; color: #3b2414; font: 500 1rem var(--body); cursor: pointer; text-align: left; }
+.beast-opt.right { background: #cfeee0; border-color: #2f8a6a; } .beast-opt.wrong { background: #f6cfc8; border-color: #b33a2a; } .beast-opt.dim { opacity: .55; }
+
+/* Flying: dusk sky, drifting clouds, the castle below */
+.sky { background: linear-gradient(#1b1840 0%, #3d2f6b 45%, #b0607a 85%, #e39a6a 100%); border: 2px solid #4a3f7a; }
+.sky.crash { animation: shake .08s linear 5; box-shadow: inset 0 0 40px rgb(226 71 76 / .7); }
+.sky-clouds { position: absolute; inset: -50% 0 0; background:
+  radial-gradient(ellipse 30% 6% at 20% 20%, rgb(255 255 255 / .18), transparent 70%),
+  radial-gradient(ellipse 25% 5% at 75% 45%, rgb(255 255 255 / .14), transparent 70%),
+  radial-gradient(ellipse 35% 6% at 40% 70%, rgb(255 255 255 / .12), transparent 70%);
+  background-size: 100% 50%; animation: clouds 3s linear infinite; }
+.sky-clouds.far { opacity: .6; animation-duration: 7s; transform: scaleX(-1); }
+@keyframes clouds { from { background-position: 0 0; } to { background-position: 0 100%; } }
+.sky-castle { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 18%; fill: #120f24; }
+.lane-line { position: absolute; top: 0; bottom: 0; width: 0; border-left: 1px dashed rgb(255 255 255 / .12); }
+.ob { filter: drop-shadow(0 4px 6px rgb(0 0 0 / .5)); z-index: 1; }
+.broom { z-index: 2; filter: drop-shadow(0 0 8px rgb(255 230 160 / .7)); }
+.broom-trail { position: absolute; left: 50%; top: 70%; width: 6px; height: 40px; transform: translateX(-50%); border-radius: 3px;
+  background: linear-gradient(rgb(255 230 160 / .7), transparent); }
+@media (prefers-reduced-motion: reduce) {
+  .charm-circle, .sky-clouds, .mandrake.up, .cauldron .bubbles circle, .cauldron .steam path { animation: none; }
+}
+
+/* ================= TV puzzles, redrawn ================= */
+/* Chess: a carved board in a gilt frame */
+.chess { border: 0; border-radius: 4px; padding: 0; box-shadow: 0 0 0 10px #4a3220, 0 0 0 13px #a9813e, 0 0 0 16px #3a2618, 0 18px 50px rgb(0 0 0 / .6); }
+.sq.light { background: radial-gradient(circle at 30% 30%, #f1e4c6, #d6c19a); }
+.sq.dark { background: radial-gradient(circle at 30% 30%, #8f6c46, #6b4e30); }
+.pc { filter: drop-shadow(0 4px 3px rgb(0 0 0 / .55)); }
+
+/* Torch wall: iron torches on a stone wall */
+.torches { padding: 14px; border-radius: 12px; gap: 10px;
+  background: linear-gradient(rgb(0 0 0 / .15), rgb(0 0 0 / .35)),
+    repeating-linear-gradient(0deg, #3b3640 0 46px, #2a2630 46px 49px),
+    repeating-linear-gradient(90deg, transparent 0 86px, #2a2630 86px 89px);
+  border: 3px solid #1d1a22; box-shadow: inset 0 0 40px rgb(0 0 0 / .7); }
+.torch { filter: none; background: transparent; border: 0; padding: 4px; border-radius: 10px; }
+.torch.on { background: radial-gradient(circle at 50% 30%, rgb(255 170 60 / .35), transparent 70%); box-shadow: none; border: 0; }
+.torch-svg { width: 100%; height: 100%; overflow: visible; }
+.torch-svg .flame { transform-origin: 30px 38px; animation: flicker .18s ease-in-out infinite alternate; filter: drop-shadow(0 0 6px #ff9a2e); }
+@keyframes flicker { from { transform: scale(1, 1) skewX(-2deg); } to { transform: scale(.94, 1.06) skewX(2deg); } }
+.torch-svg .smoke { animation: steam 3s ease-out infinite; }
+
+/* Turning lock: concentric stone rings */
+.ring-dial { width: min(58vh, 80vw); height: auto; filter: drop-shadow(0 16px 30px rgb(0 0 0 / .6)); }
+.ring-arrow { display: none; }
+
+/* Seven bottles on a wooden shelf */
+.bottles { padding: 0 24px 14px; border-bottom: 16px solid #5a3a22; box-shadow: 0 10px 0 -4px #3a2414; border-radius: 0 0 4px 4px; }
+.bottle-svg { display: block; filter: drop-shadow(0 6px 6px rgb(0 0 0 / .5)); }
+.bottle-svg.tall { width: 56px; height: 114px; } .bottle-svg.small { width: 56px; height: 114px; }
+.bottle-svg.round { width: 74px; height: 114px; } .bottle-svg.tiny { width: 44px; height: 114px; }
+.tv-puzzle .bottle-svg { transform: scale(1.5); transform-origin: bottom center; margin: 0 14px; }
+.bottle.shown.poison .bottle-svg { filter: drop-shadow(0 0 12px #e0474c); }
+.bottle.shown.forward .bottle-svg { filter: drop-shadow(0 0 16px #e3b04b); }
+.tv-puzzle .clues { background: linear-gradient(#f3e6c6, #dcc493); color: #3b2414; padding: 14px 18px 14px 40px; border-radius: 6px;
+  font-family: 'IM Fell English', Georgia, serif; box-shadow: inset 0 0 24px rgb(120 80 30 / .4); }
+
+/* Cipher: ink on old parchment */
+.cipher { background: radial-gradient(circle at 50% 45%, #f4e6c4, #d6bd88); border: 0; border-radius: 4px; padding: 1.6rem 2rem;
+  box-shadow: inset 0 0 50px rgb(110 70 20 / .55), 0 12px 40px rgb(0 0 0 / .5); }
+.rune { color: #3b2414; }
+.plain { color: #8a1f12; border-top-color: #8a6a3d; font-family: 'IM Fell English SC', Georgia, serif; }
+
+/* Star chart */
+.sky-svg { background: radial-gradient(ellipse at 50% 30%, #241f4a, #0a0916 80%); box-shadow: 0 0 0 3px #a9813e, 0 18px 50px rgb(0 0 0 / .6); }
+.sky-svg .bg-star { opacity: .5; animation: twinkle 2.8s ease-in-out infinite alternate; }
+@keyframes twinkle { from { opacity: .15; } to { opacity: .7; } }
+
+/* Moving staircases: stone blocks with steps */
+.stairs { gap: 8px; }
+.stair { background: radial-gradient(circle at 35% 30%, #4a4458, #2a2636); border: 2px solid #16131f; border-radius: 6px; box-shadow: 0 6px 12px rgb(0 0 0 / .5); }
+.stair .hub { background: #b8a27a; border-radius: 2px; }
+.stair .arm { background: repeating-linear-gradient(0deg, #d4c09a 0 6px, #9a8460 6px 8px); }
+.stair .arm.e, .stair .arm.w { background: repeating-linear-gradient(90deg, #d4c09a 0 6px, #9a8460 6px 8px); }
+.stair.lit .arm, .stair.lit .hub { background: #f1cf7a; box-shadow: 0 0 14px #e3b04b; }
+
+/* Scrambled portrait: a gilt frame */
+.slider { padding: 10px; border: 0; background: #1b1510; box-shadow: 0 0 0 8px #8a6420, 0 0 0 10px #e3b04b, 0 0 0 16px #5a3e14, 0 18px 50px rgb(0 0 0 / .6); }
+.slide { box-shadow: inset 0 0 0 1px rgb(0 0 0 / .4); }
+
+/* Rune floor: carved flagstones */
+.runeword { background: linear-gradient(#3b3640, #24212b); border-color: #a9813e; text-shadow: 0 0 10px rgb(227 176 75 / .7); }
+.rtile { background: radial-gradient(circle at 35% 30%, #57505f, #322d38); border: 2px solid #1d1a22; color: #c9b8e6;
+  text-shadow: 0 0 6px rgb(160 130 230 / .6); box-shadow: inset 0 -3px 0 rgb(0 0 0 / .35); }
+.rtile.stepped { background: radial-gradient(circle at 35% 30%, #3f7a6a, #24463e); color: #d9fff2; text-shadow: 0 0 10px #7cf0c8; border-color: #4fb3a5; }
+.rtile.trap { background: radial-gradient(circle, #a0302a, #4a1410); }
+@media (prefers-reduced-motion: reduce) { .torch-svg .flame, .sky-svg .bg-star { animation: none; } }
+.tv-puzzle .bottles-wrap { margin-top: 3.5rem; }
+
+/* Puzzle pictures (optional, from public/art/puzzles) */
+.pc.has-art { display: block; width: 92%; height: 92%; }
+.pc.has-art img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 6px 4px rgb(0 0 0 / .6)); }
+.bottle-art.has-art { display: block; width: 80px; height: 170px; }
+.bottle-art.has-art img { width: 100%; height: 100%; object-fit: contain; object-position: bottom; filter: drop-shadow(0 6px 6px rgb(0 0 0 / .5)); }
+.tv-puzzle .bottle-art.has-art { width: 110px; height: 240px; }
+.bottle.shown.poison .bottle-art img { filter: drop-shadow(0 0 14px #e0474c); }
+.bottle.shown.forward .bottle-art img { filter: drop-shadow(0 0 18px #e3b04b); }
+.stair.has-art { background: #16131f; overflow: hidden; }
+.stair.has-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .35s ease-out; }
+.stair.has-art .hub, .stair.has-art .arm { display: none; }
+.stair.has-art.lit img { filter: brightness(1.25) drop-shadow(0 0 10px #e3b04b); }
+.stair.has-art.lit { box-shadow: 0 0 0 2px #e3b04b, 0 0 18px rgb(227 176 75 / .6); }
+
+/* ---------- The little "i" ---------- */
+.info { position: relative; display: inline-flex; vertical-align: middle; }
+.info-btn { width: 18px; height: 18px; padding: 0; border-radius: 50%; border: 1.5px solid rgb(227 176 75 / .7); background: rgb(227 176 75 / .1);
+  color: var(--gold); font: italic 700 11px/1 Georgia, serif; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.info-btn.on, .info-btn:hover { background: var(--gold); color: var(--ink); }
+.info-btn::after { content: ''; position: absolute; inset: -12px; } /* a bigger tap area */
+.info-bubble { position: fixed; z-index: 60; width: min(260px, 80vw);
+  padding: .65rem .8rem; border-radius: 10px; text-align: left; font: 500 .85rem/1.35 var(--body); color: #3b2414; white-space: normal;
+  background: radial-gradient(circle at 50% 30%, #f6ead0, #dcc493); border: 1.5px solid #a9813e; box-shadow: 0 8px 24px rgb(0 0 0 / .55);
+  animation: info-in .18s ease-out; }
+.info-bubble strong { display: block; font: 1rem 'IM Fell English SC', Georgia, serif; margin-bottom: .15rem; }
+.info-bubble::before { content: ''; position: absolute; top: -7px; left: var(--arrow, 50%); width: 12px; height: 12px; transform: translateX(-50%) rotate(45deg);
+  background: #f3e3c3; border-left: 1.5px solid #a9813e; border-top: 1.5px solid #a9813e; }
+.info-bubble.above::before { top: auto; bottom: -7px; border: 0; border-right: 1.5px solid #a9813e; border-bottom: 1.5px solid #a9813e; }
+@keyframes info-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+.stat-name .info { margin-left: 2px; }
+
+/* Bag groups */
+.bag-group h3 { display: flex; align-items: center; gap: .4rem; margin: 1rem 0 .3rem; font-size: 1rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.btn.glow { box-shadow: 0 0 12px rgb(227 176 75 / .7); animation: key-glow 1.4s ease-in-out infinite alternate; }
+@keyframes key-glow { from { box-shadow: 0 0 4px rgb(227 176 75 / .4); } to { box-shadow: 0 0 16px rgb(227 176 75 / .9); } }
+@media (prefers-reduced-motion: reduce) { .btn.glow { animation: none; } }
+
+/* ---------- TV announcements: a slim gilded ribbon instead of big boxes ---------- */
+.toasts-big { top: 4.6rem; gap: .35rem; max-width: min(70vw, 1000px); pointer-events: none; }
+.toasts-big .toast { position: relative; gap: .8rem; padding: .45rem 1.6rem .45rem .5rem; border: 0; border-radius: 999px; font: 500 1.15rem/1.3 var(--body);
+  background: linear-gradient(90deg, rgb(14 11 28 / 0), rgb(14 11 28 / .92) 12%, rgb(14 11 28 / .92) 88%, rgb(14 11 28 / 0));
+  box-shadow: none; animation: ribbon-in .45s cubic-bezier(.2, 1.2, .4, 1); transition: opacity .3s, transform .3s; }
+.toasts-big .toast::before, .toasts-big .toast::after { content: ''; position: absolute; left: 8%; right: 8%; height: 1px;
+  background: linear-gradient(90deg, transparent, currentColor 20%, currentColor 80%, transparent); opacity: .7; }
+.toasts-big .toast::before { top: 0; } .toasts-big .toast::after { bottom: 0; }
+.toasts-big .toast-icon { display: grid; place-items: center; width: 2.2rem; height: 2.2rem; flex: none; border-radius: 50%; font-size: 1.25rem;
+  background: radial-gradient(circle at 40% 35%, #3a3160, #17142a); box-shadow: 0 0 0 1.5px currentColor, 0 0 14px rgb(227 176 75 / .25); }
+.toasts-big .toast-text { color: var(--bone); text-shadow: 0 1px 6px #000; }
+.toasts-big .toast-hero { font: 600 1.55rem/1.25 var(--display); padding-top: .6rem; padding-bottom: .6rem; }
+.toasts-big .toast-hero .toast-icon { width: 2.8rem; height: 2.8rem; font-size: 1.6rem; }
+.toasts-big .toast-hero .toast-text { color: #fff4d6; }
+.toasts-big .toast.older { opacity: .55; transform: scale(.88); }
+@keyframes ribbon-in { from { opacity: 0; transform: scaleX(.3); filter: blur(4px); } to { opacity: 1; transform: none; filter: none; } }
+@media (prefers-reduced-motion: reduce) { .toasts-big .toast { animation: none; } }

@@ -22,16 +22,18 @@ export default function EventToasts({ sid, nameOf, big = false, skip = [], onNew
       const d = describe(e, nameOf);
       if (!d) return;
       setToasts((t) => [...t, { ...d, id: e.id }]);
-      setTimeout(() => setToasts((t) => t.filter((x) => x.id !== e.id)), d.big ? 7000 : 5000);
+      setTimeout(() => setToasts((t) => t.filter((x) => x.id !== e.id)), big ? (d.big ? 6000 : 4000) : (d.big ? 7000 : 5000));
     });
   }, [events, nameOf]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // On the TV only the newest three show, the latest on top and the older ones fading back.
+  const shown = big ? toasts.slice(-3).reverse() : toasts;
   return (
     <div className={`toasts ${big ? 'toasts-big' : ''}`} aria-live="polite">
-      {toasts.map((t) => (
-        <div key={t.id} className={`toast tone-${t.tone} ${t.big ? 'toast-hero' : ''}`}>
+      {shown.map((t, i) => (
+        <div key={t.id} className={`toast tone-${t.tone} ${t.big ? 'toast-hero' : ''} ${big && i > 0 ? 'older' : ''}`}>
           <span className="toast-icon">{t.icon}</span>
-          <span>{t.text}</span>
+          <span className="toast-text">{t.text}</span>
         </div>
       ))}
     </div>

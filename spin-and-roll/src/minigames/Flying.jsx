@@ -39,11 +39,17 @@ export default function Flying({ diff, onFinish }) {
   return (
     <div className="mg">
       <p className="mg-status">⏱ {left}s. Crashes {s.crashes} / {CRASHES}</p>
-      <div className="sky">
+      <div className={`sky ${s.obs.some((o) => o.hit && o.y < 96) ? 'crash' : ''}`}>
+        <span className="sky-clouds" aria-hidden="true" />
+        <span className="sky-clouds far" aria-hidden="true" />
+        <svg className="sky-castle" viewBox="0 0 300 60" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M0 60 V44 h20 v-8 h6 v8 h18 V30 l6 -10 l6 10 v14 h30 V24 h4 v-6 l5 -8 l5 8 v6 h4 v20 h40 V36 h10 v8 h26 V14 l7 -12 l7 12 v30 h22 V34 h8 v10 h40 V40 h12 v20 Z" />
+        </svg>
+        {[1, 2].map((k) => <span key={k} className="lane-line" style={{ left: `${(k * 100) / LANES}%` }} aria-hidden="true" />)}
         {s.obs.map((o) => (
           <span key={o.id} className={`ob ${o.hit ? 'hit' : ''}`} style={{ left: `${(o.lane + 0.5) * (100 / LANES)}%`, top: `${o.y}%` }}>{o.icon}</span>
         ))}
-        <span className="broom" style={{ left: `${(s.lane + 0.5) * (100 / LANES)}%` }}>🧹</span>
+        <span className="broom" style={{ left: `${(s.lane + 0.5) * (100 / LANES)}%` }}>🧹<span className="broom-trail" /></span>
       </div>
       <div className="duel-btns two">
         <button className="btn big" onClick={() => move(-1)} aria-label="Left">◀</button>

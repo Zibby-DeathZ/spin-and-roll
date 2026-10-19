@@ -136,6 +136,8 @@ BLOCKS = [
         ['Mimics', 'art/mimics/hungry-trunk.png, painted-double.png', 'What they look like after they spring.'],
         ['Items', 'art/items/&lt;id&gt;.png', 'Pick-ups, shop goods, and items/wand.png for every wand. Shown on the map, in the bag and in the shops.'],
         ['Chests and hazards', 'art/chests/&lt;id&gt;.png, art/hazards/&lt;id&gt;.png', 'Square, object centred.'],
+        ['House crests', 'art/houses/&lt;house&gt;.png', 'gryffindor, slytherin, ravenclaw, hufflepuff. The game draws its own crests until you add these.'],
+        ['Creatures', 'art/creatures/&lt;id&gt;.png', 'The eleven creatures in the Befriend the Beast class game.'],
     ], [30, 52, 88]),
     ('p', 'Every picture has a ready-made prompt for an image tool in <b>docs/art/art-prompts.md</b>, with its exact file name. Pictures replace the emoji wherever that thing appears; anything without one keeps its emoji.'),
     ('h2', 'Testing on your own'),
@@ -157,6 +159,8 @@ BLOCKS = [
     ]),
     ('h2', 'Version log'),
     ('table', ['Version', 'Date', 'Changes'], [
+        ['3.2', 'October 2026', 'Item types: consumables, key items that only work in the right place, and clues. Info buttons on every item and stat. Slimmer TV announcements.'],
+        ['3.1', 'October 2026', 'New look: house crests (on the points board, phones, TV and a big Sorting reveal), redrawn class mini-games and TV puzzles. The Defence game now uses the same colours and buttons as the boss duel.'],
         ['3.0', 'October 2026', 'Test student: play a character on your own account to try everything, with one-tap kits for spells, items, levels and resets.'],
         ['2.9', 'October 2026', 'The Marauder’s Map: opened by voice, it shows the castle in ink with everyone’s footsteps and every treasure, live on the TV. Once a day, fades after 60 seconds. New puzzle, The Torn Edge, holds the words.'],
         ['2.8', 'October 2026', 'The reaction duel: boss spells come with a countdown on the target’s phone. Shield, Dodge or Counter in time, friends can cast Protego, and Vale is faster and can feint in phase 2.'],

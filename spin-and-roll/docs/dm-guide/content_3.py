@@ -179,6 +179,14 @@ BLOCKS = [
         ['Did anyone see?', 'After the Killing Curse (it spins by itself, without naming the caster)'],
     ], [42, 128]),
 
+    ('h2', 'Item types'),
+    ('p', 'The Bag on each phone sorts items into three groups. Every item, stat and number on the phone has a small <b>i</b> next to it: tap it for a short explanation, so players can check what things do without asking you.'),
+    ('table', ['Type', 'How it works', 'Items'], [
+        ['Consumables', 'Used up when used. Work anywhere.', 'Food, potions, Bertie Bott’s Beans, Felix Felicis, Remembrall, Extendable Ears, Creature treats'],
+        ['Key items', 'Only work in the right place. Anywhere else the button says <i>Not here</i>, which is itself a hint. The ones you keep are marked below.', 'Serpent key (Dungeons or the Undercroft, kept), Mandrake leaf (Greenhouses or Dungeons, to brew), Restorative Draught (Hospital Wing), Stolen ingredient jars (Dungeons, back to Grimsby), Rare Chocolate Frog card (Library, the collector), Pocket Sneakoscope (anywhere, kept), the Marauder’s Map (anywhere, kept)'],
+        ['Clues and keepsakes', 'Nothing to use: players read, show and trade them.', 'Ring clues, diary pages, the torn page about Vale'],
+    ], [32, 60, 78]),
+    ('tip', 'When a key item is used in the right place, the TV announces it and you play out what happens: the serpent door grinds open, Grimsby snatches back his jars, the drained student stirs.'),
     ('h2', 'Chests, items and hazards'),
     ('p', 'Place them from the Table tab: <b>Place on this map</b>, then Chests, Items or Hazards. They land on the current map. Tap one and tap the map to move it.'),
     ('table', ['Chest', 'Lock', 'Holds'], [

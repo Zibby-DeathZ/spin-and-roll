@@ -162,7 +162,7 @@ export function PlayerDuel({ sid, uid, session, data }) {
       ) : over ? (
         <p className="duel-said muted">Too slow!</p>
       ) : (
-        <div className="duel-btns">
+        <div className="rduel-btns">
           {Object.entries(COLORS).map(([c, x]) => (
             <button key={c} className={`duel-btn c-${c}`} onClick={() => react(c)}>{x.icon} {x.label}</button>
           ))}

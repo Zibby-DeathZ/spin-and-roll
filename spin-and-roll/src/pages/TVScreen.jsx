@@ -17,7 +17,7 @@ import SoundGate from '../components/SoundGate';
 import JumpScare from '../components/JumpScare';
 import { setMusic, play, soundForEvent } from '../lib/sound';
 import { introActive, skipToBook } from '../lib/intro';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useClaims } from '../lib/game';
 import { HouseBoard, TVQuiz } from '../components/Ceremony';
 import { Splash } from '../components/Gate';
@@ -28,6 +28,7 @@ import { TVAccuse } from '../components/Accuse';
 import { statusIcons } from '../components/Status';
 import { TVDuel } from '../components/Duel';
 import { TVMarauders } from '../components/Marauders';
+import HouseCrest from '../components/HouseCrest';
 
 export default function TVScreen() {
   const { sid } = useParams();
@@ -73,6 +74,13 @@ export default function TVScreen() {
 
 // The live table view, split out so it can be previewed with sample data.
 export function TVLive({ session, chars, profiles, data, title, answers, lessonResults, nameOf, sid, claims = {} }) {
+  // A big crest moment when the Sorting Hat calls a house.
+  const [reveal, setReveal] = useState(null);
+  useEffect(() => {
+    if (!reveal) return undefined;
+    const t = setTimeout(() => setReveal(null), 5200);
+    return () => clearTimeout(t);
+  }, [reveal]);
   // Music: the intro track during the opening, otherwise whatever the GM picked.
   const music = session.state?.music;
   const opening = introActive(session);
@@ -180,6 +188,7 @@ export function TVLive({ session, chars, profiles, data, title, answers, lessonR
           return (
             <span key={u} className={`tv2-chip ${c.hp <= 0 ? 'ko' : ''} ${enc?.order?.[enc.turn]?.id === u ? 'turn' : ''}`}>
               <Portrait family={c.family} name={c.firstName ?? c.name} className="chip-portrait" />
+              <HouseCrest house={c.house} className="chip-crest" />
               <span className="tv2-chip-text">
                 <strong>{c.firstName ?? c.name}</strong>
                 <span className="tv2-hp"><span style={{ width: `${Math.max(0, (c.hp / c.maxHp) * 100)}%` }} /></span>
@@ -190,7 +199,14 @@ export function TVLive({ session, chars, profiles, data, title, answers, lessonR
         })}
       </footer>
       {sid && <EventToasts sid={sid} nameOf={nameOf} big skip={['wheel', 'duel']}
-        onNew={(e) => { const s2 = soundForEvent(e); (Array.isArray(s2) ? s2 : s2 ? [s2] : []).forEach((n, i) => setTimeout(() => play(n), i * 180)); }} />}
+        onNew={(e) => { if (e.type === 'sorted') setReveal({ house: e.payload.house, name: nameOf(e.targetUid), id: e.id }); const s2 = soundForEvent(e); (Array.isArray(s2) ? s2 : s2 ? [s2] : []).forEach((n, i) => setTimeout(() => play(n), i * 180)); }} />}
+      {reveal && (
+        <div key={reveal.id} className={`sort-reveal house-${String(reveal.house).toLowerCase()}`} role="alert">
+          <HouseCrest house={reveal.house} className="sort-crest" />
+          <p className="sort-name">{reveal.name}</p>
+          <h2 className="sort-house">{String(reveal.house).toUpperCase()}!</h2>
+        </div>
+      )}
       {session.state?.marauders && <TVMarauders data={data} session={session} chars={chars} />}
       {session.state?.duel && <TVDuel session={session} />}
       <JumpScare scare={session.state?.scare} />

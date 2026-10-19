@@ -41,12 +41,24 @@ export default function Charms({ diff, onFinish }) {
         {phase === 'show' ? 'Watch Professor Flitwick’s wand…' : 'Your turn! Repeat the motion'}
         <span className="muted"> {seq.length} / {target(diff)}</span>
       </p>
-      <div className="dpad">
-        {DIRS.map(([id, glyph], i) => (
-          <button key={id} className={`dpad-${id} ${lit === i ? 'lit' : ''}`} disabled={phase !== 'input'}
-            onClick={() => press(i)} aria-label={id}>{glyph}</button>
-        ))}
-        <span className="dpad-core" aria-hidden="true">🪄</span>
+      <div className={`charm-stage ${phase}`}>
+        <svg className="charm-circle" viewBox="0 0 200 200" aria-hidden="true">
+          <circle cx="100" cy="100" r="92" />
+          <circle cx="100" cy="100" r="80" />
+          <circle cx="100" cy="100" r="44" />
+          <path d="M100 8 L180 146 L20 146 Z M100 192 L20 54 L180 54 Z" />
+          <text><textPath href="#charm-ring" startOffset="0">ᚹᛁᛜᚷᚨᚱᛞᛁᚢᛗ ✦ ᛚᛖᚹᛁᛟᛊᚨ ✦ ᚨᛚᛟᚺᛟᛗᛟᚱᚨ ✦ ᛚᚢᛗᛟᛊ ✦ ᚾᛟᚲᛊ ✦</textPath></text>
+          <path id="charm-ring" d="M100 14 a86 86 0 1 1 -0.1 0" fill="none" stroke="none" />
+        </svg>
+        <div className="dpad">
+          {DIRS.map(([id, glyph], i) => (
+            <button key={id} className={`dpad-${id} ${lit === i ? 'lit' : ''}`} disabled={phase !== 'input'}
+              onClick={() => press(i)} aria-label={id}>{glyph}</button>
+          ))}
+          <span className="dpad-core" aria-hidden="true">
+            <span className="charm-wand" style={{ transform: `rotate(${lit == null ? 0 : lit * 90}deg)` }}>🪄</span>
+          </span>
+        </div>
       </div>
     </div>
   );

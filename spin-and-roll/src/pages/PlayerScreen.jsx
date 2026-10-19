@@ -32,6 +32,8 @@ import TradeComposer from '../components/TradeComposer';
 import { Corruption, StatusChips } from '../components/Status';
 import { PlayerDuel, duelNeedsMe } from '../components/Duel';
 import { PlayerMapScreen } from '../components/Marauders';
+import HouseCrest from '../components/HouseCrest';
+import Info from '../components/Info';
 
 function AbilityCard({ sid, c, ability, dawn }) {
   const [used, setUsed] = useState(false);
@@ -70,18 +72,19 @@ function Sheet({ sid, c, currency, data, points, clk, scenes = null, loc, discov
       {loc && <p className="loc-chip">📍 {loc.name}</p>}
       <div className="char-head">
         <Portrait family={c.family} name={c.name} className="sheet-portrait" />
+        <HouseCrest house={c.house} className="sheet-crest" />
         <h1>{c.name}</h1>
         <p className="muted">{c.house ? `${c.house}, ` : ''}level {lvl}{fam ? `, ${fam.blood.toLowerCase()}` : ''}</p>
       </div>
-      <Bar label="HP" value={c.hp} max={c.maxHp} tone="ember" />
-      <Bar label="Mana" value={c.mana} max={c.maxMana} tone="violet" />
+      <Bar label={<>HP <Info title="HP">Your health. At 0 you’re knocked out until someone heals you. Potions and food bring it back, and a night’s sleep fills it.</Info></>} value={c.hp} max={c.maxHp} tone="ember" />
+      <Bar label={<>Mana <Info title="Mana">The magic you have left today. Every spell costs some (the number on its card). It refills when you sleep, or with a Focus Draught.</Info></>} value={c.mana} max={c.maxMana} tone="violet" />
       <StatusChips map={c.status} defs={data.statusEffects} />
       <Corruption c={c} data={data} />
-      <Bar label={next ? `XP to level ${lvl + 1}` : `XP (top level for this year)`} value={c.xp} max={next ?? c.xp} tone="gold" />
+      <Bar label={<>{next ? `XP to level ${lvl + 1}` : 'XP (top level for this year)'} <Info title="XP">Experience from classes, quests and fights. Each new level gives you more HP and mana.</Info></>} value={c.xp} max={next ?? c.xp} tone="gold" />
       <div className="vitals">
-        <span><b>{defenceOf(c)}</b> Defence</span>
-        {b.spellPower > 0 && <span><b>+{b.spellPower}</b> Spell damage</span>}
-        <span><b>{c.gold}</b> {currency.icon} {currency.name}</span>
+        <span><b>{defenceOf(c)}</b> Defence <Info title="Defence">How hard you are to hit. An enemy must roll this or higher on its attack. Robes and some familiars raise it.</Info></span>
+        {b.spellPower > 0 && <span><b>+{b.spellPower}</b> Spell damage <Info title="Spell damage">Added to the damage of every attack spell you cast. Comes from your wand.</Info></span>}
+        <span><b>{c.gold}</b> {currency.icon} {currency.name} <Info title={currency.name}>Money for the shops and for bribes. Your family vault decides how much you start with.</Info></span>
       </div>
       <div className="stats">
         {STATS.map(([k, label]) => {
@@ -91,7 +94,7 @@ function Sheet({ sid, c, currency, data, points, clk, scenes = null, loc, discov
             <div key={k} className={`stat ${extra ? 'buffed' : ''}`}>
               <span className="stat-mod">{fmtMod(mod(v))}</span>
               <span className="stat-score">{v}{extra ? ` (+${extra})` : ''}</span>
-              <span className="stat-name">{label}</span>
+              <span className="stat-name">{label} <Info title={label}>{STAT_INFO[k]}</Info></span>
             </div>
           );
         })}
@@ -129,13 +132,45 @@ function Sheet({ sid, c, currency, data, points, clk, scenes = null, loc, discov
   );
 }
 
-function Bag({ c, sid, others, data, onGive, onOpenMap }) {
+// What each stat is for, shown behind the little "i".
+const STAT_INFO = {
+  str: 'Muscle: lifting, pushing, climbing and breaking things. Your Improvised attack (punches and throws) rolls it.',
+  dex: 'Quick hands and feet: sneaking, dodging, catching. Aimed spells like Expelliarmus and Diffindo roll it, and it decides who goes first in a fight.',
+  con: 'Toughness: your HP grows with it, and it helps you shrug off poison, cold and tiredness.',
+  int: 'Book smarts: most attack spells (Stupefy, Incendio, Glacius) roll it, it adds to your mana, and it helps with puzzles and locks.',
+  wis: 'Good sense: noticing clues, reading people, Finite Incantatem, and fighting off mind magic.',
+  cha: 'Charm and nerve: persuading, bluffing, bargaining, and spells like Rictusempra, Silencio and Riddikulus.',
+};
+
+const KINDS = [
+  ['consumable', 'Consumables', 'Used up when you use them. Work anywhere.'],
+  ['key', 'Key items', 'Only work in the right place. If there’s nothing to use it on here, the button stays dark.'],
+  ['clue', 'Clues and keepsakes', 'Nothing to use: read them, show them, trade them.'],
+];
+// Old saved items may not have a kind yet: anything with an effect or a wheel is a consumable.
+const kindOf = (data, i) => data?.items?.[i.id]?.kind ?? (i.effect || i.wheel ? 'consumable' : 'clue');
+
+function itemInfo(def, i, kind) {
+  const fx = def.effect ?? i.effect;
+  const bits = [];
+  if (fx?.hp) bits.push(`Heals ${fx.hp} HP.`);
+  if (fx?.mana) bits.push(`Restores ${fx.mana} mana.`);
+  const note = def.note ?? i.note;
+  if (note) bits.push(/[.!?”]$/.test(note) ? note : `${note}.`);
+  if (kind === 'key') bits.push(def.keep ? 'You keep it after using it.' : 'Used up once it has done its job.');
+  if (kind === 'consumable') bits.push('Used up when you use it.');
+  if (def.opensMap) bits.push('Open it, then say the words out loud.');
+  return bits.join(' ');
+}
+
+function Bag({ c, sid, others, data, onGive, onOpenMap, here }) {
   const [used, setUsed] = useState(null);
   const use = async (item) => {
     setUsed(item.id);
     try { await consumeItem(sid, c.uid, item.id); } finally { setTimeout(() => setUsed(null), 1200); }
   };
   const eq = Object.entries(c.equipment ?? {});
+  const inv = c.inventory ?? [];
   return (
     <>
       {eq.length > 0 && (
@@ -146,7 +181,8 @@ function Bag({ c, sid, others, data, onGive, onOpenMap }) {
               <li key={slot} className="item-row">
                 <span className="item-name">
                   <Art path={itemArt(val.id, slot)} icon={val.icon} className="item-icon" />
-                  <span>{val.name}<br /><span className="muted small">{bonusText(val.bonus) || val.desc}</span></span>
+                  <span>{val.name} <Info title={val.name}>{[bonusText(val.bonus), val.desc].filter(Boolean).join('. ') || `Your ${slot}.`}</Info>
+                    <br /><span className="muted small">{bonusText(val.bonus) || val.desc}</span></span>
                 </span>
                 <span className="muted small cap">{slot}</span>
               </li>
@@ -155,27 +191,42 @@ function Bag({ c, sid, others, data, onGive, onOpenMap }) {
         </>
       )}
       <h2>Bag</h2>
-      {(c.inventory ?? []).length === 0 && <p className="muted">Your bag is empty.</p>}
-      <ul className="rows">
-        {(c.inventory ?? []).map((i) => (
-          <li key={i.id} className="item-row">
-            <span className="item-name">
-              <Art path={itemArt(i.id)} icon={i.icon} className="item-icon" />
-              {i.name} <span className="muted">×{i.qty}</span>
-            </span>
-            <span className="item-actions">
-              {data?.items?.[i.id]?.opensMap ? (
-                <button className="btn small gold" onClick={onOpenMap}>Open</button>
-              ) : (i.effect || i.note) && (
-                <button className="btn small teal" disabled={used === i.id} onClick={() => use(i)}>
-                  {used === i.id ? 'Used' : 'Use'}
-                </button>
-              )}
-              {others.length > 0 && <button className="btn small" onClick={() => onGive()}>Give</button>}
-            </span>
-          </li>
-        ))}
-      </ul>
+      {inv.length === 0 && <p className="muted">Your bag is empty.</p>}
+      {KINDS.map(([k, label, help]) => {
+        const list = inv.filter((i) => kindOf(data, i) === k);
+        if (!list.length) return null;
+        return (
+          <section key={k} className={`bag-group bag-${k}`}>
+            <h3>{label} <Info title={label}>{help}</Info></h3>
+            <ul className="rows">
+              {list.map((i) => {
+                const def = data?.items?.[i.id] ?? {};
+                const canUse = !def.usableAt?.length || def.usableAt.includes(here);
+                return (
+                  <li key={i.id} className="item-row">
+                    <span className="item-name">
+                      <Art path={itemArt(i.id)} icon={i.icon} className="item-icon" />
+                      <span>{i.name} {i.qty > 1 && <span className="muted">×{i.qty}</span>} <Info title={i.name}>{itemInfo(def, i, k)}</Info></span>
+                    </span>
+                    <span className="item-actions">
+                      {def.opensMap ? (
+                        <button className="btn small gold" onClick={onOpenMap}>Open</button>
+                      ) : k === 'clue' ? null : k === 'key' && !canUse ? (
+                        <button className="btn small" disabled title="There’s nothing to use it on here">Not here</button>
+                      ) : (
+                        <button className={`btn small ${k === 'key' ? 'gold glow' : 'teal'}`} disabled={used === i.id} onClick={() => use(i)}>
+                          {used === i.id ? 'Used' : 'Use'}
+                        </button>
+                      )}
+                      {others.length > 0 && <button className="btn small" onClick={() => onGive()}>Give</button>}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        );
+      })}
     </>
   );
 }
@@ -376,7 +427,7 @@ export default function PlayerScreen() {
         {tab === 'dice' && <DiceTab sid={sid} c={me} data={data} session={session} chars={chars} />}
         {tab === 'shop' && <Shop sid={sid} c={me} data={data} open={shopOpen} />}
         {tab === 'bag' && (
-          <Bag c={me} sid={sid} others={others} data={data}
+          <Bag c={me} sid={sid} others={others} data={data} here={locOf(session, user.uid) ?? session.state?.map?.loc}
             onGive={() => setTab('party')} onOpenMap={() => setMapOpen(true)} />
         )}
         {tab === 'party' && pending > 0 && <Trades sid={sid} me={me} chars={chars} trades={trades} currency={currency} />}
