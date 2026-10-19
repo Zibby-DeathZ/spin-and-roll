@@ -6,6 +6,7 @@ import { chestToken, hazardToken, itemToken } from './world';
 import { doubleToken, trunkToken } from './mimic';
 import { giveQuest } from './world';
 import { sendOwl } from './owls';
+import { bossHp } from './accuse';
 
 const sessionRef = (sid) => doc(db, 'sessions', sid);
 
@@ -61,7 +62,7 @@ export function talkNow(data, npcId, clk) {
   return { ...t, topics: t.topics.filter((x) => d >= (x.from ?? 0) && d <= (x.to ?? 99)) };
 }
 
-function spawnToken(data, s) {
+function spawnToken(data, s, weakened = false) {
   const pos = { x: s.x ?? 30 + Math.random() * 40, y: s.y ?? 30 + Math.random() * 30 };
   let t;
   if (s.type === 'item') t = itemToken(data, s.item, s.loc);
@@ -73,7 +74,8 @@ function spawnToken(data, s) {
     t = { kind: s.npc, name: s.name ?? b.name, icon: b.icon, npc: true, loc: s.loc };
   } else {
     const b = data.bestiary[s.kind];
-    t = { kind: s.kind, loc: s.loc, icon: b.icon, name: b.name, npc: false, hp: b.hp, maxHp: b.hp, defence: b.defence, boss: !!b.boss };
+    const hp = bossHp(b, weakened);
+    t = { kind: s.kind, loc: s.loc, icon: b.icon, name: b.name, npc: false, hp, maxHp: hp, defence: b.defence, boss: !!b.boss };
   }
   return { ...t, ...pos, spawnId: s.id, transient: !!s.transient };
 }
@@ -124,7 +126,7 @@ export async function applyWorld(sid, data, clkIn = null) {
   }
   for (const s of sch?.spawn ?? []) {
     if (spawned[s.id]) continue;
-    const t = spawnToken(data, s);
+    const t = spawnToken(data, s, !!st.bossesWeakened);
     if (s.transient) t.slot = key;
     upd[`state.tokens.sp-${s.id}`] = t;
     upd[`state.spawned.${s.id}`] = true;

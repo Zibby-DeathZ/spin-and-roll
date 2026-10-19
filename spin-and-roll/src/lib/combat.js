@@ -4,6 +4,7 @@ import { db } from '../firebase';
 import { adjust, bonuses, defenceOf, logEvent, mod, startSpin, statOf } from './game';
 import { rollD20, rollDice } from './dice';
 import { mimicRemains, mirrorAttack, springMimic, trunkBonus, trunkSwallow } from './mimic';
+import { bossHp } from './accuse';
 
 const sessionRef = (sid) => doc(db, 'sessions', sid);
 const charRef = (sid, uid) => doc(db, 'sessions', sid, 'characters', uid);
@@ -27,6 +28,9 @@ export async function travel(sid, data, locId) {
 
 export async function addToken(sid, data, kind, loc, existing = {}) {
   const b = data.bestiary[kind];
+  // A correct final accusation leaves the bosses weaker.
+  const weakened = b.boss ? !!(await getDoc(sessionRef(sid))).data()?.state?.bossesWeakened : false;
+  const hp = bossHp(b, weakened);
   const same = Object.values(existing).filter((t) => t.kind === kind && t.loc === loc).length;
   const id = `${kind}-${Date.now().toString(36)}`;
   const token = {
@@ -34,7 +38,7 @@ export async function addToken(sid, data, kind, loc, existing = {}) {
     name: same ? `${b.name} ${same + 1}` : b.name,
     x: 25 + Math.random() * 50, y: 30 + Math.random() * 35,
     npc: !!b.npc,
-    ...(b.npc ? {} : { hp: b.hp, maxHp: b.hp, defence: b.defence, boss: !!b.boss }),
+    ...(b.npc ? {} : { hp, maxHp: hp, defence: b.defence, boss: !!b.boss }),
   };
   await updateDoc(sessionRef(sid), { [`state.tokens.${id}`]: token });
   return id;

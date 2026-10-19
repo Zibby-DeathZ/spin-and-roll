@@ -79,7 +79,7 @@ BLOCKS = [
         ['Lunch', 'Cassius is seen in the courtyard with half of an old map. The Fenwick should get <b>The Other Half</b>.', 'Courtyard'],
         ['Afternoon class', '<b>Flying Lessons</b> with Madam Hooch. Teaches broom flying. Minigame: Broom Dodge.', 'Quidditch Pitch'],
         ['Free time', '<b>Beat:</b> the only page about Corvin Vale vanishes from the Restricted Section, unless the players already took it.', 'Restricted Section'],
-        ['Curfew', 'A good night for the Torch Wall or the Moving Staircases if the party is exploring.', 'Anywhere'],
+        ['Curfew', 'The Painted Double appears in the story tonight. Open with a round of the <b>Painted Double</b> party game first (Part 3). Also a good night for the Torch Wall or the Moving Staircases if the party is exploring.', 'Anywhere'],
     ]),
     ('read', 'Madam Hooch blows her whistle hard enough to rattle the stands. “Right hand over the broom and say UP! Not up, not please, UP! And if anyone flies into the hoops, I am not picking you up.”'),
     ('gm', 'Clues to pin as found: <b>Ashgrove’s classroom has more paintings every day</b>, <b>Filch has keys to every corridor</b>, <b>Cassius was seen with half of an old map</b>, and <b>A page about Corvin Vale</b> if they reach it in time. Place it as an item, <b>Torn page about Corvin Vale</b>, in the Restricted Section early in the day.'),
@@ -96,7 +96,7 @@ BLOCKS = [
     ('h3', 'Curfew beat: the red herring'),
     ('read', 'In the dungeon corridor, a third student lies grey and still. Kneeling over them, wand raised, is Professor Grimsby. When he sees you, his face goes from shock to fury. “Back to your common rooms! Now!” In his other hand is a small bottle of something glowing faintly gold.'),
     ('gm', 'Pin <b>Grimsby was found standing over the third victim</b> under Grimsby. Do not clear him yet. If the players investigate his office or the bottle, give them <b>Grimsby was secretly brewing a draught to wake the victims</b>, which clears him.'),
-    ('tip', 'This is the moment the players will want to accuse Grimsby. Let them. Their accusation is wrong, and finding that out is half the fun. Use the suspect board: mark him <b>Accused</b>, then <b>Cleared</b> when the truth comes out. This is the end of session two.'),
+    ('tip', 'This is the moment the players will want to accuse Grimsby. Let them. Their accusation is wrong, and finding that out is half the fun. Call an accusation vote and keep it a <b>hunch</b>: he is stamped <b>Accused</b>. Mark him <b>Cleared</b> when the truth comes out. This is the end of session two.'),
 
     ('h2', 'Day 6: Hogsmeade'),
     day_table([
@@ -116,7 +116,7 @@ BLOCKS = [
         ['Morning class', '<b>Transfiguration</b> with Vance. Teaches <b>Incendio</b>. This is the spell that burns Paint Wraiths and Vale’s canvas.', 'Transfiguration classroom'],
         ['Lunch', 'Ashgrove does not appear at lunch. His classroom is locked. His paintings are gone.', 'Great Hall'],
         ['Afternoon class', 'Classes cancelled. The castle is on lockdown. Teachers patrol the corridors.', 'Common rooms'],
-        ['Free time', 'The last chance to prepare: brew, rest, find the Time-Turner, solve the Trials.', 'Anywhere'],
+        ['Free time', 'The last chance to prepare: brew, rest, find the Time-Turner, solve the Trials. Before they go down, hold the <b>final accusation</b> (Part 3): naming the painting weakens the bosses.', 'Anywhere'],
         ['Curfew', '<b>Beat: the ritual.</b> If Vale is not stopped before this block ends, he walks free and the game is lost.', 'The Undercroft'],
     ]),
     ('read', 'At breakfast, the Headmaster stands and the hall falls silent. “As of this afternoon, the castle is closed. Students will remain in their common rooms. No exceptions.” Every portrait in the Great Hall is empty. Somewhere far below, so deep you feel it in your feet more than hear it, something is humming.'),

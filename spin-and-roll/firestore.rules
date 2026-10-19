@@ -25,6 +25,8 @@ service cloud.firestore {
       // Saved characters that carry into the next year of a series.
       match /heroes/{series} { allow read: if signedIn(); allow write: if isDM(); }
       match /trophies/{sid} { allow read: if signedIn(); allow write: if isDM(); }
+      // The DM's own word list for the Painted Double game. Only the DM can see it.
+      match /imposter/{campaign} { allow read, write: if isDM() && request.auth.uid == uid; }
     }
 
     match /sessions/{sid} {
@@ -127,6 +129,23 @@ service cloud.firestore {
             || (request.auth.uid == resource.data.fromUid && request.resource.data.status == 'cancelled')
           )
         );
+      }
+
+      // The Painted Double: each player's secret card. Only that player (and the DM) can read it,
+      // so nobody can peek at whether they are the Double or what the word is.
+      match /imposter/{uid} {
+        allow read: if isDM() || (signedIn() && request.auth.uid == uid);
+        allow write: if isDM();
+      }
+      // Votes: a player writes only their own, stored as "<round>_<their uid>".
+      match /imposterVotes/{vid} {
+        allow read: if isDM();
+        allow create, update: if inSession(sid)
+          && request.resource.data.uid == request.auth.uid
+          && vid == request.resource.data.round + '_' + request.auth.uid
+          && request.resource.data.keys().hasOnly(['round', 'uid', 'vote', 'at'])
+          && request.resource.data.vote is string;
+        allow delete: if isDM();
       }
     }
   }

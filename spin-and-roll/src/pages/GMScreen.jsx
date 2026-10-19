@@ -22,6 +22,9 @@ import { GMShows } from '../components/Shows';
 import GMSpells from '../components/GMSpells';
 import { GMOwlPost } from '../components/OwlPost';
 import GMMedia from '../components/GMMedia';
+import { GMImposter } from '../components/Imposter';
+import { useImposterEngine } from '../lib/imposter';
+import { useAccuseEngine } from '../lib/accuse';
 import { saveHeroes } from '../lib/heroes';
 import { sendOwl } from '../lib/owls';
 import { sendToDetention } from '../lib/world';
@@ -214,7 +217,7 @@ function Feed({ sid, nameOf }) {
 
 const TABS = [
   ['table', '🗺️ Table'], ['day', '🕰️ Day & class'], ['quests', '📜 Quests'], ['puzzles', '🧩 Puzzles'],
-  ['shows', '🎬 TV shows'], ['players', '🧑‍🎓 Players'], ['owls', '🦉 Owl Post'], ['spells', '✨ Spells'], ['wheels', '🎡 Wheels'], ['media', '🎞️ Media'],
+  ['shows', '🎬 TV shows'], ['players', '🧑‍🎓 Players'], ['owls', '🦉 Owl Post'], ['imposter', '🎭 Double'], ['spells', '✨ Spells'], ['wheels', '🎡 Wheels'], ['media', '🎞️ Media'],
 ];
 
 export default function GMScreen() {
@@ -227,6 +230,8 @@ export default function GMScreen() {
   const data = session ? getCampaignData(session.campaignId) : null;
   useGameEngine(sid, data); // carries out claims, purchases, trades and item uses while open
   const lessonResults = useLessonEngine(sid, data, session?.state?.lesson);
+  useImposterEngine(sid, session); // tells the TV who has voted in a Painted Double round
+  useAccuseEngine(sid, session); // and in an accusation vote
   // If a game was started without its opening (for example from an old, un-refreshed dashboard tab),
   // start it now, as long as nobody has chosen a family yet.
   const autoIntro = useRef(false);
@@ -287,6 +292,8 @@ export default function GMScreen() {
             {id === 'table' && enc && <span className="gm-dot ember" aria-label="fight in progress" />}
             {id === 'day' && lesson && <span className="gm-dot gold" aria-label="class in progress" />}
             {id === 'puzzles' && session.state?.puzzle && <span className="gm-dot violet" aria-label="puzzle on the TV" />}
+            {id === 'imposter' && session.state?.imposter && <span className="gm-dot violet" aria-label="Painted Double round running" />}
+            {id === 'shows' && session.state?.accuse && <span className="gm-dot gold" aria-label="accusation vote running" />}
           </button>
         ))}
       </nav>
@@ -314,6 +321,7 @@ export default function GMScreen() {
           {active === 'quests' && <GMQuests sid={sid} data={data} session={session} chars={chars} />}
           {active === 'media' && <GMMedia data={data} session={session} />}
           {active === 'owls' && <GMOwlPost sid={sid} session={session} chars={chars} />}
+          {active === 'imposter' && <GMImposter sid={sid} session={session} chars={chars} />}
           {active === 'spells' && <GMSpells sid={sid} data={data} session={session} chars={chars} />}
           {active === 'shows' && <GMShows sid={sid} data={data} session={session} chars={chars} />}
           {active === 'puzzles' && <GMPuzzles sid={sid} data={data} session={session} chars={chars} />}

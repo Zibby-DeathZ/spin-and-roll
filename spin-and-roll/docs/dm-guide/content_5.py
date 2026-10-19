@@ -147,6 +147,9 @@ BLOCKS = [
     ]),
     ('h2', 'Version log'),
     ('table', ['Version', 'Date', 'Changes'], [
+        ['2.6', 'October 2026', 'The accusation vote: players vote on their phones for the culprit. Keep it a hunch, or make it the final accusation, which reveals the truth, pays XP and house points, and weakens the bosses if the table is right.'],
+        ['2.5', 'October 2026', 'The Painted Double: an Imposter-style party game with your own words and hints, phone voting and a TV reveal.'],
+        ['2.4', 'October 2026', 'The Forbidden Forest fight is now a Thornback Boar (Day 3 free time and the forest wheel). Creature treats or a Thornbury can calm it.'],
         ['2.3', 'October 2026', 'Pictures for people, monsters, items, chests and hazards (public/art), replacing the emoji on the map, phones and shops. An image prompt for every picture in docs/art.'],
         ['2.2', 'October 2026', 'The scene counter (2 things at lunch, 3 in free time, 2 at curfew) shown on the TV and phones. Missed quests now arrive by Owl Post, spread through the week. Fixed new mornings not restoring HP.'],
         ['2.1', 'October 2026', 'The living castle: every person has a place for all 35 blocks of the week and moves there on Advance time, along with the clues, chests, hazards and monsters for that block. Quests on offer, conversations on the GM screen, and the companion Conversation Book.'],

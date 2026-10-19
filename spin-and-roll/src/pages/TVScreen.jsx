@@ -23,6 +23,8 @@ import { HouseBoard, TVQuiz } from '../components/Ceremony';
 import { Splash } from '../components/Gate';
 import Wheel from '../components/Wheel';
 import EventToasts from '../components/EventToasts';
+import { TVImposter } from '../components/Imposter';
+import { TVAccuse } from '../components/Accuse';
 
 export default function TVScreen() {
   const { sid } = useParams();
@@ -97,7 +99,9 @@ export function TVLive({ session, chars, profiles, data, title, answers, lessonR
   }
 
   let stage;
-  if (session.state?.show) stage = <div className="tv2-center"><TVShow data={data} session={session} /></div>;
+  if (session.state?.accuse && data.suspects) stage = <div className="tv2-center"><TVAccuse data={data} session={session} chars={chars} /></div>;
+  else if (session.state?.imposter) stage = <div className="tv2-center"><TVImposter session={session} chars={chars} /></div>;
+  else if (session.state?.show) stage = <div className="tv2-center"><TVShow data={data} session={session} /></div>;
   else if (quiz) stage = <div className="tv2-center"><TVQuiz quiz={quiz} answer={answers[answerKey(q.id, q.uid)]} name={nameOf(q.uid)} /></div>;
   else if (showSpin) stage = <div className="tv2-center"><TVSpin data={data} spin={spin} name={spin.uid ? nameOf(spin.uid) : null} /></div>;
   else if (session.state?.puzzle && data.puzzles?.find((p) => p.id === session.state.puzzle.id)) {

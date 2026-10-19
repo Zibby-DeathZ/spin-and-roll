@@ -1229,3 +1229,69 @@ p.scene-ctl { border: none; background: none; padding: 0; }
 .here-thing { display: inline-flex; align-items: center; gap: .45rem; }
 .here-icon.has-art { display: inline-block; width: 1.9rem; height: 1.9rem; border-radius: 50%; flex-shrink: 0; }
 .here-icon.big.has-art { width: 3rem; height: 3rem; }
+
+/* ---------- The Painted Double ---------- */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.gm-imposter { display: flex; flex-direction: column; gap: 1rem; }
+.imp-setup, .imp-round, .imp-words { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.1rem; display: flex; flex-direction: column; gap: .7rem; }
+.imp-row { display: flex; flex-wrap: wrap; gap: 1rem; }
+.imp-row label { display: flex; flex-direction: column; gap: .3rem; flex: 1 1 240px; font-size: .9rem; }
+.imp-row select, .imp-add input, .imp-bulk textarea, .imp-table input { background: var(--ink); color: var(--bone); border: 1px solid var(--line); border-radius: 8px; padding: .5rem .6rem; font: inherit; min-width: 0; }
+.imp-secret { display: flex; flex-wrap: wrap; gap: .4rem 1.4rem; padding: .7rem .9rem; border-radius: 10px; background: rgb(142 124 195 / .15); border: 1px dashed var(--violet); }
+.imp-votes { margin: 0; padding-left: 1.1rem; }
+.imp-result { font-size: 1.1rem; font-weight: 600; margin: 0; }
+.imp-end { border-top: 1px solid var(--line); padding-top: .6rem; }
+.imp-add { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) auto; gap: .5rem; }
+@media (max-width: 640px) { .imp-add { grid-template-columns: 1fr; } }
+.imp-bulk { display: flex; flex-direction: column; gap: .4rem; }
+.imp-table { width: 100%; border-collapse: collapse; font-size: .95rem; }
+.imp-table th, .imp-table td { text-align: left; padding: .4rem .5rem; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.imp-table tr.used td { opacity: .6; }
+.imp-acts { white-space: nowrap; text-align: right; }
+
+.imp-phone { min-height: 100%; padding: 1.4rem 1rem 2rem; display: flex; flex-direction: column; align-items: center; gap: 1rem; text-align: center; }
+.imp-title { font: 700 1.5rem var(--display); color: var(--violet); margin: 0; }
+.imp-card { width: min(100%, 360px); min-height: 230px; border-radius: 18px; border: 2px solid var(--violet); background: var(--panel); color: var(--bone);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .6rem; padding: 1.2rem; font: inherit; cursor: pointer; }
+.imp-card.open { background: #2b2450; }
+.imp-card.double { border-color: var(--ember); background: #3a1f2a; }
+.imp-word { font: 700 2rem/1.15 var(--display); color: var(--gold); }
+.imp-card.double .imp-word { color: #ff9b86; font-size: 1.6rem; }
+.imp-hint { font: 700 1.5rem var(--display); color: var(--gold); }
+.imp-step { font-weight: 600; margin: 0; }
+.imp-vote { width: min(100%, 420px); display: flex; flex-direction: column; gap: .7rem; }
+.imp-vote-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .6rem; }
+.imp-pick { display: flex; flex-direction: column; align-items: center; gap: .35rem; padding: .7rem .4rem; border-radius: 14px; border: 2px solid var(--line); background: var(--panel); color: var(--bone); font: inherit; cursor: pointer; min-height: 44px; }
+.imp-pick .portrait { width: 56px; height: 56px; }
+.imp-pick.on { border-color: var(--gold); background: rgb(227 176 75 / .15); }
+.imp-outcome { display: flex; flex-direction: column; gap: .5rem; }
+
+.tv-imp { width: min(92vw, 1400px); display: flex; flex-direction: column; align-items: center; gap: 1.2rem; text-align: center; }
+.tv-imp-eyebrow { font: 700 1.4rem var(--display); color: var(--violet); letter-spacing: .06em; margin: 0; }
+.tv-imp h2 { font-size: clamp(2rem, 4vw, 3.6rem); margin: 0; }
+.tv-imp-sub { font-size: 1.4rem; color: var(--muted); margin: 0; }
+.tv-imp-ring { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.6rem; margin-top: 1rem; }
+.tv-imp-p { width: 170px; display: flex; flex-direction: column; align-items: center; gap: .4rem; position: relative; transition: transform .4s; }
+.tv-imp-face { width: 130px; height: 130px; border: 4px solid var(--line); font-size: 3rem; }
+.tv-imp-p.voted .tv-imp-face { border-color: var(--teal); }
+.tv-imp-p.double .tv-imp-face { border-color: var(--ember); box-shadow: 0 0 40px rgb(208 84 63 / .7); animation: imp-pulse 1.6s ease-in-out infinite; }
+.tv-imp-p.double { transform: scale(1.12); }
+.tv-imp-name { font: 700 1.4rem var(--display); }
+.tv-imp-tag { font-size: 1rem; color: var(--muted); }
+.tv-imp-bar { width: 100%; height: 14px; border-radius: 7px; background: var(--panel); overflow: hidden; }
+.tv-imp-bar i { display: block; height: 100%; border-radius: 7px; background: var(--gold); transition: width 1.2s ease-out; }
+.tv-imp-mark { font: 700 1.1rem var(--display); color: var(--ember); text-transform: uppercase; letter-spacing: .08em; }
+.tv-imp-word { font-size: 2rem; margin: .5rem 0 0; }
+.tv-imp-word strong { color: var(--gold); font-family: var(--display); }
+@keyframes imp-pulse { 50% { box-shadow: 0 0 10px rgb(208 84 63 / .4); } }
+@media (prefers-reduced-motion: reduce) { .tv-imp-p.double .tv-imp-face { animation: none; } .tv-imp-bar i { transition: none; } }
+
+/* ---------- Accusation vote ---------- */
+.accuse-gm { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.1rem; margin: .8rem 0 1.2rem; display: flex; flex-direction: column; gap: .6rem; }
+.accuse-choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+@media (max-width: 700px) { .accuse-choices { grid-template-columns: 1fr; } }
+.accuse-choices p { margin: .4rem 0 0; }
+.accuse-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.accuse-face { width: 64px; height: 64px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 2rem; background: var(--ink); overflow: hidden; }
+.accuse-tv-face { display: inline-flex; align-items: center; justify-content: center; font-size: 3.4rem; background: var(--panel); border-radius: 50%; overflow: hidden; }
+.tv-imp-ring .tv-imp-p .has-art img { border-radius: 50%; }

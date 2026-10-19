@@ -88,7 +88,7 @@ A tall, silent library with endless dark wooden shelves, rolling ladders, readin
 ### Restricted Section
 `public/maps/restricted-section.jpg`
 
-A locked, roped-off corner of a library, ancient books held shut with iron chains, some faintly glowing or twitching, cobwebs, lantern light. Wide game map background seen from a high three-quarter angle. Keep the middle of the floor open and uncluttered, because character tokens are placed on top. No people. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+A locked, roped-off corner of a library, ancient books held shut with iron chains, some faintly glowing or twitching, dust, lantern light. Wide game map background seen from a high three-quarter angle. Keep the middle of the floor open and uncluttered, because character tokens are placed on top. No people. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
 
 ### The Dungeons
 `public/maps/dungeons.jpg`
@@ -378,10 +378,10 @@ An older student in dueling stance, wand raised, cocky grin, robes swirling, a s
 
 A ghostly figure made of dripping, smeared oil paint, swirling colours for a body, hollow eyes, clawing hands trailing brushstrokes. Square creature portrait, the whole creature centred and filling the frame so it reads when cropped to a small circle, plain dark background. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
 
-### Acromantula
-`public/art/monsters/acromantula.png`
+### Thornback Boar
+`public/art/monsters/thornback-boar.png`
 
-A huge hairy spider the size of a horse with many gleaming eyes and clicking pincers, in a dark misty forest. Square creature portrait, the whole creature centred and filling the frame so it reads when cropped to a small circle, plain dark background. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+A huge, shaggy wild boar with a ridge of thorny bramble-like bristles along its back, curved tusks and glowing amber eyes, charging out of a dark misty forest. Square creature portrait, the whole creature centred and filling the frame so it reads when cropped to a small circle, plain dark background. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
 
 ### Mountain Troll
 `public/art/monsters/troll.png`

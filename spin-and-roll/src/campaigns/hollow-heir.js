@@ -376,7 +376,7 @@ export const hollowHeir = {
     boggart: { name: 'Boggart', icon: '👤', hp: 10, defence: 12, atk: 3, dmg: { count: 1, die: 6 }, init: 2, xp: 20, note: 'Laughter hurts it' },
     'rival-duelist': { name: 'Dueling Club rival', icon: '🧑‍🎓', hp: 14, defence: 12, atk: 3, dmg: { count: 1, die: 6 }, init: 2, xp: 15 },
     'paint-wraith': { name: 'Paint Wraith', icon: '🎨', hp: 12, defence: 13, atk: 4, dmg: { count: 1, die: 6 }, init: 3, xp: 25, note: 'Vale’s servant. Fire burns it' },
-    acromantula: { name: 'Acromantula', icon: '🕷️', hp: 22, defence: 13, atk: 5, dmg: { count: 1, die: 8 }, init: 2, xp: 40 },
+    'thornback-boar': { name: 'Thornback Boar', icon: '🐗', hp: 22, defence: 13, atk: 5, dmg: { count: 1, die: 8 }, init: 2, xp: 40, note: 'Charges. Calming it (Creature treats, or a Thornbury) ends the fight' },
     troll: { name: 'Mountain Troll', icon: '👹', hp: 30, defence: 11, atk: 6, dmg: { count: 1, die: 10 }, init: -1, xp: 50 },
     'ashgrove-possessed': { name: 'Ashgrove (possessed)', icon: '🧙', hp: 45, defence: 14, atk: 5, dmg: { count: 1, die: 8, bonus: 2 }, init: 3, xp: 100, boss: true },
     'corvin-vale': { name: 'Corvin Vale', icon: '🖼️', hp: 60, defence: 15, atk: 6, dmg: { count: 1, die: 10, bonus: 2 }, init: 4, xp: 200, boss: true },
@@ -578,7 +578,7 @@ export const hollowHeir = {
       name: 'Forbidden Forest', icon: '🌲',
       segments: [
         { label: 'Bowtruckles', text: 'A family of Bowtruckles watches from a tree' },
-        { label: 'Acromantula', text: 'ACROMANTULA! Roll for initiative' },
+        { label: 'Thornback Boar', text: 'A THORNBACK BOAR charges! Roll for initiative' },
         { label: 'Centaur', text: 'A centaur blocks the path. It has questions' },
         { label: 'Unicorn', text: 'A unicorn, silver in the dark. +10 XP', effect: { xp: 10 } },
         { label: 'Thestral', text: 'Something invisible breathes nearby' },
@@ -768,6 +768,9 @@ export const hollowHeir = {
     { id: 'ghost', name: 'A Hogwarts ghost', icon: '👻', note: 'Goes through walls.' },
     { id: 'painting', name: 'The covered painting', icon: '🖼️', note: 'Arrived on the train.' },
   ],
+  // The final accusation (TV shows tab): the true culprit, who also counts as half right, and the reward per player.
+  // Naming the culprit as a table also takes 10 HP off each boss.
+  accusation: { culprit: 'painting', partOf: ['ashgrove'], reward: { xp: 40, points: 20 } },
   // Pin a clue under a suspect when the players find it. "clears" clues point away from someone.
   clues: [
     { id: 'cupboard-raided', text: 'Grimsby’s store cupboard was raided the night of the first attack', points: 'grimsby' },

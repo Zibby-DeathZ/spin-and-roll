@@ -96,7 +96,7 @@ export const schedule = {
   '3-Lunch': { spawn: [{ id: 'victim-2', type: 'npc', npc: 'victim', name: 'A drained fourth-year', loc: 'library', x: 40, y: 45 }] },
   '3-Free time': { spawn: [
     { id: 'diary-1', type: 'item', item: 'diary-page', loc: 'restricted-section', x: 75, y: 35 },
-    { id: 'spider-3', type: 'monster', kind: 'acromantula', loc: 'forbidden-forest', transient: true, x: 70, y: 30 },
+    { id: 'boar-3', type: 'monster', kind: 'thornback-boar', loc: 'forbidden-forest', transient: true, x: 70, y: 30 },
   ] },
   '3-Curfew': { spawn: [{ id: 'trunk', type: 'mimic', mimic: 'hungry-trunk', loc: 'trophy-room', x: 35, y: 55 }] },
   '4-Morning class': { spawn: [{ id: 'vale-page', type: 'item', item: 'vale-page', loc: 'restricted-section', x: 30, y: 40 }] },

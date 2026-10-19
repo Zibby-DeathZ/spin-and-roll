@@ -21,6 +21,10 @@
   passing monsters leave when the block ends. Quests on offer show a scroll on the TV and a Give button for the GM.
 - **Conversations:** tap anyone on the GM map (or in the castle panel) for their voice, wants and today's topics,
   with buttons to pin clues and give quests. Printed as `docs/dm-guide/Conversation-Book.pdf`.
+- **The Painted Double:** an Imposter-style party game (🎭 Double tab). The DM's own word list with a hint per word,
+  secret cards that only their player can read, phone voting, TV reveal, rewards.
+- **Accusation vote** (TV shows tab): phones vote on the culprit. A hunch stamps the pick as Accused; the final accusation
+  reveals the truth, pays XP and house points, and takes 10 HP off each boss if the table is right.
 - **Art:** pictures in `public/art/` (people, monsters, mimics, items, chests, hazards) replace the emoji on the
   maps, phones and shops. Prompts for every picture: `docs/art/art-prompts.md`.
 - **Scene counter:** time left this block (Lunch 2, Free time 3, Curfew 2) as gold pips on the TV and phones;

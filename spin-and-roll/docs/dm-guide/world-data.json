@@ -785,9 +785,9 @@
      "y": 35
     },
     {
-     "id": "spider-3",
+     "id": "boar-3",
      "type": "monster",
-     "kind": "acromantula",
+     "kind": "thornback-boar",
      "loc": "forbidden-forest",
      "transient": true,
      "x": 70,
@@ -1809,7 +1809,7 @@
    "boggart": "Boggart",
    "rival-duelist": "Dueling Club rival",
    "paint-wraith": "Paint Wraith",
-   "acromantula": "Acromantula",
+   "thornback-boar": "Thornback Boar",
    "troll": "Mountain Troll",
    "ashgrove-possessed": "Ashgrove (possessed)",
    "corvin-vale": "Corvin Vale",

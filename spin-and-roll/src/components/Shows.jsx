@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { computeAwards, houseCup, pinClue, setShow, setSuspectMark } from '../lib/world';
+import { GMAccuse } from './Accuse';
 
 const HOUSES = ['Gryffindor', 'Hufflepuff', 'Ravenclaw', 'Slytherin'];
 
@@ -105,6 +106,8 @@ export function GMShows({ sid, data, session, chars }) {
           {show && <button className="btn small ghost" onClick={() => setShow(sid, null)}>Back to the map</button>}
         </span>
       </div>
+
+      {data.accusation && <GMAccuse sid={sid} data={data} session={session} chars={chars} />}
 
       <h2>🕵️ Suspect board</h2>
       <p className="muted small">Pin a clue under a suspect when the players find it. Ticked clues point away from someone.</p>

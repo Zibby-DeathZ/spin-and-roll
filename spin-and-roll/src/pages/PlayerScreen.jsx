@@ -18,6 +18,8 @@ import MainEventLock from '../components/MainEventLock';
 import JumpScare from '../components/JumpScare';
 import { OwlArchive, OwlArrival } from '../components/OwlPost';
 import { useMyOwls } from '../lib/owls';
+import { PlayerImposter } from '../components/Imposter';
+import { PlayerAccuse } from '../components/Accuse';
 import { canChooseFamily, mainEvent } from '../lib/intro';
 import { LessonScreen } from '../minigames';
 import { useLessonResults } from '../lib/lessons';
@@ -314,6 +316,16 @@ export default function PlayerScreen() {
       <LessonScreen sid={sid} uid={user.uid} lesson={lesson} cls={data.classes[lesson.cls]}
         result={lessonResults[user.uid]} onLeave={() => setLeftLesson(lesson.id)} />
     );
+  }
+
+  const acc = session.state?.accuse;
+  if (acc && acc.uids?.includes(user.uid) && data.suspects) {
+    return <PlayerAccuse sid={sid} uid={user.uid} data={data} session={session} />;
+  }
+
+  const imp = session.state?.imposter;
+  if (imp && imp.uids?.includes(user.uid)) {
+    return <PlayerImposter sid={sid} uid={user.uid} session={session} chars={chars} />;
   }
 
   const others = Object.values(chars).filter((c) => c.uid !== user.uid);
