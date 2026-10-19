@@ -1402,3 +1402,9 @@ button.status-chip.removable:hover { background: rgba(200, 60, 80, 0.3); }
 .mm-type form { display: flex; gap: 6px; margin-top: 6px; }
 .mm-type input { flex: 1; min-width: 0; padding: .45rem .6rem; border-radius: 8px; border: 1.5px solid #8a6a3d; background: #fbf3df; color: #3b2414; font: 500 .95rem var(--body); }
 .mm-gm .marauders { margin-top: 8px; border-radius: 8px; }
+
+/* ---------- Test student ---------- */
+.test-bench { margin: 0 0 12px; padding: 10px 12px; border: 1.5px dashed var(--teal, #4fb3a5); border-radius: 12px; grid-column: 1 / -1; }
+.test-bench summary { cursor: pointer; font-weight: 700; }
+.test-bench select { background: var(--panel); color: var(--bone); border: 1.5px solid var(--line); border-radius: 8px; padding: .3rem .5rem; }
+.test-kits { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }

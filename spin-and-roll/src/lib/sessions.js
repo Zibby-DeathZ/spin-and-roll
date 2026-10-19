@@ -51,6 +51,7 @@ export async function endSession(session, result) {
   const batch = writeBatch(db);
   batch.update(doc(db, 'sessions', session.id), { status: result, endedAt: serverTimestamp() });
   for (const uid of session.playerUids) {
+    if (uid === session.dmUid) continue; // the GM's own test student gets no history or trophy
     batch.set(doc(db, 'users', uid, 'history', session.id), {
       campaignId: session.campaignId,
       campaignTitle: campaign?.title ?? session.campaignId,

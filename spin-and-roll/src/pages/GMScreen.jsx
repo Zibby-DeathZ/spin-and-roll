@@ -36,6 +36,7 @@ import { useClaims } from '../lib/game';
 import { useLessonEngine } from '../lib/lessons';
 import { setExpelled, teachForbidden } from '../lib/combat';
 import { Corruption, StatusEditor } from '../components/Status';
+import TestBench from '../components/TestBench';
 
 function Buttons({ sid, uid, field, steps }) {
   return (
@@ -106,6 +107,7 @@ function CharacterControls({ sid, c, data, playerName, quizBusy, forbiddenLearne
           <span className="muted small"> {playerName}, level {levelFor(c.xp)}{c.levelCap && levelFor(c.xp) >= c.levelCap ? ' (max)' : ''}, Defence {defenceOf(c)}</span>
           {c.hp <= 0 && <span className="tag tag-warn">Knocked out</span>}
           {c.expelled && <span className="tag tag-warn">Expelled</span>}
+          {c.test && <span className="tag">🧪 Test</span>}
           {forbiddenLearner === c.uid && <span className="tag tag-green">Knows the Killing Curse</span>}
         </div>
         {data.houses.length > 0 && (
@@ -335,6 +337,7 @@ export default function GMScreen() {
           {active === 'wheels' && <GMSpin sid={sid} data={data} session={session} chars={chars} />}
           {active === 'players' && (
             <section className="gm-players">
+              <TestBench sid={sid} data={data} session={session} chars={chars} />
               {session.playerUids.map((u) => chars[u]
                 ? <CharacterControls key={u} sid={sid} c={chars[u]} data={data} playerName={profiles[u]?.displayName} quizBusy={!!quizState} forbiddenLearner={session.state?.forbiddenLearner} />
                 : <NewCharacter key={u} sid={sid} uid={u} profile={profiles[u]} data={data} />)}

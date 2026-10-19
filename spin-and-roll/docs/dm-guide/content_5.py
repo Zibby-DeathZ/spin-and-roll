@@ -138,6 +138,16 @@ BLOCKS = [
         ['Chests and hazards', 'art/chests/&lt;id&gt;.png, art/hazards/&lt;id&gt;.png', 'Square, object centred.'],
     ], [30, 52, 88]),
     ('p', 'Every picture has a ready-made prompt for an image tool in <b>docs/art/art-prompts.md</b>, with its exact file name. Pictures replace the emoji wherever that thing appears; anything without one keeps its emoji.'),
+    ('h2', 'Testing on your own'),
+    ('p', 'You can play a student yourself to try anything before game night, using a test student on your own account.'),
+    ('list', [
+        '<b>Add it:</b> start a practice game, go to the <b>Players</b> tab, open <b>Test student</b>, pick a family and press <b>Add a test student</b>. It appears where the party is, already sorted and with its vault open.',
+        '<b>Play it:</b> press <b>player screen</b> to open the phone view in a new tab, or open the game on your phone signed in as you. Keep the GM screen open too: it is what carries out everything the student does.',
+        '<b>Kits:</b> one tap each for top level, every spell (locked dark spells too), one of every item (both halves of the Marauder’s Map too), lots of mana, a full refill, Galleons, and resetting the once-a-day things (the family ability, the map, a duel reaction).',
+        '<b>Good things to try:</b> the Marauder’s Map by voice, a reaction duel against Corvin Vale, dark spells and status effects, a class mini-game, a chest, the shop.',
+        '<b>Two-player things</b> (Protego saves, the Painted Double, votes) need a second account: sign in with another Google account in a private window or on a second phone and join with the code.',
+        '<b>Before game night:</b> press <b>Remove the test student</b>, or just start a fresh game. A test student is never saved to a profile and never gets a trophy.',
+    ]),
     ('h2', 'Printing this book'),
     ('list', [
         '<b>Page size:</b> A4 portrait (210 × 297 mm).',
@@ -147,6 +157,7 @@ BLOCKS = [
     ]),
     ('h2', 'Version log'),
     ('table', ['Version', 'Date', 'Changes'], [
+        ['3.0', 'October 2026', 'Test student: play a character on your own account to try everything, with one-tap kits for spells, items, levels and resets.'],
         ['2.9', 'October 2026', 'The Marauder’s Map: opened by voice, it shows the castle in ink with everyone’s footsteps and every treasure, live on the TV. Once a day, fades after 60 seconds. New puzzle, The Torn Edge, holds the words.'],
         ['2.8', 'October 2026', 'The reaction duel: boss spells come with a countdown on the target’s phone. Shield, Dodge or Counter in time, friends can cast Protego, and Vale is faster and can feint in phase 2.'],
         ['2.7', 'October 2026', 'Dark magic: a series spellbook of dark, blood and later-year spells locked by year and level, Corruption from 0 to 10, status effects that count down in fights (Bleed, Stunned, Silenced, Fear and more), and villain spells cast by monsters.'],

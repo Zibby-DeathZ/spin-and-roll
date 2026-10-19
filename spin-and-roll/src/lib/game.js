@@ -644,7 +644,7 @@ export async function applyItemUse(sid, eid, data) {
   if (wheel && data?.wheels?.[wheel]) await startSpin(sid, data, wheel, actor);
 }
 
-function buildCharacter(data, fam, firstName) {
+export function buildCharacter(data, fam, firstName) {
   const d = structuredClone(data.defaults);
   const floor = data.levelFloor ?? 1; // later years start new students at a higher level
   const maxHp = d.maxHp + mod(fam.stats.con) * 2 + LEVEL_HP * (floor - 1);

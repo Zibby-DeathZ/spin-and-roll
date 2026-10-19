@@ -15,7 +15,7 @@ export async function saveHeroes(sid, session, data) {
   let n = 0;
   snap.docs.forEach((d) => {
     const c = d.data();
-    if (!session.playerUids.includes(d.id)) return;
+    if (!session.playerUids.includes(d.id) || c.test) return; // test students aren't saved
     const hero = Object.fromEntries(KEEP.filter((k) => c[k] !== undefined).map((k) => [k, c[k]]));
     batch.set(doc(db, 'users', d.id, 'heroes', data.series), {
       ...hero, level: levelFor(c.xp), series: data.series, seriesName: data.seriesName ?? data.series,

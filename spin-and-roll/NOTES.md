@@ -153,3 +153,7 @@ two cold braziers. The TV lists each one under "Here", so the players can plan a
 - Opening goes through an `item_used` event with `payload.map = 'open' | 'close'` (allowed by the existing rules),
   handled in `applyItemUse`. Once per dawn (`state.marauders.usedDawn`); the GM screen closes it after 60 s.
 - Voice uses the browser's SpeechRecognition (Chrome, Edge, Safari). Phones without it can type the words.
+
+### Test student (DM Guide v3.0)
+- Players tab → Test student. `src/lib/testing.js` adds a character on the GM's own uid (`test: true`), so the GM can
+  open `#/session/<id>/play` and act as a player. Excluded from saved heroes, history and trophies.
