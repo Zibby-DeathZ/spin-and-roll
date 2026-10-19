@@ -1365,3 +1365,40 @@ button.status-chip.removable:hover { background: rgba(200, 60, 80, 0.3); }
 .tv-duel-result.good { color: #9fe0c8; }
 .tv-duel-result.bad { color: #f3a0a0; }
 .token-panel .duel-gm, .token-panel .status-edit, .token-panel .villain-cast { flex-basis: 100%; width: 100%; }
+
+/* ---------- The Marauder's Map ---------- */
+.marauders { width: 100%; height: auto; display: block; }
+.marauders .mm-room { font: italic 13px 'IM Fell English', Georgia, serif; }
+.marauders .mm-title { font: 22px 'IM Fell English SC', Georgia, serif; letter-spacing: .25em; }
+.marauders .mm-tag { font: italic 10px 'IM Fell English', Georgia, serif; }
+.marauders .mm-name { font: italic 12px 'IM Fell English', Georgia, serif; }
+.marauders .mm-name.student { font-weight: 700; font-size: 13px; }
+.marauders .mm-name.smudged { animation: mm-smudge 1.6s ease-in-out infinite alternate; }
+@keyframes mm-smudge { from { opacity: .35; } to { opacity: .85; } }
+.marauders .mm-ink { transition: opacity .25s linear; }
+.marauders .mm-bloom { animation: mm-bloom 2.6s ease-out both; }
+.marauders .mm-drain { animation: mm-drain 1.4s ease-in both; }
+@keyframes mm-bloom { from { r: 0; } to { r: 1300px; } }
+@keyframes mm-drain { from { r: 1300px; } to { r: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .marauders .mm-bloom, .marauders .mm-drain, .marauders .mm-name.smudged { animation-duration: .01s; }
+}
+.tv-marauders { position: fixed; inset: 0; z-index: 35; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: radial-gradient(circle at 50% 40%, rgb(40 26 14 / .88), rgb(8 6 16 / .96)); padding: 2vh 2vw; }
+.tv-marauders .marauders { width: auto; height: calc(100vh - 90px); max-width: 96vw; filter: drop-shadow(0 12px 40px rgb(0 0 0 / .6)); }
+.tv-marauders-cap { margin: 10px 0 0; font: italic 1.4rem 'IM Fell English', Georgia, serif; color: #e8d7b0; }
+.mm-phone { min-height: 100dvh; padding: 16px; display: flex; flex-direction: column; gap: 12px;
+  background: radial-gradient(circle at 50% 30%, #3a2716, #120f22 75%); }
+.mm-back { align-self: flex-start; }
+.mm-blank { margin: auto 0; padding: 28px 20px; border-radius: 10px; text-align: center; color: #3b2414;
+  background: radial-gradient(circle at 50% 40%, #f3e6c6, #d9bf8a); box-shadow: inset 0 0 40px rgb(120 80 30 / .45); }
+.mm-blank h1 { font: 1.5rem 'IM Fell English SC', Georgia, serif; margin: 0 0 8px; color: #3b2414; }
+.mm-hint, .mm-said, .mm-reply { font: italic 1.1rem 'IM Fell English', Georgia, serif; }
+.mm-said { color: #6b4a2a; }
+.mm-reply { color: #4a2c17; animation: mm-write 1.2s steps(30) both; }
+@keyframes mm-write { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+.mm-type { margin-top: 14px; text-align: left; color: #3b2414; }
+.mm-type summary { cursor: pointer; font-size: .9rem; }
+.mm-type form { display: flex; gap: 6px; margin-top: 6px; }
+.mm-type input { flex: 1; min-width: 0; padding: .45rem .6rem; border-radius: 8px; border: 1.5px solid #8a6a3d; background: #fbf3df; color: #3b2414; font: 500 .95rem var(--body); }
+.mm-gm .marauders { margin-top: 8px; border-radius: 8px; }

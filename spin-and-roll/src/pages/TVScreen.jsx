@@ -27,6 +27,7 @@ import { TVImposter } from '../components/Imposter';
 import { TVAccuse } from '../components/Accuse';
 import { statusIcons } from '../components/Status';
 import { TVDuel } from '../components/Duel';
+import { TVMarauders } from '../components/Marauders';
 
 export default function TVScreen() {
   const { sid } = useParams();
@@ -190,6 +191,7 @@ export function TVLive({ session, chars, profiles, data, title, answers, lessonR
       </footer>
       {sid && <EventToasts sid={sid} nameOf={nameOf} big skip={['wheel', 'duel']}
         onNew={(e) => { const s2 = soundForEvent(e); (Array.isArray(s2) ? s2 : s2 ? [s2] : []).forEach((n, i) => setTimeout(() => play(n), i * 180)); }} />}
+      {session.state?.marauders && <TVMarauders data={data} session={session} chars={chars} />}
       {session.state?.duel && <TVDuel session={session} />}
       <JumpScare scare={session.state?.scare} />
       <SoundGate />

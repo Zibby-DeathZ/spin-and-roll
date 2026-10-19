@@ -1,5 +1,6 @@
 import { extraNpcs, offers, routines, schedule, talk } from './hollow-heir-world.js';
-import darkSpells from './spellbooks/dark-spells.json';
+import darkSpells from './spellbooks/dark-spells.json' with { type: 'json' };
+import { marauders } from './hollow-heir-map.js';
 import { addMissing, importSpellbook } from '../lib/spellbook.js';
 
 // The Hogwarts series spellbook: dark arts, blood magic and later-year spells, with Corruption and status effects.
@@ -22,7 +23,8 @@ const items = {
   'mandrake-leaf': { name: 'Mandrake leaf', icon: '🌱', note: 'Key ingredient in the draught that restores drained students' },
   'creature-treats': { name: 'Creature treats', icon: '🦴', note: 'Calms one magical creature instantly' },
   'serpent-key': { name: 'Serpent key', icon: '🗝️', note: 'Opens the door beneath Hogwarts. Only a Parseltongue can turn it' },
-  'map-half': { name: 'Half of the Marauder’s Map', icon: '📜', note: 'Torn down the middle. Someone has the rest' },
+  'map-half': { name: 'Half of the Marauder’s Map', icon: '📜', note: 'Torn down the middle. It wakes only for the right words', opensMap: true },
+  'map-other-half': { name: 'The other half of the Marauder’s Map', icon: '📜', note: 'Its torn edge matches the Fenwick half exactly', opensMap: true },
   'vale-page': { name: 'Torn page about Corvin Vale', icon: '📄', note: 'A painter who wanted to live forever' },
   'restorative-draught': { name: 'Restorative Draught', icon: '⚗️', note: 'Wakes one drained student' },
   'frog-card': { name: 'Rare Chocolate Frog card', icon: '🃏', note: 'A collector would love this' },
@@ -83,9 +85,10 @@ export const hollowHeir = {
       id: 'fenwick', name: 'Fenwick', startItems: ['map-half'], blood: 'Half-blood', wealth: 'Healthy vault', vault: 220,
       ability: {
         name: 'Marauder’s Legacy', icon: '🗺️',
-        passive: 'Your great-uncle ran with the Marauders. You know the words: “I solemnly swear that I am up to no good.”',
-        active: 'Once per day, open your half of the Marauder’s Map to see who is in any one area of the castle (the DM reveals it).',
-        drawback: 'Half the map is missing. Finding the other half is a side quest only you know about.',
+        passive: 'Your great-uncle ran with the Marauders and left you his half of their map. It wakes only for the right words, and he never told you them. Tiny runes are scratched along its torn edge.',
+        active: 'Once per day, open the map from your Bag: speak the words into your phone and the whole table sees everyone’s footsteps and every treasure on your half of the castle, for 60 seconds.',
+        drawback: 'Half the map is missing, and the ink fades fast. Finding the other half is a side quest only you know about.',
+        opensMap: true,
       },
       stats: { str: 10, dex: 15, con: 12, int: 13, wis: 8, cha: 14 },
       story: 'Your family runs Fenwick’s Fizzing Follies, a joke shop on Diagon Alley. You grew up testing products nobody else would touch.',
@@ -376,6 +379,7 @@ export const hollowHeir = {
   },
 
   // Villain spells: the GM casts these from a monster's panel on the map. Never learnable.
+  marauders,
   villainSpells: dark.villain,
   statusEffects: dark.statusEffects,
   corruption: dark.corruptionRules,
@@ -874,6 +878,13 @@ export const hollowHeir = {
         'The way forward stands somewhere to the left of the way back.',
       ],
       solution: 'Bottle 4, the small gold one. Poison: 1, 3, 5. Sleep: 2, 6. Back: 7. (Checked: these six clues allow only this answer, and every clue is needed.)',
+    },
+    {
+      id: 'marauders-oath', type: 'cipher', icon: '📜', title: 'The Torn Edge',
+      intro: 'Along the torn edge of the Fenwick map, someone scratched a line of tiny runes in faded ink. The parchment stays blank. Perhaps it is waiting to hear something.',
+      message: 'I SOLEMNLY SWEAR THAT I AM UP TO NO GOOD',
+      given: ['O', 'A'],
+      solution: 'I SOLEMNLY SWEAR THAT I AM UP TO NO GOOD. Whoever holds the map opens it from their Bag and says it out loud; the phone listens.',
     },
     {
       id: 'vale-diary', type: 'cipher', icon: '📓', title: 'Vale’s Diary',

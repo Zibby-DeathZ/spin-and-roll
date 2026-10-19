@@ -9,6 +9,7 @@ import { applyOpenChest, applyPickup, sendToDetention } from './world';
 import { applyWorld, owlMissedQuests } from './schedule';
 import { addStatus, corruptionAfter, removeStatuses } from './spellbook';
 import { duelText } from './duel';
+import { openState } from './marauders';
 
 // ---------- Rules of the game ----------
 
@@ -591,7 +592,7 @@ async function executeTrade(sid, tid) {
   if (outcome) await logEvent(sid, { type: outcome, actorUid: t.fromUid, targetUid: t.toUid });
 }
 
-async function applyItemUse(sid, eid, data) {
+export async function applyItemUse(sid, eid, data) {
   const eRef = doc(db, 'sessions', sid, 'events', eid);
   let wheel = null, actor = null;
   await runTransaction(db, async (tx) => {
@@ -603,6 +604,27 @@ async function applyItemUse(sid, eid, data) {
     const item = c?.inventory?.find((i) => i.id === e.payload.itemId);
     if (!item) {
       tx.update(eRef, { processed: true, failed: true });
+      return;
+    }
+    // The Marauder's Map isn't used up: the words open it on the TV, once per day.
+    if (data?.items?.[item.id]?.opensMap && e.payload.map) {
+      const sSnap = await tx.get(doc(db, 'sessions', sid));
+      const sess = sSnap.data();
+      const m = sess?.state?.marauders ?? {};
+      const base = { ...e.payload, name: item.name, icon: '🗺️' };
+      if (e.payload.map === 'close') {
+        if (m.open) tx.update(sSnap.ref, { 'state.marauders.open': false, 'state.marauders.closedAt': Date.now() });
+        tx.update(eRef, { processed: true, payload: base });
+        return;
+      }
+      if (m.open) { tx.update(eRef, { processed: true, failed: true }); return; }
+      const st = openState(data, sess, e.actorUid, c);
+      if (m.usedDawn === st.usedDawn) {
+        tx.update(eRef, { processed: true, failed: true, payload: { ...base, reason: 'resting' } });
+        return;
+      }
+      tx.update(sSnap.ref, { 'state.marauders': st });
+      tx.update(eRef, { processed: true, payload: base });
       return;
     }
     const [inv] = takeItems(c.inventory, item.id, 1);
@@ -819,7 +841,14 @@ export function describe(e, nameOf) {
     case 'gold': return { icon: '🪙', text: `${target} ${d < 0 ? 'spent' : 'got'} ${Math.abs(d)} gold`, tone: 'gold' };
     case 'level_up': return { icon: '🎉', text: `${target} reached level ${e.payload.level}!`, tone: 'gold', big: true };
     case 'item_given': return { icon: e.payload.icon, text: `${target} received ${e.payload.name}${e.payload.qty > 1 ? ` ×${e.payload.qty}` : ''}`, tone: 'teal' };
-    case 'item_used': return e.failed ? null
+    case 'item_used':
+      if (e.payload?.map === 'open') {
+        return e.failed
+          ? (e.payload.reason === 'resting' ? { icon: '🗺️', text: `${actor} whispers to the map, but the parchment stays blank. The ink needs a night’s rest.`, tone: 'muted' } : null)
+          : { icon: '🗺️', text: `${actor} touches a wand to the parchment and whispers the oath. Ink spreads across it…`, tone: 'violet', big: true };
+      }
+      if (e.payload?.map === 'close') return { icon: '🗺️', text: 'Mischief managed. The map goes blank.', tone: 'muted' };
+      return e.failed ? null
       : { icon: e.payload.icon, text: `${actor} used ${e.payload.name}${e.payload.note ? ` (${e.payload.note})` : ''}`, tone: 'violet' };
     case 'trade_offered': return { icon: '🤝', text: `${actor} offered ${target} a trade`, tone: 'muted' };
     case 'gift_offered': return { icon: '🎁', text: `${actor} is sending ${target} a gift`, tone: 'muted' };

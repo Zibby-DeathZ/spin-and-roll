@@ -3,6 +3,7 @@ import MapView, { isMonster } from './MapView';
 import { Conversation } from './GMWorld';
 import { StatusEditor, VillainCast, statusIcons } from './Status';
 import { GMDuel } from './Duel';
+import { GMMarauders } from './Marauders';
 import { defenceOf } from '../lib/game';
 import {
   addToken, endFight, monsterAttack, moveToken, nextTurn, placeToken, removeToken, setTokenHp, startFight,
@@ -174,6 +175,12 @@ export default function GMTable({ sid, data, session, chars }) {
             <button className="linkish" onClick={() => placeStaff(sid, data, session)}>👩‍🏫 Send all staff to their rooms</button>
           )}
         </Box>
+
+        {data.marauders && (
+          <Box title="🗺️ Marauder’s Map" open={false}>
+            <GMMarauders sid={sid} data={data} session={session} chars={chars} />
+          </Box>
+        )}
 
         <Box title="➕ Place on this map">
           <div className="seg four" role="group" aria-label="What to place">

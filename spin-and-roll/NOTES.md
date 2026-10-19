@@ -145,3 +145,11 @@ two cold braziers. The TV lists each one under "Here", so the players can plan a
   a campaign can override them with a `duel` object. `duelFast` bosses get 25% less time.
 - Reactions are written to the Painted Double's vote collection (round `duel-<id>`, vote `red|1834`), so no new
   Firebase rules. Each phone times itself; the GM screen's `useDuelEngine` settles it and clears the TV after 7 s.
+
+### The Marauder's Map (DM Guide v2.9)
+- `src/campaigns/hollow-heir-map.js` holds the password, the room layout on a 1000 × 720 sheet (torn at x = 500),
+  the insults and which hidden places the joined map gives away. `src/components/Marauders.jsx` draws it as SVG
+  and animates the footsteps; `src/lib/marauders.js` has the rules, phrase matching and who/what it shows.
+- Opening goes through an `item_used` event with `payload.map = 'open' | 'close'` (allowed by the existing rules),
+  handled in `applyItemUse`. Once per dawn (`state.marauders.usedDawn`); the GM screen closes it after 60 s.
+- Voice uses the browser's SpeechRecognition (Chrome, Edge, Safari). Phones without it can type the words.

@@ -147,6 +147,7 @@ BLOCKS = [
     ]),
     ('h2', 'Version log'),
     ('table', ['Version', 'Date', 'Changes'], [
+        ['2.9', 'October 2026', 'The Marauder’s Map: opened by voice, it shows the castle in ink with everyone’s footsteps and every treasure, live on the TV. Once a day, fades after 60 seconds. New puzzle, The Torn Edge, holds the words.'],
         ['2.8', 'October 2026', 'The reaction duel: boss spells come with a countdown on the target’s phone. Shield, Dodge or Counter in time, friends can cast Protego, and Vale is faster and can feint in phase 2.'],
         ['2.7', 'October 2026', 'Dark magic: a series spellbook of dark, blood and later-year spells locked by year and level, Corruption from 0 to 10, status effects that count down in fights (Bleed, Stunned, Silenced, Fear and more), and villain spells cast by monsters.'],
         ['2.6', 'October 2026', 'The accusation vote: players vote on their phones for the culprit. Keep it a hunch, or make it the final accusation, which reveals the truth, pays XP and house points, and weakens the bosses if the table is right.'],

@@ -26,6 +26,7 @@ import { GMImposter } from '../components/Imposter';
 import { useImposterEngine } from '../lib/imposter';
 import { useAccuseEngine } from '../lib/accuse';
 import { useDuelEngine } from '../lib/duel';
+import { useMaraudersEngine } from '../lib/marauders';
 import { saveHeroes } from '../lib/heroes';
 import { sendOwl } from '../lib/owls';
 import { sendToDetention } from '../lib/world';
@@ -237,6 +238,7 @@ export default function GMScreen() {
   useImposterEngine(sid, session); // tells the TV who has voted in a Painted Double round
   useAccuseEngine(sid, session); // and in an accusation vote
   useDuelEngine(sid, data, session); // settles boss spells once the students have reacted
+  useMaraudersEngine(sid, session); // the Marauder’s Map ink fades after its time
   // If a game was started without its opening (for example from an old, un-refreshed dashboard tab),
   // start it now, as long as nobody has chosen a family yet.
   const autoIntro = useRef(false);

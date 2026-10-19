@@ -31,6 +31,7 @@ import Wheel from '../components/Wheel';
 import TradeComposer from '../components/TradeComposer';
 import { Corruption, StatusChips } from '../components/Status';
 import { PlayerDuel, duelNeedsMe } from '../components/Duel';
+import { PlayerMapScreen } from '../components/Marauders';
 
 function AbilityCard({ sid, c, ability, dawn }) {
   const [used, setUsed] = useState(false);
@@ -47,9 +48,13 @@ function AbilityCard({ sid, c, ability, dawn }) {
       <p><span className="tag">Always</span>{ability.passive}</p>
       <p><span className="tag">Once a day</span>{ability.active}</p>
       <p className="muted small"><span className="tag tag-warn">Drawback</span>{ability.drawback}</p>
-      <button className="btn gold" disabled={used || usedToday} onClick={fire}>
-        {usedToday ? 'Used today. Recharges after you sleep' : used ? 'Announced on the TV' : `Use ${ability.name}`}
-      </button>
+      {ability.opensMap ? (
+        <p className="muted small">Open the map from your Bag.</p>
+      ) : (
+        <button className="btn gold" disabled={used || usedToday} onClick={fire}>
+          {usedToday ? 'Used today. Recharges after you sleep' : used ? 'Announced on the TV' : `Use ${ability.name}`}
+        </button>
+      )}
     </section>
   );
 }
@@ -124,7 +129,7 @@ function Sheet({ sid, c, currency, data, points, clk, scenes = null, loc, discov
   );
 }
 
-function Bag({ c, sid, others, onGive }) {
+function Bag({ c, sid, others, data, onGive, onOpenMap }) {
   const [used, setUsed] = useState(null);
   const use = async (item) => {
     setUsed(item.id);
@@ -159,7 +164,9 @@ function Bag({ c, sid, others, onGive }) {
               {i.name} <span className="muted">×{i.qty}</span>
             </span>
             <span className="item-actions">
-              {(i.effect || i.note) && (
+              {data?.items?.[i.id]?.opensMap ? (
+                <button className="btn small gold" onClick={onOpenMap}>Open</button>
+              ) : (i.effect || i.note) && (
                 <button className="btn small teal" disabled={used === i.id} onClick={() => use(i)}>
                   {used === i.id ? 'Used' : 'Use'}
                 </button>
@@ -266,6 +273,7 @@ export default function PlayerScreen() {
   const unread = owls.filter((o) => !o.read).slice(-1)[0];
   const [tab, setTab] = useState('sheet');
   const [composer, setComposer] = useState(null);
+  const [mapOpen, setMapOpen] = useState(false);
 
   if (session === undefined || chars === null) return <Splash />;
   if (!session || !session.playerUids.includes(user.uid)) {
@@ -327,6 +335,11 @@ export default function PlayerScreen() {
     return <PlayerDuel key={session.state.duel.id} sid={sid} uid={user.uid} session={session} data={data} />;
   }
 
+  // The Marauder's Map: the holder speaks the words into the phone.
+  if (me && data.marauders && (mapOpen || (session.state?.marauders?.open && session.state.marauders.by === user.uid))) {
+    return <PlayerMapScreen sid={sid} c={me} data={data} session={session} chars={chars} onClose={() => setMapOpen(false)} />;
+  }
+
   const acc = session.state?.accuse;
   if (acc && acc.uids?.includes(user.uid) && data.suspects) {
     return <PlayerAccuse sid={sid} uid={user.uid} data={data} session={session} />;
@@ -363,8 +376,8 @@ export default function PlayerScreen() {
         {tab === 'dice' && <DiceTab sid={sid} c={me} data={data} session={session} chars={chars} />}
         {tab === 'shop' && <Shop sid={sid} c={me} data={data} open={shopOpen} />}
         {tab === 'bag' && (
-          <Bag c={me} sid={sid} others={others}
-            onGive={() => setTab('party')} />
+          <Bag c={me} sid={sid} others={others} data={data}
+            onGive={() => setTab('party')} onOpenMap={() => setMapOpen(true)} />
         )}
         {tab === 'party' && pending > 0 && <Trades sid={sid} me={me} chars={chars} trades={trades} currency={currency} />}
         {tab === 'party' && (
