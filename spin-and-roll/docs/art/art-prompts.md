@@ -718,7 +718,7 @@ A painting wrapped in grey cloth being loaded onto a scarlet steam train at nigh
 
 Six sealed letters with wax seals flying through the sky towards six different houses, a castle on a hill in the distance. Storybook page illustration with warm parchment tones and a soft vignette, like an old hand-painted fairy-tale book. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
 
-## Puzzle parts (25)
+## Puzzle parts (34)
 
 Pictures for the TV puzzles. The game moves these pieces itself, so each one is a separate picture. Until you add them, the game draws its own.
 
@@ -798,6 +798,51 @@ A giant enchanted chess piece carved from dark polished obsidian-black stone: a 
 `public/art/puzzles/lock-dial.png`
 
 Seen straight from above: an ancient circular stone combination lock set in a dungeon wall. Three wide concentric carved stone rings, each a slightly different stone, separated by deep dark grooves, around a small round bronze plate with a keyhole in the very centre. The rings are blank: no symbols, letters or numbers. Moss and dust in the grooves. Perfectly round, filling the frame. Transparent background. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Lock symbol: Moon
+`public/art/puzzles/lock-moon.png`
+
+One small round medallion symbol for a carved stone lock: a crescent moon, carved in raised relief in old tarnished bronze with a faint golden glow in the grooves. Bold, simple and readable even when very small, like an icon. Front-on, centred, filling the frame. Make all nine lock symbols in the same style. Transparent background. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Lock symbol: Owl
+`public/art/puzzles/lock-owl.png`
+
+One small round medallion symbol for a carved stone lock: an owl with wide round eyes, wings folded, carved in raised relief in old tarnished bronze with a faint golden glow in the grooves. Bold, simple and readable even when very small, like an icon. Front-on, centred, filling the frame. Make all nine lock symbols in the same style. Transparent background. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Lock symbol: Serpent
+`public/art/puzzles/lock-serpent.png`
+
+One small round medallion symbol for a carved stone lock: a coiled serpent with its head raised, carved in raised relief in old tarnished bronze with a faint golden glow in the grooves. Bold, simple and readable even when very small, like an icon. Front-on, centred, filling the frame. Make all nine lock symbols in the same style. Transparent background. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Lock symbol: Star
+`public/art/puzzles/lock-star.png`
+
+One small round medallion symbol for a carved stone lock: a five-pointed star with fine rays, carved in raised relief in old tarnished bronze with a faint golden glow in the grooves. Bold, simple and readable even when very small, like an icon. Front-on, centred, filling the frame. Make all nine lock symbols in the same style. Transparent background. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Lock symbol: Key
+`public/art/puzzles/lock-key.png`
+
+One small round medallion symbol for a carved stone lock: an old-fashioned skeleton key with an ornate bow, carved in raised relief in old tarnished bronze with a faint golden glow in the grooves. Bold, simple and readable even when very small, like an icon. Front-on, centred, filling the frame. Make all nine lock symbols in the same style. Transparent background. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Lock symbol: Lion
+`public/art/puzzles/lock-lion.png`
+
+One small round medallion symbol for a carved stone lock: a lion’s head with a full mane, carved in raised relief in old tarnished bronze with a faint golden glow in the grooves. Bold, simple and readable even when very small, like an icon. Front-on, centred, filling the frame. Make all nine lock symbols in the same style. Transparent background. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Lock symbol: Badger
+`public/art/puzzles/lock-badger.png`
+
+One small round medallion symbol for a carved stone lock: a badger’s head with its striped face, carved in raised relief in old tarnished bronze with a faint golden glow in the grooves. Bold, simple and readable even when very small, like an icon. Front-on, centred, filling the frame. Make all nine lock symbols in the same style. Transparent background. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Lock symbol: Sun
+`public/art/puzzles/lock-sun.png`
+
+One small round medallion symbol for a carved stone lock: a round sun with a face and wavy rays, carved in raised relief in old tarnished bronze with a faint golden glow in the grooves. Bold, simple and readable even when very small, like an icon. Front-on, centred, filling the frame. Make all nine lock symbols in the same style. Transparent background. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Lock symbol: Eagle
+`public/art/puzzles/lock-eagle.png`
+
+One small round medallion symbol for a carved stone lock: an eagle with its wings spread, carved in raised relief in old tarnished bronze with a faint golden glow in the grooves. Bold, simple and readable even when very small, like an icon. Front-on, centred, filling the frame. Make all nine lock symbols in the same style. Transparent background. A single game puzzle part, exactly as described, perfectly centred and filling the frame, even lighting, no text or symbols unless asked. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
 
 ### Bottle 1 (tall, green)
 `public/art/puzzles/bottle-1.png`

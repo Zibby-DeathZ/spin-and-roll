@@ -1608,11 +1608,12 @@ button.status-chip.removable:hover { background: rgba(200, 60, 80, 0.3); }
 .tv-puzzle .bottles-wrap { margin-top: 3.5rem; }
 
 /* Puzzle pictures (optional, from public/art/puzzles) */
-.pc.has-art { display: block; width: 92%; height: 92%; }
+.pc.has-art { position: absolute; inset: 3% 8% 6%; display: block; }
+.chess .sq { overflow: hidden; }
 .pc.has-art img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 6px 4px rgb(0 0 0 / .6)); }
-.bottle-art.has-art { display: block; width: 80px; height: 170px; }
-.bottle-art.has-art img { width: 100%; height: 100%; object-fit: contain; object-position: bottom; filter: drop-shadow(0 6px 6px rgb(0 0 0 / .5)); }
-.tv-puzzle .bottle-art.has-art { width: 110px; height: 240px; }
+.bottle-art.has-art { display: block; height: 170px; }
+.bottle-art.has-art img { height: 100%; width: auto; display: block; filter: drop-shadow(0 6px 6px rgb(0 0 0 / .5)); }
+.tv-puzzle .bottle-art.has-art { height: 250px; }
 .bottle.shown.poison .bottle-art img { filter: drop-shadow(0 0 14px #e0474c); }
 .bottle.shown.forward .bottle-art img { filter: drop-shadow(0 0 18px #e3b04b); }
 .stair.has-art { background: #16131f; overflow: hidden; }
@@ -1681,3 +1682,7 @@ button.status-chip.removable:hover { background: rgba(200, 60, 80, 0.3); }
 .clue-footer { font: italic .9rem/1.4 'IM Fell English', Georgia, serif; color: #6b4a2a; text-align: center; margin: .8rem 0 .4rem; }
 .clue-close { display: block; margin: .6rem auto 0; color: #3b2414; border-color: #8a6a3d; }
 @media (prefers-reduced-motion: reduce) { .clue-sheet { animation: none; } }
+
+.ring-dial { width: min(68vh, 82vw); }
+.ring-dial .sym-on { filter: drop-shadow(0 0 6px rgb(255 214 120 / .95)) drop-shadow(0 0 14px rgb(255 190 80 / .6)); }
+.pc.b.has-art img { filter: drop-shadow(0 0 3px rgb(255 240 210 / .6)) drop-shadow(0 6px 4px rgb(0 0 0 / .6)); }

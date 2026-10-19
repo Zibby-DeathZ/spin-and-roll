@@ -33,9 +33,22 @@ function Torch({ on }) {
 }
 
 // Three stone rings, one inside the other, each carved with symbols. The top one sits under the arrow.
+// The lock's symbols can be pictures too: public/art/puzzles/lock-<name>.png
+const LOCK_SYMBOLS = { '🌙': 'moon', '🦉': 'owl', '🐍': 'serpent', '⭐': 'star', '🗝️': 'key', '🦁': 'lion', '🦡': 'badger', '☀️': 'sun', '🦅': 'eagle' };
+const LOCK_NAMES = Object.values(LOCK_SYMBOLS);
+function useLockArt() {
+  const urls = [
+    useArtUrl('puzzles/lock-moon'), useArtUrl('puzzles/lock-owl'), useArtUrl('puzzles/lock-serpent'),
+    useArtUrl('puzzles/lock-star'), useArtUrl('puzzles/lock-key'), useArtUrl('puzzles/lock-lion'),
+    useArtUrl('puzzles/lock-badger'), useArtUrl('puzzles/lock-sun'), useArtUrl('puzzles/lock-eagle'),
+  ]; // same order as LOCK_NAMES
+  return Object.fromEntries(Object.entries(LOCK_SYMBOLS).map(([sym, n]) => [sym, urls[LOCK_NAMES.indexOf(n)]]));
+}
+
 function RingDial({ rings, pos }) {
   const R = [168, 118, 68];
   const dial = useArtUrl('puzzles/lock-dial');
+  const symArt = useLockArt();
   return (
     <svg viewBox="0 0 400 400" className="ring-dial" role="img" aria-label="The turning lock">
       <defs>
@@ -69,7 +82,10 @@ function RingDial({ rings, pos }) {
                 const x = 200 + R[r] * Math.cos(a), y = 200 + R[r] * Math.sin(a);
                 return (
                   <g key={k} style={{ transform: `rotate(${-rot}deg)`, transformOrigin: `${x}px ${y}px`, transition: 'transform .6s cubic-bezier(.3, 1.3, .5, 1)' }}>
-                    <text x={x} y={y} textAnchor="middle" dominantBaseline="central" fontSize={r === 2 ? 30 : 34} opacity={k === pos[r] ? 1 : 0.55}>{sym}</text>
+                    {symArt[sym]
+                      ? <image href={symArt[sym]} x={x - (r === 2 ? 23 : 27)} y={y - (r === 2 ? 23 : 27)} width={r === 2 ? 46 : 54} height={r === 2 ? 46 : 54}
+                        opacity={k === pos[r] ? 1 : 0.75} className={k === pos[r] ? 'sym-on' : ''} />
+                      : <text x={x} y={y} textAnchor="middle" dominantBaseline="central" fontSize={r === 2 ? 30 : 34} opacity={k === pos[r] ? 1 : 0.55}>{sym}</text>}
                   </g>
                 );
               })}
