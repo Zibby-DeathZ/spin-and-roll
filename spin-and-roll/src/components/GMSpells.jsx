@@ -1,17 +1,32 @@
 import { useState } from 'react';
 import Portrait from './Portrait';
-import { forgetSpell, teachSpell } from '../lib/game';
+import { forgetSpell, levelFor, teachSpell } from '../lib/game';
+import { lockReason } from '../lib/spellbook';
 import { diceLabel } from '../lib/dice';
 
-const GROUPS = [['class', 'Taught in class'], ['extra', 'Other charms and jinxes'], ['advanced', 'Advanced magic']];
+const GROUPS = [['class', 'Taught in class'], ['extra', 'Other charms and jinxes'], ['advanced', 'Advanced magic'], ['dark', 'Dark arts, blood magic and later years']];
 const STATS = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
 
 function rollText(sp) {
   const parts = [];
   if (sp.hit) parts.push(`d20 + ${sp.hit.toUpperCase()} to hit`);
   if (sp.check) parts.push(`d20 + ${sp.check.toUpperCase()} check`);
-  if (sp.dice) parts.push(`${diceLabel(sp.dice)} ${sp.damage ? 'damage' : sp.effectLabel ?? ''}`.trim());
+  if (sp.dice) parts.push(`${diceLabel(sp.dice)} ${sp.damage && sp.attack ? 'damage' : sp.effectLabel ?? ''}`.trim());
   return parts.join(', ') || 'No roll';
+}
+
+// Extra lines for spellbook spells: what it does to the target, its cost and its d20 twists.
+function extras(sp, defs) {
+  const out = [];
+  if (sp.applies?.length) out.push(`Applies ${sp.applies.map((a) => `${defs?.[a.status]?.name ?? a.status}${a.held ? ' (until lifted)' : a.turns ? ` (${a.turns})` : ''}${a.nat20Only ? ' on a nat 20' : ''}`).join(', ')}`);
+  if (sp.removes?.length) out.push(`Lifts ${sp.removes.map((k) => defs?.[k]?.name ?? k).join(', ')}`);
+  if (sp.hpCost) out.push(`Costs ${sp.hpCost} HP`);
+  if (sp.corruption) out.push(`${sp.corruption > 0 ? '+' : ''}${sp.corruption} Corruption`);
+  if (sp.nat20) out.push(`Nat 20: ${sp.nat20}`);
+  if (sp.nat1) out.push(`Nat 1: ${sp.nat1}`);
+  if (sp.controlRoll) out.push(`Every turn: d20, ${sp.controlRoll.dc}+ to keep control, or ${sp.controlRoll.onFail}`);
+  if (sp.source) out.push(`Source: ${sp.source}`);
+  return out;
 }
 
 const slug = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -70,6 +85,9 @@ export default function GMSpells({ sid, data, session, chars }) {
   const [uid, setUid] = useState(players[0] ?? null);
   const [announce, setAnnounce] = useState(false);
   const [form, setForm] = useState('');
+  const [ignoreLocks, setIgnoreLocks] = useState(false);
+  const year = data.year ?? 1;
+  const defs = data.statusEffects;
   const c = uid ? chars[uid] : null;
   const known = new Set((c?.spells ?? []).map((s) => s.id));
   const library = Object.entries(data.spells ?? {}).filter(([, s]) => !s.forbidden);
@@ -97,6 +115,10 @@ export default function GMSpells({ sid, data, session, chars }) {
         <input type="checkbox" checked={announce} onChange={(e) => setAnnounce(e.target.checked)} />
         Announce on the TV (leave off for backstory secrets)
       </label>
+      <label className="announce">
+        <input type="checkbox" checked={ignoreLocks} onChange={(e) => setIgnoreLocks(e.target.checked)} />
+        Let me teach locked spells anyway (they normally unlock by year and level)
+      </label>
 
       {(c?.spells ?? []).some((s) => s.custom) && (
         <>
@@ -120,25 +142,45 @@ export default function GMSpells({ sid, data, session, chars }) {
             {library.filter(([, s]) => (s.group ?? 'extra') === g).map(([id, s]) => {
               const has = known.has(id);
               const mine = c?.spells?.find((x) => x.id === id);
+              const lock = c ? lockReason(s, levelFor(c.xp), year) : null;
+              const more = g === 'dark' ? extras(s, defs) : [];
               return (
-                <li key={id} className={has ? 'known' : ''}>
+                <li key={id} className={`${has ? 'known' : ''} ${lock && !has ? 'locked' : ''}`}>
                   <span className="item-icon">{s.icon}</span>
                   <span className="spell-info">
                     <strong>{s.name}{mine?.form ? ` (${mine.form})` : ''}</strong>
                     <span className="muted small">{s.mana} mana. {rollText(s)}. {s.desc}</span>
+                    {more.length > 0 && <span className="muted small spell-more">{more.join('. ')}.</span>}
                     {s.patronus && !has && (
                       <input className="form-input" value={form} onChange={(e) => setForm(e.target.value)} placeholder="Patronus form, e.g. otter" aria-label="Patronus form" />
                     )}
                   </span>
                   {has
                     ? <button className="btn small ghost" onClick={() => forgetSpell(sid, uid, id)}>Remove</button>
-                    : <button className="btn small gold" onClick={() => teach(id, s)}>Teach</button>}
+                    : lock && !ignoreLocks
+                      ? <span className="tag lock-tag">🔒 {lock}</span>
+                      : <button className="btn small gold" onClick={() => teach(id, s)}>Teach</button>}
                 </li>
               );
             })}
           </ul>
         </div>
       ))}
+
+      {Object.keys(data.villainSpells ?? {}).length > 0 && (
+        <>
+          <h3>Villain spells (enemies only)</h3>
+          <p className="muted small">Players can never learn these. A monster or boss casts them from its panel on the Table tab (🐍 Villain spell).</p>
+          <ul className="spell-lib">
+            {Object.entries(data.villainSpells).map(([id, s]) => (
+              <li key={id} className="locked">
+                <span className="item-icon">{s.icon}</span>
+                <span className="spell-info"><strong>{s.name}</strong><span className="muted small">{s.desc}{s.bossOnly ? ' Use it in a cutscene, not a dice roll.' : ''}</span></span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
 
       <CustomSpell onMake={(sp) => teachSpell(sid, uid, sp, announce)} />
       <p className="muted small">The Killing Curse isn’t here on purpose. It stays secret, on the Players tab under Edit stats and limits.</p>

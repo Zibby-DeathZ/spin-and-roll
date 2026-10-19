@@ -1,4 +1,10 @@
 import { extraNpcs, offers, routines, schedule, talk } from './hollow-heir-world.js';
+import darkSpells from './spellbooks/dark-spells.json';
+import { addMissing, importSpellbook } from '../lib/spellbook.js';
+
+// The Hogwarts series spellbook: dark arts, blood magic and later-year spells, with Corruption and status effects.
+// Most unlock in later years; the GM Spells tab shows them locked until then.
+const dark = importSpellbook(darkSpells);
 
 // The Hollow Heir: campaign data the engine reads.
 
@@ -349,14 +355,14 @@ export const hollowHeir = {
     'finite-incantatem': { group: 'extra', name: 'Finite Incantatem', icon: '✋', mana: 2, check: 'wis', desc: 'Ends a spell or curse if the roll beats it.' },
     episkey: { group: 'extra', name: 'Episkey', icon: '🩹', mana: 3, dice: { count: 1, die: 6 }, effectLabel: 'HP healed (GM applies)', desc: 'Heals small wounds on yourself or a friend.' },
     flipendo: { group: 'extra', name: 'Flipendo', icon: '💨', mana: 2, hit: 'int', attack: true, dice: { count: 1, die: 6 }, damage: true, desc: 'Knockback jinx.' },
-    rictusempra: { group: 'extra', name: 'Rictusempra', icon: '😂', mana: 2, hit: 'cha', attack: true, desc: 'Tickling charm. On a hit, the target loses its next turn laughing.' },
+    rictusempra: { group: 'extra', name: 'Rictusempra', icon: '😂', mana: 2, hit: 'cha', attack: true, applies: [{ status: 'stun', turns: 1 }], desc: 'Tickling charm. On a hit, the target loses its next turn laughing.' },
     diffindo: { group: 'extra', name: 'Diffindo', icon: '✂️', mana: 3, hit: 'dex', attack: true, dice: { count: 1, die: 6 }, damage: true, desc: 'Severing charm. Cuts ropes, vines and bags.' },
     riddikulus: { group: 'extra', name: 'Riddikulus', icon: '🤡', mana: 3, hit: 'cha', attack: true, dice: { count: 1, die: 10 }, damage: true, onlyKind: 'boggart', desc: 'Turns fear into a joke. Only hurts Boggarts.' },
-    silencio: { group: 'extra', name: 'Silencio', icon: '🤐', mana: 3, hit: 'cha', attack: true, desc: 'On a hit, the target can’t cast spells on its next turn.' },
+    silencio: { group: 'extra', name: 'Silencio', icon: '🤐', mana: 3, hit: 'cha', attack: true, applies: [{ status: 'silence', turns: 1 }], desc: 'On a hit, the target can’t cast spells on its next turn.' },
     glacius: { group: 'extra', name: 'Glacius', icon: '❄️', mana: 4, hit: 'int', attack: true, dice: { count: 1, die: 8 }, damage: true, desc: 'Freezing charm.' },
     confundo: { group: 'extra', name: 'Confundo', icon: '😵', mana: 4, hit: 'cha', attack: true, desc: 'On a hit, the target attacks the wrong person next turn (GM decides).' },
-    immobulus: { group: 'extra', name: 'Immobulus', icon: '⏸️', mana: 4, hit: 'wis', attack: true, desc: 'On a hit, freezes a creature in place for a round.' },
-    'petrificus-totalus': { group: 'extra', name: 'Petrificus Totalus', icon: '🧊', mana: 5, hit: 'int', attack: true, desc: 'Full body-bind. On a hit, the target skips its next turn.' },
+    immobulus: { group: 'extra', name: 'Immobulus', icon: '⏸️', mana: 4, hit: 'wis', attack: true, applies: [{ status: 'stun', turns: 1 }], desc: 'On a hit, freezes a creature in place for a round.' },
+    'petrificus-totalus': { group: 'extra', name: 'Petrificus Totalus', icon: '🧊', mana: 5, hit: 'int', attack: true, applies: [{ status: 'stun', turns: 1 }], desc: 'Full body-bind. On a hit, the target skips its next turn.' },
     // Advanced magic
     bombarda: { group: 'advanced', name: 'Bombarda', icon: '💣', mana: 7, hit: 'int', attack: true, dice: { count: 2, die: 8 }, damage: true, desc: 'Explosive. Loud. Very loud.' },
     'expecto-patronum': {
@@ -364,10 +370,15 @@ export const hollowHeir = {
       desc: 'Your Patronus. Drives back dark creatures and Vale’s servants. Advanced magic, usually learned in Year 3.',
     },
     'avada-kedavra': {
-      name: 'Avada Kedavra', icon: '💚', mana: 10, hit: 'cha', attack: true, kill: true, forbidden: true,
+      name: 'Avada Kedavra', icon: '💚', mana: 10, hit: 'cha', attack: true, kill: true, forbidden: true, corruption: 5,
       desc: 'The Killing Curse. Kills any creature outright; bosses take 20. If anyone sees, you are expelled.',
     },
   },
+
+  // Villain spells: the GM casts these from a monster's panel on the map. Never learnable.
+  villainSpells: dark.villain,
+  statusEffects: dark.statusEffects,
+  corruption: dark.corruptionRules,
 
   // Monsters and people you can place on the map. Monsters can be fought.
   bestiary: {
@@ -378,8 +389,24 @@ export const hollowHeir = {
     'paint-wraith': { name: 'Paint Wraith', icon: '🎨', hp: 12, defence: 13, atk: 4, dmg: { count: 1, die: 6 }, init: 3, xp: 25, note: 'Vale’s servant. Fire burns it' },
     'thornback-boar': { name: 'Thornback Boar', icon: '🐗', hp: 22, defence: 13, atk: 5, dmg: { count: 1, die: 8 }, init: 2, xp: 40, note: 'Charges. Calming it (Creature treats, or a Thornbury) ends the fight' },
     troll: { name: 'Mountain Troll', icon: '👹', hp: 30, defence: 11, atk: 6, dmg: { count: 1, die: 10 }, init: -1, xp: 50 },
-    'ashgrove-possessed': { name: 'Ashgrove (possessed)', icon: '🧙', hp: 45, defence: 14, atk: 5, dmg: { count: 1, die: 8, bonus: 2 }, init: 3, xp: 100, boss: true },
-    'corvin-vale': { name: 'Corvin Vale', icon: '🖼️', hp: 60, defence: 15, atk: 6, dmg: { count: 1, die: 10, bonus: 2 }, init: 4, xp: 200, boss: true },
+    'ashgrove-possessed': {
+      name: 'Ashgrove (possessed)', icon: '🧙', hp: 45, defence: 14, atk: 5, dmg: { count: 1, die: 8, bonus: 2 }, init: 3, xp: 100, boss: true,
+      // Reaction duel: one spell per colour. Red = Shield, blue = Dodge, gold = Counter.
+      duelSpells: [
+        { name: 'Stupefy', icon: '💥', color: 'red', dmg: { count: 1, die: 8, bonus: 2 } },
+        { name: 'Paint Lash', icon: '🖌️', color: 'blue', dmg: { count: 1, die: 8, bonus: 2 } },
+        { name: 'Bombarda Maxima', icon: '💣', color: 'gold', dmg: { count: 2, die: 8 } },
+      ],
+    },
+    'corvin-vale': {
+      name: 'Corvin Vale', icon: '🖼️', hp: 60, defence: 15, atk: 6, dmg: { count: 1, die: 10, bonus: 2 }, init: 4, xp: 200, boss: true,
+      duelFast: true, // phase 2: less time to react, and he can feint
+      duelSpells: [
+        { name: 'Varnish Hex', icon: '🫙', color: 'red', dmg: { count: 1, die: 10, bonus: 2 } },
+        { name: 'Brushstroke Blade', icon: '🗡️', color: 'blue', dmg: { count: 1, die: 10, bonus: 2 } },
+        { name: 'Crucio', icon: '⚡', color: 'gold', dmg: { count: 1, die: 6 }, applies: [{ status: 'cruciatus', held: true }] },
+      ],
+    },
     // People (no stats)
     ashgrove: { name: 'Professor Ashgrove', icon: '🧙', npc: true },
     grimsby: { name: 'Professor Grimsby', icon: '⚗️', npc: true },
@@ -890,3 +917,6 @@ export const hollowHeir = {
 
   items,
 };
+
+// Spellbook spells join the list without replacing this year's versions (like the secret Killing Curse).
+addMissing(hollowHeir.spells, dark.spells);

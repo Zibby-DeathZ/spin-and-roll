@@ -125,3 +125,23 @@ running character; Cassius Thorne exists as a suspect and token), 5 (secret pass
 Place in the Undercroft: the ritual circle, Vale's empty canvas, a shelf of paint jars, a cracked mirror and
 two cold braziers. The TV lists each one under "Here", so the players can plan around them. Ashgrove
 (phase 1) then Vale (phase 2). Breaking the circle and burning the canvas are what make phase 2 winnable.
+
+### Dark magic, Corruption and status effects (DM Guide v2.7)
+- `src/campaigns/spellbooks/dark-spells.json` is the series spellbook, written as plain JSON. Replace or extend it
+  freely; `src/lib/spellbook.js` converts it to app spells. Icons, mana and to-hit stats for each spell live in the
+  `APP` table there; new spells get sensible defaults.
+- Spells unlock by `unlockYear` and `minLevel` (GM Spells tab shows the lock, with an override). `villainOnly`
+  spells never reach players; the GM casts them from a monster's panel (`villainCast` in `src/lib/status.js`).
+  `bossOnly` (Avada Kedavra) is cutscene-only. The Year 1 secret Killing Curse is a separate spell and still works
+  as before, now adding 5 Corruption.
+- Corruption: `characters/{uid}.corruption`, 0–10, carried into the next year. Thresholds come from the JSON.
+- Status effects: `status` maps on tokens and characters, `{ bleed: { turns: 3 } }`, `turns: null` = until lifted.
+  They tick at the start of that combatant's turn in `nextTurn`. Fear gives disadvantage, Silence locks spells,
+  Blood Shield blocks one hit. Petrificus, Immobulus, Rictusempra (stun) and Silencio (silence) now apply them.
+
+### Reaction duel (DM Guide v2.8)
+- Bosses with `duelSpells` (one per colour: red = Shield, blue = Dodge, gold = Counter) get a Reaction duel panel on
+  their token. `src/lib/duel.js` holds the rules and the tunable `DEFAULTS` (window, DEX bonus, feint, Protego);
+  a campaign can override them with a `duel` object. `duelFast` bosses get 25% less time.
+- Reactions are written to the Painted Double's vote collection (round `duel-<id>`, vote `red|1834`), so no new
+  Firebase rules. Each phone times itself; the GM screen's `useDuelEngine` settles it and clears the TV after 7 s.

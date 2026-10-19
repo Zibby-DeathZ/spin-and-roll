@@ -6,7 +6,7 @@ import { levelFor } from './game';
 
 // What carries over. Live, per-game things (HP, positions, once-a-day uses) are left behind.
 const KEEP = ['name', 'firstName', 'family', 'familyName', 'house', 'xp', 'stats', 'maxHp', 'maxMana', 'gold',
-  'equipment', 'inventory', 'spells', 'perks', 'expelled'];
+  'equipment', 'inventory', 'spells', 'perks', 'expelled', 'corruption'];
 
 export async function saveHeroes(sid, session, data) {
   if (!data?.series) return 0;

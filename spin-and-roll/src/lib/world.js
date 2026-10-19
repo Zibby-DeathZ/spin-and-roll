@@ -17,7 +17,7 @@ export function pcsAt(session, chars, loc) {
   const pos = session?.state?.pcPos ?? {};
   return Object.entries(pos)
     .filter(([uid, p]) => p.loc === loc && chars?.[uid])
-    .map(([uid, p]) => ({ uid, x: p.x, y: p.y, name: chars[uid].firstName ?? chars[uid].name, family: chars[uid].family, house: chars[uid].house, hp: chars[uid].hp, maxHp: chars[uid].maxHp }));
+    .map(([uid, p]) => ({ uid, x: p.x, y: p.y, name: chars[uid].firstName ?? chars[uid].name, family: chars[uid].family, house: chars[uid].house, hp: chars[uid].hp, maxHp: chars[uid].maxHp, status: chars[uid].status }));
 }
 
 // Places you can walk to from here. Paths go both ways; secret places stay

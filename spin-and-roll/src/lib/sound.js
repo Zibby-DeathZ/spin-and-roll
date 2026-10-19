@@ -107,6 +107,7 @@ export function soundForEvent(e) {
       if (p.nat === 20) return ['whoosh', 'sparkle', p.defeated ? 'thud' : 'hit'];
       return p.hit ? ['whoosh', p.defeated ? 'thud' : 'hit'] : ['whoosh', 'swish'];
     case 'monster_attack': return p.hit ? ['hit'] : ['swish'];
+    case 'duel': return p.rebound != null ? ['sparkle', 'hit'] : p.hit && p.dmg ? ['hit'] : ['swish', 'chime'];
     case 'spell_cast': return e.failed ? null : ['whoosh', 'sparkle'];
     case 'points': return p.delta > 0 ? 'chime' : 'lowChime';
     case 'level_up': case 'sorted': case 'quest_done': case 'puzzle_solved': case 'lesson_passed': return 'fanfare';

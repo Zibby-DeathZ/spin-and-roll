@@ -5,6 +5,8 @@ import { adjust, bonuses, defenceOf, logEvent, mod, startSpin, statOf } from './
 import { rollD20, rollDice } from './dice';
 import { mimicRemains, mirrorAttack, springMimic, trunkBonus, trunkSwallow } from './mimic';
 import { bossHp } from './accuse';
+import { addStatus, corruptionAfter, removeStatuses } from './spellbook';
+import { tickTurn } from './status';
 
 const sessionRef = (sid) => doc(db, 'sessions', sid);
 const charRef = (sid, uid) => doc(db, 'sessions', sid, 'characters', uid);
@@ -83,7 +85,7 @@ export async function startFight(sid, data, session, chars, opts = {}) {
   await logEvent(sid, { type: 'fight_start', payload: { order: order.map((o) => `${o.name} ${o.init}`) } });
 }
 
-export async function nextTurn(sid, session) {
+export async function nextTurn(sid, session, data) {
   const enc = session.state.encounter;
   const tokens = session.state.tokens ?? {};
   const alive = (o) => o.kind === 'pc' || (tokens[o.id]?.hp ?? 0) > 0;
@@ -94,6 +96,9 @@ export async function nextTurn(sid, session) {
     if (alive(enc.order[turn])) break;
   }
   await updateDoc(sessionRef(sid), { 'state.encounter.turn': turn, 'state.encounter.round': round });
+  // Bleeding, burning, stunned…: these happen as the new turn starts.
+  const o = enc.order[turn];
+  if (data && o) await tickTurn(sid, data, { kind: o.kind, id: o.id }, o.name);
 }
 
 export async function endFight(sid, data, session) {
@@ -137,15 +142,21 @@ export async function monsterAttack(sid, data, tokenId, targetUid) {
       result = { name: token.name, icon: token.icon, nat: m.nat, total: m.total, defence, hit: m.hit, dmg: m.dmg, ko: m.hit && hp === 0, mirror: token.lastSpell.name };
       return;
     }
-    const d20 = rollD20();
+    // Fear: the monster rolls twice and keeps the lower.
+    const feared = !!token.status?.fear;
+    const d20 = rollD20(feared ? 'dis' : 'normal');
     const total = d20.nat + (b.atk ?? 0);
     const disarmed = !!token.disarmed;
-    const hit = !disarmed && (d20.nat === 20 || (d20.nat !== 1 && total >= defence));
+    const landed = !disarmed && (d20.nat === 20 || (d20.nat !== 1 && total >= defence));
+    // A Blood Shield soaks the whole hit, then breaks.
+    const shielded = landed && !!c.status?.bloodshield;
+    const hit = landed && !shielded;
     const dmg = hit ? rollDice(b.dmg).total + (token.mimic === 'hungry-trunk' ? trunkBonus(token) : 0) : 0;
     const hp = Math.max(0, c.hp - dmg);
     if (hit) tx.update(cSnap.ref, { hp });
+    if (shielded) tx.update(cSnap.ref, { status: removeStatuses(c.status, ['bloodshield']) });
     if (disarmed) tx.update(sessionRef(sid), { [`state.tokens.${tokenId}.disarmed`]: deleteField() });
-    result = { name: token.name, icon: token.icon, nat: d20.nat, total, defence, hit, dmg, ko: hit && hp === 0, disarmed };
+    result = { name: token.name, icon: token.icon, nat: d20.nat, total, defence, hit, dmg, ko: hit && hp === 0, disarmed, feared, shielded };
   });
   if (!result) return;
   if (result.hit && pre?.mimic === 'hungry-trunk') {
@@ -184,26 +195,43 @@ export async function applyAttack(sid, eid, data) {
     const mimicDef = token?.mimic ? data.mimics?.[token.mimic] : null;
     if (mimicDef?.weakTo && spell.id === mimicDef.weakTo) dmg *= 2;
     let defeated = false;
+    // Status effects the spell puts on its target (Stunned, Bleed…).
+    const defs = data.statusEffects ?? {};
+    const applied = hit ? (spell.applies ?? []).filter((x) => !x.nat20Only || p.nat === 20) : [];
+    const withStatus = (map) => applied.reduce((m, x) => addStatus(m, x.status, x.held ? null : x.turns, defs), map ?? {});
     if (token) {
       const hp = Math.max(0, token.hp - dmg);
       defeated = hp === 0;
       const upd = { [`state.tokens.${p.targetId}.hp`]: hp };
+      if (applied.length && !defeated) upd[`state.tokens.${p.targetId}.status`] = withStatus(token.status);
       if (hit && spell.id === 'expelliarmus') upd[`state.tokens.${p.targetId}.disarmed`] = true;
       if (hit && dmg > 0 && token.mimic === 'painted-double') {
         upd[`state.tokens.${p.targetId}.lastSpell`] = { name: spell.name, icon: spell.icon, dmg, caster: e.actorUid };
       }
       tx.update(sessionRef(sid), upd);
-    } else if (dmg) {
+    } else if (dmg || applied.length) {
       const hp = Math.max(0, tgt.hp - dmg);
       defeated = hp === 0;
-      tx.update(tSnap.ref, { hp });
+      tx.update(tSnap.ref, { hp, ...(applied.length ? { status: withStatus(tgt.status) } : {}) });
     }
-    if (spell.mana) tx.update(aSnap.ref, { mana: a.mana - spell.mana });
+    // The caster: mana, any HP cost, blood drawn back, and Corruption from dark magic.
+    const aUpd = {};
+    if (spell.mana) aUpd.mana = a.mana - spell.mana;
+    let casterHp = a.hp;
+    if (spell.hpCost) casterHp = Math.max(0, casterHp - spell.hpCost);
+    const healed = hit && spell.lifesteal && dmg ? Math.floor(dmg * spell.lifesteal) : 0;
+    if (healed) casterHp = Math.min(a.maxHp, casterHp + healed);
+    if (casterHp !== a.hp) aUpd.hp = casterHp;
+    if (spell.corruption) aUpd.corruption = corruptionAfter(a.corruption ?? 0, spell.corruption, data.corruption);
+    if (Object.keys(aUpd).length) tx.update(aSnap.ref, aUpd);
+    const twist = p.nat === 20 ? spell.nat20 : p.nat === 1 ? spell.nat1 : null;
     tx.update(eRef, {
       processed: true,
       payload: {
         ...p, name: spell.name, icon: spell.icon, targetName: token ? token.name : tgt.name,
         defence, hit, dmg, defeated, forbidden: !!spell.forbidden,
+        statuses: applied.filter(() => !defeated).map((x) => defs[x.status]?.name ?? x.status),
+        ...(healed ? { healed } : {}), ...(twist ? { twist } : {}),
       },
     });
     forbidden = !!spell.forbidden;

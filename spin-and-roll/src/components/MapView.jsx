@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import Art, { tokenArt } from './Art';
 import Portrait from './Portrait';
+import { statusIcons } from './Status';
 
 const EXTS = ['jpg', 'png', 'webp'];
 export const isMonster = (t) => !t.npc && t.kind !== 'chest' && t.kind !== 'item' && t.kind !== 'hazard';
@@ -41,6 +42,7 @@ export default function MapView({ loc, tokens = {}, pcs = [], encounter, selecte
             <Art path={tokenArt(t)} icon={t.icon} className={`token-icon ${t.revealed ? 'mimic-icon' : ''}`} />
             {!small && <span className="token-name">{t.name}</span>}
             {mon && <span className="token-hp"><span style={{ width: `${Math.max(0, (t.hp / t.maxHp) * 100)}%` }} /></span>}
+            {mon && t.status && Object.keys(t.status).length > 0 && <span className="token-status" aria-hidden="true">{statusIcons(t.status)}</span>}
           </button>
         );
       })}
@@ -54,6 +56,7 @@ export default function MapView({ loc, tokens = {}, pcs = [], encounter, selecte
             <Portrait family={p.family} name={p.name} className="token-icon" />
             {!small && <span className="token-name">{p.name}</span>}
             <span className="token-hp pc-hp"><span style={{ width: `${Math.max(0, (p.hp / p.maxHp) * 100)}%` }} /></span>
+            {p.status && Object.keys(p.status).length > 0 && <span className="token-status" aria-hidden="true">{statusIcons(p.status)}</span>}
           </button>
         );
       })}

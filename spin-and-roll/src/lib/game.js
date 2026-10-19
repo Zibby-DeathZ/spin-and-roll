@@ -7,6 +7,8 @@ import { db } from '../firebase';
 import { applyAttack } from './combat';
 import { applyOpenChest, applyPickup, sendToDetention } from './world';
 import { applyWorld, owlMissedQuests } from './schedule';
+import { addStatus, corruptionAfter, removeStatuses } from './spellbook';
+import { duelText } from './duel';
 
 // ---------- Rules of the game ----------
 
@@ -700,7 +702,7 @@ async function applyPurchase(sid, eid, data) {
   });
 }
 
-async function applyCast(sid, eid, data) {
+export async function applyCast(sid, eid, data) {
   const eRef = doc(db, 'sessions', sid, 'events', eid);
   await runTransaction(db, async (tx) => {
     const e = (await tx.get(eRef)).data();
@@ -709,12 +711,47 @@ async function applyCast(sid, eid, data) {
     const c = cSnap.data();
     const own = c?.spells?.find((x) => x.id === e.payload.spellId);
     const spell = own ? { ...own, ...(data?.spells?.[own.id] ?? {}) } : null;
+    const p = e.payload;
+    // Spellbook extras: a friend to help, every enemy here, or the caster themselves.
+    const allySnap = spell?.targetAlly && p.targetUid && p.targetUid !== e.actorUid ? await tx.get(charRef(sid, p.targetUid)) : null;
+    const sess = spell?.area === 'all-enemies' ? (await tx.get(doc(db, 'sessions', sid))).data() : null;
     if (!spell || c.mana < spell.mana) {
       tx.update(eRef, { processed: true, failed: true });
       return;
     }
-    tx.update(cSnap.ref, { mana: c.mana - spell.mana });
-    tx.update(eRef, { processed: true, payload: { ...e.payload, name: spell.name, icon: spell.icon } });
+    const defs = data?.statusEffects ?? {};
+    const upd = { mana: c.mana - spell.mana };
+    let status = c.status ?? {};
+    if (spell.hpCost) upd.hp = Math.max(0, c.hp - spell.hpCost);
+    if (spell.corruption) upd.corruption = corruptionAfter(c.corruption ?? 0, spell.corruption, data.corruption);
+    if (spell.selfStatus) status = addStatus(status, spell.selfStatus, null, defs);
+    let targetName = null;
+    // Counter-spells (Liberacorpus, Vulnera Sanentur) lift statuses from whoever they're cast on.
+    if (spell.removes?.length && p.targetUid) {
+      if (allySnap?.exists()) {
+        tx.update(allySnap.ref, { status: removeStatuses(allySnap.data().status, spell.removes) });
+        targetName = allySnap.data().name;
+      } else if (p.targetUid === e.actorUid) status = removeStatuses(status, spell.removes);
+    } else if (allySnap?.exists()) targetName = allySnap.data().name;
+    if (status !== (c.status ?? {})) upd.status = status;
+    tx.update(cSnap.ref, upd);
+    // Morsmordre and the like: every enemy where the caster stands.
+    let hits = 0;
+    if (sess && spell.applies?.length) {
+      const loc = sess.state?.pcPos?.[e.actorUid]?.loc ?? sess.state?.map?.loc;
+      const tUpd = {};
+      for (const [id, t] of Object.entries(sess.state?.tokens ?? {})) {
+        if (t.loc !== loc || t.npc || !(t.hp > 0) || ['chest', 'item', 'hazard'].includes(t.kind)) continue;
+        tUpd[`state.tokens.${id}.status`] = spell.applies.reduce((m, x) => addStatus(m, x.status, x.held ? null : x.turns, defs), t.status ?? {});
+        hits++;
+      }
+      if (hits) tx.update(doc(db, 'sessions', sid), tUpd);
+    }
+    const statuses = sess ? (spell.applies ?? []).map((x) => defs[x.status]?.name ?? x.status) : [];
+    tx.update(eRef, {
+      processed: true,
+      payload: { ...p, name: spell.name, icon: spell.icon, ...(targetName ? { targetName } : {}), ...(hits ? { hits, statuses } : {}) },
+    });
   });
 }
 
@@ -804,7 +841,11 @@ export function describe(e, nameOf) {
     case 'time_turner': return { icon: '⌛', text: 'The Time-Turner spins… It’s Day 1 again. Then it cracks.', tone: 'violet', big: true };
     case 'class_held': return { icon: '🎓', text: `${e.payload.names.join(', ')} learned ${e.payload.lesson} in ${e.payload.cls}`, tone: 'teal' };
     case 'spell_cast': return e.failed ? null
-      : { icon: e.payload.icon, text: `${actor} casts ${e.payload.name}!${e.payload.rolled != null ? ` Rolled ${e.payload.rolled} ${e.payload.rollLabel ?? ''}` : ''}`, tone: 'violet', big: true };
+      : {
+        icon: e.payload.icon,
+        text: `${actor} casts ${e.payload.name}${e.payload.targetName ? ` on ${e.payload.targetName}` : ''}!${e.payload.rolled != null ? ` Rolled ${e.payload.rolled} ${e.payload.rollLabel ?? ''}` : ''}${e.payload.hits ? ` ${e.payload.hits} ${e.payload.hits === 1 ? 'enemy is' : 'enemies are'} hit: ${e.payload.statuses.join(', ')}.` : ''}`,
+        tone: 'violet', big: true,
+      };
     case 'attack': {
       if (e.failed) return null;
       const p = e.payload;
@@ -814,20 +855,41 @@ export function describe(e, nameOf) {
       const crit = p.nat === 20 ? ' Natural 20!' : p.nat === 1 ? ' Natural 1!' : '';
       return {
         icon: p.icon,
-        text: `${actor} → ${p.targetName}: ${p.name}, ${p.hitTotal} vs Defence ${p.defence}.${crit} ${p.hit ? (p.dmg ? `Hit for ${p.dmg}!` : 'Hit!') : 'Miss.'}${p.defeated ? ` ${p.targetName} is down!` : ''}`,
+        text: `${actor} → ${p.targetName}: ${p.name}, ${p.hitTotal} vs Defence ${p.defence}.${crit} ${p.hit ? (p.dmg ? `Hit for ${p.dmg}!` : 'Hit!') : 'Miss.'}${p.statuses?.length ? ` ${p.targetName}: ${p.statuses.join(', ')}.` : ''}${p.healed ? ` ${actor} drinks back ${p.healed} HP.` : ''}${p.defeated ? ` ${p.targetName} is down!` : ''}${p.twist ? ` ${p.twist}.` : ''}`,
         tone: p.hit ? 'gold' : 'muted', big: true,
       };
     }
     case 'monster_attack': {
       const p = e.payload;
       if (p.disarmed) return { icon: p.icon, text: `${p.name} reaches for its weapon… it’s been disarmed! Miss.`, tone: 'muted', big: true };
+      if (p.shielded) return { icon: '🔰', text: `${p.name} → ${target}: ${p.total} vs Defence ${p.defence}. The Blood Shield takes the whole hit and breaks!`, tone: 'violet', big: true };
       const mirror = p.mirror ? ` casts ${p.mirror} back at` : ' →';
       const ate = p.swallowed ? ` It swallows ${target}’s ${p.swallowed}${p.heal ? ` and heals ${p.heal}` : ''}, and grows!` : '';
       return {
         icon: p.icon,
-        text: `${p.name}${mirror} ${target}: ${p.total} vs Defence ${p.defence}. ${p.hit ? `Hit for ${p.dmg}!` : 'Miss.'}${ate}${p.ko ? ` ${target} is knocked out!` : ''}`,
+        text: `${p.name}${mirror} ${target}: ${p.total} vs Defence ${p.defence}${p.feared ? ' (shaking with fear)' : ''}. ${p.hit ? `Hit for ${p.dmg}!` : 'Miss.'}${ate}${p.ko ? ` ${target} is knocked out!` : ''}`,
         tone: p.hit ? 'ember' : 'muted', big: true,
       };
+    }
+    case 'duel': {
+      const p = e.payload;
+      const good = p.rebound != null || !p.hit || !p.dmg;
+      return { icon: p.icon, text: duelText(p), tone: good ? 'teal' : 'ember', big: true };
+    }
+    case 'status_tick': {
+      const p = e.payload;
+      const bits = [];
+      if (p.damage) bits.push(`takes ${p.damage} damage`);
+      if (p.skip) bits.push(`is ${p.skip.toLowerCase()} and loses the turn`);
+      const worn = p.expired?.length ? ` ${p.expired.join(', ')} wore off.` : '';
+      return { icon: p.skip ? '💫' : '🩸', text: `${p.name} ${bits.join(' and ') || 'shakes it off'}.${worn}${p.ko ? ` ${p.name} is down!` : ''}`, tone: p.damage ? 'ember' : 'muted', big: !!(p.damage || p.skip) };
+    }
+    case 'villain_spell': {
+      const p = e.payload;
+      let res = 'Miss.';
+      if (p.hit && p.dc) res = p.resisted ? `${target} fights it off (${p.resist} vs ${p.dc})!` : `${target} is under their control (${p.resist} vs ${p.dc})…`;
+      else if (p.hit) res = `${target} collapses, screaming.`;
+      return { icon: p.icon, text: `${p.name} → ${target}: ${p.spell}! ${p.total} vs Defence ${p.defence}. ${res}`, tone: p.hit ? 'house-slytherin' : 'muted', big: true };
     }
     case 'roll': {
       const p = e.payload;

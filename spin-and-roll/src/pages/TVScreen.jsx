@@ -25,6 +25,8 @@ import Wheel from '../components/Wheel';
 import EventToasts from '../components/EventToasts';
 import { TVImposter } from '../components/Imposter';
 import { TVAccuse } from '../components/Accuse';
+import { statusIcons } from '../components/Status';
+import { TVDuel } from '../components/Duel';
 
 export default function TVScreen() {
   const { sid } = useParams();
@@ -122,7 +124,7 @@ export function TVLive({ session, chars, profiles, data, title, answers, lessonR
               <li className="tv-round">Round {enc.round}</li>
               {enc.order.map((o, i) => (
                 <li key={o.id} className={`${i === enc.turn ? 'on' : ''} ${o.kind === 'mon' ? 'mon' : ''} ${o.kind === 'mon' && (session.state?.tokens?.[o.id]?.hp ?? 0) <= 0 ? 'out' : ''}`}>
-                  {o.name}
+                  {o.name} {statusIcons(o.kind === 'mon' ? session.state?.tokens?.[o.id]?.status : chars[o.id]?.status)}
                 </li>
               ))}
             </ol>
@@ -186,8 +188,9 @@ export function TVLive({ session, chars, profiles, data, title, answers, lessonR
           );
         })}
       </footer>
-      {sid && <EventToasts sid={sid} nameOf={nameOf} big skip={['wheel']}
+      {sid && <EventToasts sid={sid} nameOf={nameOf} big skip={['wheel', 'duel']}
         onNew={(e) => { const s2 = soundForEvent(e); (Array.isArray(s2) ? s2 : s2 ? [s2] : []).forEach((n, i) => setTimeout(() => play(n), i * 180)); }} />}
+      {session.state?.duel && <TVDuel session={session} />}
       <JumpScare scare={session.state?.scare} />
       <SoundGate />
     </main>

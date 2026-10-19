@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import MapView, { isMonster } from './MapView';
 import { Conversation } from './GMWorld';
+import { StatusEditor, VillainCast, statusIcons } from './Status';
+import { GMDuel } from './Duel';
 import { defenceOf } from '../lib/game';
 import {
   addToken, endFight, monsterAttack, moveToken, nextTurn, placeToken, removeToken, setTokenHp, startFight,
@@ -75,7 +77,10 @@ export default function GMTable({ sid, data, session, chars }) {
         {(t || selPc) && (
           <div className="token-panel">
             {selPc && (
-              <span><strong>{selPc.name}</strong> <span className="muted small">{selPc.hp}/{selPc.maxHp} HP, Defence {defenceOf(selPc)}</span></span>
+              <>
+                <span><strong>{selPc.name}</strong> <span className="muted small">{selPc.hp}/{selPc.maxHp} HP, Defence {defenceOf(selPc)}</span></span>
+                <StatusEditor sid={sid} data={data} who={{ kind: 'pc', id: sel.slice(3) }} map={selPc.status} />
+              </>
             )}
             {t && <strong>{t.icon} {t.name}</strong>}
             {t?.mimic && !t.revealed && (
@@ -123,6 +128,9 @@ export default function GMTable({ sid, data, session, chars }) {
                   </select>
                   <button className="btn small ember" disabled={!target || t.hp <= 0} onClick={() => monsterAttack(sid, data, sel, target)}>Attack</button>
                 </span>
+                <GMDuel sid={sid} data={data} session={session} chars={chars} tokenId={sel} here={here} />
+                <StatusEditor sid={sid} data={data} who={{ kind: 'mon', id: sel }} map={t.status} />
+                <VillainCast sid={sid} data={data} tokenId={sel} here={here} chars={chars} />
               </>
             )}
             {t?.npc && !t.mimic && data.talk?.[t.kind] && (
@@ -199,13 +207,13 @@ export default function GMTable({ sid, data, session, chars }) {
               <ol className="turn-order">
                 {enc.order.map((o, i) => (
                   <li key={o.id} className={`${i === enc.turn ? 'on' : ''} ${o.kind === 'mon' && (tokens[o.id]?.hp ?? 0) <= 0 ? 'out' : ''}`}>
-                    {o.name} <span className="muted">{o.init}</span>
+                    {o.name} {statusIcons(o.kind === 'mon' ? tokens[o.id]?.status : chars[o.id]?.status)} <span className="muted">{o.init}</span>
                   </li>
                 ))}
               </ol>
               <div className="actions">
                 {current?.kind === 'mon' && <button className="btn small" onClick={() => setSel(current.id)}>Select {current.name}</button>}
-                <button className="btn small gold" onClick={() => nextTurn(sid, session)}>Next turn ▶</button>
+                <button className="btn small gold" onClick={() => nextTurn(sid, session, data)}>Next turn ▶</button>
                 <button className="btn small ghost" onClick={() => endFight(sid, data, session)}>End and share XP</button>
               </div>
             </>

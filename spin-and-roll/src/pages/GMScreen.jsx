@@ -25,6 +25,7 @@ import GMMedia from '../components/GMMedia';
 import { GMImposter } from '../components/Imposter';
 import { useImposterEngine } from '../lib/imposter';
 import { useAccuseEngine } from '../lib/accuse';
+import { useDuelEngine } from '../lib/duel';
 import { saveHeroes } from '../lib/heroes';
 import { sendOwl } from '../lib/owls';
 import { sendToDetention } from '../lib/world';
@@ -33,6 +34,7 @@ import { introActive, setLock, setMusicState, skipIntro, startIntro } from '../l
 import { useClaims } from '../lib/game';
 import { useLessonEngine } from '../lib/lessons';
 import { setExpelled, teachForbidden } from '../lib/combat';
+import { Corruption, StatusEditor } from '../components/Status';
 
 function Buttons({ sid, uid, field, steps }) {
   return (
@@ -115,6 +117,8 @@ function CharacterControls({ sid, c, data, playerName, quizBusy, forbiddenLearne
       <div className="gm-row"><Bar label="HP" value={c.hp} max={c.maxHp} tone="ember" /><Buttons sid={sid} uid={c.uid} field="hp" steps={[-5, -1, 1, 5]} /></div>
       <div className="gm-row"><Bar label="Mana" value={c.mana} max={c.maxMana} tone="violet" /><Buttons sid={sid} uid={c.uid} field="mana" steps={[-3, -1, 1, 3]} /></div>
       <div className="gm-row"><span className="gm-label">XP {c.xp}</span><Buttons sid={sid} uid={c.uid} field="xp" steps={[10, 25, 50]} /></div>
+      <Corruption c={c} data={data} sid={sid} />
+      <StatusEditor sid={sid} data={data} who={{ kind: 'pc', id: c.uid }} map={c.status} />
       <div className="gm-row"><span className="gm-label">{data.currency.icon} {c.gold}</span><Buttons sid={sid} uid={c.uid} field="gold" steps={[-5, 5, 10, 50]} /></div>
 
       {data.quizzes && (
@@ -232,6 +236,7 @@ export default function GMScreen() {
   const lessonResults = useLessonEngine(sid, data, session?.state?.lesson);
   useImposterEngine(sid, session); // tells the TV who has voted in a Painted Double round
   useAccuseEngine(sid, session); // and in an accusation vote
+  useDuelEngine(sid, data, session); // settles boss spells once the students have reacted
   // If a game was started without its opening (for example from an old, un-refreshed dashboard tab),
   // start it now, as long as nobody has chosen a family yet.
   const autoIntro = useRef(false);

@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import MapView, { isMonster } from './MapView';
 import { defenceOf } from '../lib/game';
+import { StatusEditor, VillainCast, statusIcons } from './Status';
+import { GMDuel } from './Duel';
 import {
   addToken, endFight, monsterAttack, moveToken, nextTurn, placeToken, removeToken, setTokenHp, startFight,
 } from '../lib/combat';
@@ -106,6 +108,7 @@ export default function GMMap({ sid, data, session, chars }) {
         <div className="token-panel">
           <strong>{selPc.name}</strong>
           <span className="muted small">{selPc.hp}/{selPc.maxHp} HP, Defence {defenceOf(selPc)}. Move them with the map, or to another place above.</span>
+          <StatusEditor sid={sid} data={data} who={{ kind: 'pc', id: sel.slice(3) }} map={selPc.status} />
         </div>
       )}
 
@@ -138,6 +141,9 @@ export default function GMMap({ sid, data, session, chars }) {
                 </select>
                 <button className="btn small ember" disabled={!target || t.hp <= 0} onClick={() => monsterAttack(sid, data, sel, target)}>Attack</button>
               </div>
+              <GMDuel sid={sid} data={data} session={session} chars={chars} tokenId={sel} here={here} />
+              <StatusEditor sid={sid} data={data} who={{ kind: 'mon', id: sel }} map={t.status} />
+              <VillainCast sid={sid} data={data} tokenId={sel} here={here} chars={chars} />
             </>
           )}
           <button className="btn small ghost" onClick={() => { removeToken(sid, sel); setSel(null); }}>Remove</button>
@@ -155,12 +161,12 @@ export default function GMMap({ sid, data, session, chars }) {
             <ol className="turn-order">
               {enc.order.map((o, i) => (
                 <li key={o.id} className={`${i === enc.turn ? 'on' : ''} ${o.kind === 'mon' && (tokens[o.id]?.hp ?? 0) <= 0 ? 'out' : ''}`}>
-                  {o.name} <span className="muted">{o.init}</span>
+                  {o.name} {statusIcons(o.kind === 'mon' ? tokens[o.id]?.status : chars[o.id]?.status)} <span className="muted">{o.init}</span>
                 </li>
               ))}
             </ol>
             {current?.kind === 'mon' && <button className="btn small" onClick={() => setSel(current.id)}>Select {current.name}</button>}
-            <button className="btn small gold" onClick={() => nextTurn(sid, session)}>Next turn ▶</button>
+            <button className="btn small gold" onClick={() => nextTurn(sid, session, data)}>Next turn ▶</button>
             <button className="btn small ghost" onClick={() => endFight(sid, data, session)}>End fight and share XP</button>
           </>
         )}

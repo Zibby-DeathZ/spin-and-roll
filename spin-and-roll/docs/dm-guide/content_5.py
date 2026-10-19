@@ -147,6 +147,8 @@ BLOCKS = [
     ]),
     ('h2', 'Version log'),
     ('table', ['Version', 'Date', 'Changes'], [
+        ['2.8', 'October 2026', 'The reaction duel: boss spells come with a countdown on the target’s phone. Shield, Dodge or Counter in time, friends can cast Protego, and Vale is faster and can feint in phase 2.'],
+        ['2.7', 'October 2026', 'Dark magic: a series spellbook of dark, blood and later-year spells locked by year and level, Corruption from 0 to 10, status effects that count down in fights (Bleed, Stunned, Silenced, Fear and more), and villain spells cast by monsters.'],
         ['2.6', 'October 2026', 'The accusation vote: players vote on their phones for the culprit. Keep it a hunch, or make it the final accusation, which reveals the truth, pays XP and house points, and weakens the bosses if the table is right.'],
         ['2.5', 'October 2026', 'The Painted Double: an Imposter-style party game with your own words and hints, phone voting and a TV reveal.'],
         ['2.4', 'October 2026', 'The Forbidden Forest fight is now a Thornback Boar (Day 3 free time and the forest wheel). Creature treats or a Thornbury can calm it.'],

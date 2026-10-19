@@ -29,6 +29,8 @@ import { Splash } from '../components/Gate';
 import Bar from '../components/Bar';
 import Wheel from '../components/Wheel';
 import TradeComposer from '../components/TradeComposer';
+import { Corruption, StatusChips } from '../components/Status';
+import { PlayerDuel, duelNeedsMe } from '../components/Duel';
 
 function AbilityCard({ sid, c, ability, dawn }) {
   const [used, setUsed] = useState(false);
@@ -68,6 +70,8 @@ function Sheet({ sid, c, currency, data, points, clk, scenes = null, loc, discov
       </div>
       <Bar label="HP" value={c.hp} max={c.maxHp} tone="ember" />
       <Bar label="Mana" value={c.mana} max={c.maxMana} tone="violet" />
+      <StatusChips map={c.status} defs={data.statusEffects} />
+      <Corruption c={c} data={data} />
       <Bar label={next ? `XP to level ${lvl + 1}` : `XP (top level for this year)`} value={c.xp} max={next ?? c.xp} tone="gold" />
       <div className="vitals">
         <span><b>{defenceOf(c)}</b> Defence</span>
@@ -316,6 +320,11 @@ export default function PlayerScreen() {
       <LessonScreen sid={sid} uid={user.uid} lesson={lesson} cls={data.classes[lesson.cls]}
         result={lessonResults[user.uid]} onLeave={() => setLeftLesson(lesson.id)} />
     );
+  }
+
+  // A boss spell at you (or a friend you can shield) takes over the phone for a few seconds.
+  if (me && duelNeedsMe(session, user.uid)) {
+    return <PlayerDuel key={session.state.duel.id} sid={sid} uid={user.uid} session={session} data={data} />;
   }
 
   const acc = session.state?.accuse;

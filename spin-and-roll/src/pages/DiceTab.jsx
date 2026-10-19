@@ -4,6 +4,10 @@ import { damageBonus, sendAttack, sendRoll, spellDef, STRIKE } from '../lib/comb
 import { DICE, diceLabel, rollD20, rollDice, rollDie } from '../lib/dice';
 import { locOf } from '../lib/world';
 import { isMonster } from '../components/MapView';
+import { StatusChips } from '../components/Status';
+
+// Does any status on this character have a given rule (cannotCast, disadvantage…)?
+const hasRule = (c, defs, rule) => Object.keys(c.status ?? {}).some((k) => defs?.[k]?.[rule]);
 
 // Shows a number that tumbles for a moment before landing.
 function useTumble() {
@@ -34,10 +38,10 @@ function ModeToggle({ mode, setMode }) {
   );
 }
 
-function FreeRoller({ sid, c }) {
+function FreeRoller({ sid, c, feared }) {
   const [die, setDie] = useState(20);
   const [stat, setStat] = useState('');
-  const [mode, setMode] = useState('normal');
+  const [mode, setMode] = useState(feared ? 'dis' : 'normal');
   const { shown, rolling, tumble } = useTumble();
   const [last, setLast] = useState(null);
 
@@ -78,7 +82,7 @@ function FreeRoller({ sid, c }) {
   );
 }
 
-function badges(sp, c) {
+function badges(sp, c, defs) {
   const out = [];
   if (sp.hit) out.push(`d20 ${fmtMod(mod(statOf(c, sp.hit)))} to hit (${sp.hit.toUpperCase()})`);
   if (sp.check) out.push(`d20 ${fmtMod(mod(statOf(c, sp.check)))} check (${sp.check.toUpperCase()})`);
@@ -87,13 +91,22 @@ function badges(sp, c) {
     out.push(`${diceLabel(sp.dice)}${b ? ` + ${b}` : ''} ${sp.damage ? 'damage' : sp.effectLabel ?? ''}`);
   }
   if (sp.kill) out.push('Kills on a hit');
+  if (sp.applies?.length) {
+    out.push(sp.applies.map((a) => `${a.nat20Only ? 'Nat 20: ' : ''}${defs?.[a.status]?.name ?? a.status}${a.turns ? ` (${a.turns} ${a.turns === 1 ? 'turn' : 'turns'})` : ''}`).join(', '));
+  }
+  if (sp.area === 'all-enemies') out.push('Every enemy here');
+  if (sp.targetAlly) out.push('Cast on a friend');
+  if (sp.hpCost) out.push(`Costs ${sp.hpCost} HP`);
+  if (sp.lifesteal) out.push(`Heals you ${Math.round(sp.lifesteal * 100)}% of the damage`);
+  if (sp.corruption > 0) out.push(`☠️ +${sp.corruption} Corruption`);
+  if (sp.corruption < 0) out.push(`✨ ${sp.corruption} Corruption`);
   return out;
 }
 
 // The step-by-step cast: pick a target, roll to hit, roll the spell's die.
-function CastFlow({ sid, c, sp, targets, onClose }) {
+function CastFlow({ sid, c, sp, targets, friends, feared, onClose }) {
   const [target, setTarget] = useState(null);
-  const [mode, setMode] = useState('normal');
+  const [mode, setMode] = useState(feared ? 'dis' : 'normal');
   const [hit, setHit] = useState(null); // { nat, total, rolls, success }
   const [dmg, setDmg] = useState(null);
   const [done, setDone] = useState(false);
@@ -140,12 +153,16 @@ function CastFlow({ sid, c, sp, targets, onClose }) {
       rolled = r.total;
       rollLabel = sp.effectLabel ?? '';
     }
-    await castSpell(sid, c.uid, sp.id, rolled != null ? { rolled, rollLabel } : {});
+    await castSpell(sid, c.uid, sp.id, {
+      ...(rolled != null ? { rolled, rollLabel } : {}),
+      ...(sp.targetAlly && target ? { targetUid: target.id } : {}),
+    });
     setDmg({ total: rolled });
     setDone(true);
   };
 
-  const needsTarget = sp.attack && !target;
+  const needsTarget = (sp.attack || sp.targetAlly) && !target;
+  const choices = sp.targetAlly ? friends : targets;
 
   return (
     <div className="sheet-overlay" role="dialog" aria-label={`Cast ${sp.name}`}>
@@ -155,14 +172,14 @@ function CastFlow({ sid, c, sp, targets, onClose }) {
 
         {needsTarget ? (
           <>
-            <p className="muted">Choose a target:</p>
-            {!targets.length && <p className="muted">There’s nobody here to target.</p>}
+            <p className="muted">{sp.targetAlly ? 'Who is it for?' : 'Choose a target:'}</p>
+            {!choices.length && <p className="muted">There’s nobody here to target.</p>}
             <ul className="rows">
-              {targets.map((t) => (
+              {choices.map((t) => (
                 <li key={t.kind + t.id}>
                   <button className="target-btn" onClick={() => setTarget(t)}>
                     <span>{t.icon} {t.name}</span>
-                    <span className="muted small">Defence {t.defence}{t.hp != null ? `, ${t.hp} HP` : ''}</span>
+                    <span className="muted small">{sp.targetAlly ? `${t.hp} HP` : `Defence ${t.defence}${t.hp != null ? `, ${t.hp} HP` : ''}`}</span>
                   </button>
                 </li>
               ))}
@@ -170,7 +187,10 @@ function CastFlow({ sid, c, sp, targets, onClose }) {
           </>
         ) : (
           <>
-            {target && <p>Target: <strong>{target.icon} {target.name}</strong>, Defence {target.defence}</p>}
+            {target && <p>{sp.targetAlly ? 'For' : 'Target'}: <strong>{target.icon} {target.name}</strong>{sp.targetAlly ? '' : `, Defence ${target.defence}`}</p>}
+            {feared && (sp.hit || sp.check) && <p className="warn small">😱 You’re afraid: roll with disadvantage.</p>}
+            {hit?.nat === 20 && sp.nat20 && <p className="hit small">Natural 20: {sp.nat20}</p>}
+            {hit?.nat === 1 && sp.nat1 && <p className="miss small">Natural 1: {sp.nat1}</p>}
             {(sp.hit || sp.check) && !hit && !done && <ModeToggle mode={mode} setMode={setMode} />}
             <div className="roll-out">
               <span className={`big-die ${rolling ? 'rolling' : ''}`}>{shown ?? '–'}</span>
@@ -219,13 +239,20 @@ export default function DiceTab({ sid, c, data, session, chars }) {
   ];
   const spells = [STRIKE, ...(c.spells ?? []).map((sp) => spellDef(data, sp))];
   const ko = c.hp <= 0;
+  const defs = data.statusEffects;
+  const silenced = hasRule(c, defs, 'cannotCast');
+  const feared = hasRule(c, defs, 'disadvantage');
+  const friends = [c, ...Object.values(chars).filter((o) => o.uid !== c.uid && (!placed || locOf(session, o.uid) === loc))]
+    .map((o) => ({ kind: 'pc', id: o.uid, name: o.uid === c.uid ? `${o.name} (you)` : o.name, icon: '🧑‍🎓', hp: o.hp }));
 
   return (
     <>
-      <FreeRoller sid={sid} c={c} />
+      <FreeRoller sid={sid} c={c} feared={feared} />
       <section className="spells">
         <h2>Spells and attacks</h2>
         <p className="muted small">Mana: {c.mana} / {c.maxMana}</p>
+        <StatusChips map={c.status} defs={defs} />
+        {silenced && <p className="warn small">🤐 You can’t cast spells right now. You can still attack without your wand.</p>}
         <ul className="rows">
           {spells.map((sp) => (
             <li key={sp.id} className={`item-row spell-card ${sp.forbidden ? 'forbidden' : ''}`}>
@@ -233,11 +260,12 @@ export default function DiceTab({ sid, c, data, session, chars }) {
                 <span className="item-icon">{sp.icon}</span>
                 <span>
                   <strong>{sp.name}{sp.form ? ` (${sp.form})` : ''}</strong> <span className="muted small">{sp.mana ? `${sp.mana} mana` : 'free'}</span>
-                  <br /><span className="badges">{badges(sp, c).map((b) => <span key={b} className="badge-pill">{b}</span>)}</span>
+                  <br /><span className="badges">{badges(sp, c, defs).map((b) => <span key={b} className="badge-pill">{b}</span>)}</span>
                   <br /><span className="muted small">{sp.desc}</span>
+                  {(sp.nat20 || sp.nat1) && <><br /><span className="muted small">{sp.nat20 ? `Nat 20: ${sp.nat20}. ` : ''}{sp.nat1 ? `Nat 1: ${sp.nat1}.` : ''}</span></>}
                 </span>
               </span>
-              <button className="btn small gold" disabled={ko || c.mana < (sp.mana ?? 0)} onClick={() => setCasting(sp)}>
+              <button className="btn small gold" disabled={ko || c.mana < (sp.mana ?? 0) || (silenced && !sp.basic)} onClick={() => setCasting(sp)}>
                 {sp.attack ? 'Attack' : 'Cast'}
               </button>
             </li>
@@ -245,7 +273,7 @@ export default function DiceTab({ sid, c, data, session, chars }) {
         </ul>
         {ko && <p className="warn">You’re knocked out. Someone needs to heal you.</p>}
       </section>
-      {casting && <CastFlow sid={sid} c={c} sp={casting} targets={targets} onClose={() => setCasting(null)} />}
+      {casting && <CastFlow sid={sid} c={c} sp={casting} targets={targets} friends={friends} feared={feared} onClose={() => setCasting(null)} />}
     </>
   );
 }
