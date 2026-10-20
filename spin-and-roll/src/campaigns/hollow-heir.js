@@ -919,13 +919,13 @@ export const hollowHeir = {
     },
     {
       id: 'constellation', type: 'constellation', icon: '✨', title: 'The Serpent in the Stars',
-      intro: 'On the Astronomy Tower, the stars are numbered in silver. “Draw the serpent: begin at its eye, the brightest star, and always move to the next brightest.” Tell the DM which stars to join.',
+      intro: 'On the Astronomy Tower, twelve stars are numbered in silver. Carved on the parapet: “The serpent’s eye is the brightest star. From there it always flies to the nearest star with a higher number. Its tail ends where no higher star remains.” Tell the DM which stars to join.',
       stars: [
-        { n: 5, x: 14, y: 30, r: 26 }, { n: 2, x: 26, y: 20, r: 22 }, { n: 7, x: 39, y: 30, r: 19 }, { n: 1, x: 48, y: 46, r: 16 },
-        { n: 8, x: 58, y: 60, r: 13 }, { n: 3, x: 70, y: 66, r: 10 }, { n: 6, x: 80, y: 54, r: 8 }, { n: 4, x: 88, y: 38, r: 6 },
+        { n: 1, x: 45, y: 26, r: 10 }, { n: 2, x: 86, y: 68, r: 24 }, { n: 3, x: 55, y: 38, r: 9 }, { n: 4, x: 90, y: 55, r: 11 }, { n: 5, x: 26, y: 20, r: 13 }, { n: 6, x: 84, y: 38, r: 8 },
+        { n: 7, x: 83, y: 27, r: 8 }, { n: 8, x: 19, y: 44, r: 12 }, { n: 9, x: 68, y: 18, r: 8 }, { n: 10, x: 42, y: 68, r: 10 }, { n: 11, x: 47, y: 10, r: 12 }, { n: 12, x: 14, y: 71, r: 8 },
       ],
-      answer: [[5, 2], [2, 7], [7, 1], [1, 8], [8, 3], [3, 6], [6, 4]],
-      solution: 'Join 5–2–7–1–8–3–6–4 (brightest to faintest). Any order of joining works; it checks the lines.',
+      answer: [[2, 4], [4, 6], [6, 7], [7, 9], [9, 11], [11, 12]],
+      solution: '2–4–6–7–9–11–12. The eye is star 2 (the big one). Each step goes to the closest star with a higher number, not the next number: from 2 the nearest higher star is 4, not 3. Any order of joining works; it checks the lines. Checked: every “nearest” is clearly nearest, and the lines never cross.',
     },
     {
       id: 'moving-stairs', type: 'stairs', icon: '🪜', title: 'The Moving Staircases',
@@ -942,10 +942,10 @@ export const hollowHeir = {
     },
     {
       id: 'rune-floor', type: 'runefloor', icon: '🪨', title: 'The Rune Floor',
-      intro: 'Above the far door, five runes are carved. Cross the floor from the bottom row to the top, stepping only up, left or right, on those runes in that order, again and again. One wrong step and the floor bites.',
-      word: 'ALONE',
-      grid: ['OLNBL', 'EAAAR', 'NOLRO', 'STAEN', 'NRTLO', 'NBOAI'],
-      solution: 'Start on the bottom row, 4th tile. Path (row counted from the bottom, column): 1-4, 2-4, 2-5, 3-5, 3-4, 3-3, 4-3, 4-2, 4-1, 5-1, 5-2, 6-2. Checked: it is the only safe path.',
+      intro: 'Above the far door, seven runes are carved. Cross the floor from the bottom row to the top, stepping only up, left or right, on those runes in that order, again and again. One wrong step and the floor bites.',
+      word: 'SERPENT',
+      grid: ['NIEPNN', 'ERPESM', 'STSRPE', 'ENIUEE', 'PREEEP', 'MUSTSI', 'EIANEP', 'SSASER'],
+      solution: 'Start on the bottom row, tile 4. Path (row counted from the bottom, column): 1-4, 1-5, 1-6, 2-6, 2-5, 2-4, 3-4, 3-3, 4-3, 4-2, 4-1, 5-1, 5-2, 6-2, 6-1, 7-1, 7-2, 7-3, 8-3. Checked: it is the only safe path. Beware the long false trail that starts from another S and dies near the top.',
     },
 
   ],

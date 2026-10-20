@@ -13,7 +13,7 @@ const SCENES = [
   { id: 'demiguise', icon: '🐒', name: 'Demiguise', q: 'A Demiguise vanishes right in front of you.', right: 'Do something it can’t predict', wrong: ['Chase where it just was', 'Throw a net over the spot'] },
   { id: 'erumpent', icon: '🦏', name: 'Erumpent', q: 'An Erumpent’s horn begins to glow.', right: 'Don’t touch the horn, and back off', wrong: ['Grab the horn to steady it', 'Tap the horn to calm it'] },
   { id: 'thestral', icon: '🐴', name: 'Thestral', q: 'A Thestral steps out of the trees.', right: 'Offer it raw meat, slowly', wrong: ['Offer it an apple', 'Try to climb on its back'] },
-  { id: 'murtlap', icon: '🐀', name: 'Murtlap', q: 'A Murtlap bites your hand.', right: 'Soak it in Murtlap essence', wrong: ['Ignore it, it’s harmless', 'Bite it back'] },
+  { id: 'swooping-evil', icon: '🦋', name: 'Swooping Evil', q: 'A spiky green cocoon on the windowsill snaps open into a Swooping Evil, its huge wings spreading over you.', right: 'Stay calm and coax it back into its cocoon', wrong: ['Swat it away with your book', 'Duck under it and run for the door'] },
 ];
 const ROUNDS = 5, NEED = 4;
 

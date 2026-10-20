@@ -1686,3 +1686,4 @@ button.status-chip.removable:hover { background: rgba(200, 60, 80, 0.3); }
 .ring-dial { width: min(68vh, 82vw); }
 .ring-dial .sym-on { filter: drop-shadow(0 0 6px rgb(255 214 120 / .95)) drop-shadow(0 0 14px rgb(255 190 80 / .6)); }
 .pc.b.has-art img { filter: drop-shadow(0 0 3px rgb(255 240 210 / .6)) drop-shadow(0 6px 4px rgb(0 0 0 / .6)); }
+.tv-puzzle .sky-svg { width: min(calc((100vh - 240px) * 1.25), 92vw); }

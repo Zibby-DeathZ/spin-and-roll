@@ -226,7 +226,7 @@ SECTIONS = [
         ('demiguise', 'Demiguise', 'A gentle ape-like creature with long silky silver hair and large sad black eyes, half fading into invisibility.'),
         ('erumpent', 'Erumpent', 'A huge grey rhinoceros-like beast with thick hide and a single glowing horn on its forehead.'),
         ('thestral', 'Thestral', 'A skeletal black winged horse with leathery bat-like wings and white eyes, eerie but gentle, among dark trees.'),
-        ('murtlap', 'Murtlap', 'A small rat-like creature with a growth on its back that looks like a sea anemone, sitting on a rock.'),
+        ('swooping-evil', 'Swooping Evil', 'A large winged creature unfurling from a spiky green cocoon, with vivid blue and green wings like a giant butterfly crossed with a bat, a spiny reptilian body, wings spread wide.'),
     ]),
     ('puzzle', 'Puzzle picture', 'public/puzzles', 'The Scrambled Portrait puzzle (file name portrait.jpg).', [
         ('portrait', 'The Scrambled Portrait', 'An old oil portrait of a young painter in a velvet coat holding a brush, a coiled serpent carved into the gold frame, a small window behind him showing a lake, a candle on the left, a paint palette held against his chest.'),

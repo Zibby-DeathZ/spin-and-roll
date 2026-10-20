@@ -976,10 +976,10 @@ A huge grey rhinoceros-like beast with thick hide and a single glowing horn on i
 
 A skeletal black winged horse with leathery bat-like wings and white eyes, eerie but gentle, among dark trees. Square creature portrait for a bestiary page, the whole creature centred so it reads when cropped to a small circle, soft parchment-coloured background like an old natural-history book plate. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
 
-### Murtlap
-`public/art/creatures/murtlap.png`
+### Swooping Evil
+`public/art/creatures/swooping-evil.png`
 
-A small rat-like creature with a growth on its back that looks like a sea anemone, sitting on a rock. Square creature portrait for a bestiary page, the whole creature centred so it reads when cropped to a small circle, soft parchment-coloured background like an old natural-history book plate. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+A large winged creature unfurling from a spiky green cocoon, with vivid blue and green wings like a giant butterfly crossed with a bat, a spiny reptilian body, wings spread wide. Square creature portrait for a bestiary page, the whole creature centred so it reads when cropped to a small circle, soft parchment-coloured background like an old natural-history book plate. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
 
 ## Puzzle picture (1)
 

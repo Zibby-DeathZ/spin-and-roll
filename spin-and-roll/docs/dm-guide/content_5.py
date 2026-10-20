@@ -159,6 +159,7 @@ BLOCKS = [
     ]),
     ('h2', 'Version log'),
     ('table', ['Version', 'Date', 'Changes'], [
+        ['3.4', 'October 2026', 'Harder puzzles: The Serpent in the Stars now has twelve stars and a nearest-higher-number rule; The Rune Floor is bigger, spells SERPENT and has a long false trail.'],
         ['3.3', 'October 2026', 'Read button for clues: diary pages show their runes, the torn page about Vale has its own text, the map half shows the runes on its edge. Test kit for every clue.'],
         ['3.2', 'October 2026', 'Item types: consumables, key items that only work in the right place, and clues. Info buttons on every item and stat. Slimmer TV announcements.'],
         ['3.1', 'October 2026', 'New look: house crests (on the points board, phones, TV and a big Sorting reveal), redrawn class mini-games and TV puzzles. The Defence game now uses the same colours and buttons as the boss duel.'],

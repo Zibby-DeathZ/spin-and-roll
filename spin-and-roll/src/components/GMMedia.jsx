@@ -41,7 +41,7 @@ function artGroups(data) {
       ['lock-dial', 'Turning Lock dial'], ...['moon', 'owl', 'serpent', 'star', 'key', 'lion', 'badger', 'sun', 'eagle'].map((n) => [`lock-${n}`, `Lock symbol: ${n}`]), ...[1, 2, 3, 4, 5, 6, 7].map((n) => [`bottle-${n}`, `Bottle ${n}`]),
       ['stairs-straight', 'Staircase: straight'], ['stairs-corner', 'Staircase: corner'], ['stairs-tee', 'Staircase: T-junction'],
     ]),
-    'Art: creatures (Befriend the Beast)': rows('creatures', [['hippogriff', 'Hippogriff'], ['bowtruckle', 'Bowtruckle'], ['niffler', 'Niffler'], ['puffskein', 'Puffskein'], ['kneazle', 'Kneazle'], ['fwooper', 'Fwooper'], ['occamy', 'Occamy'], ['demiguise', 'Demiguise'], ['erumpent', 'Erumpent'], ['thestral', 'Thestral'], ['murtlap', 'Murtlap']]),
+    'Art: creatures (Befriend the Beast)': rows('creatures', [['hippogriff', 'Hippogriff'], ['bowtruckle', 'Bowtruckle'], ['niffler', 'Niffler'], ['puffskein', 'Puffskein'], ['kneazle', 'Kneazle'], ['fwooper', 'Fwooper'], ['occamy', 'Occamy'], ['demiguise', 'Demiguise'], ['erumpent', 'Erumpent'], ['thestral', 'Thestral'], ['swooping-evil', 'Swooping Evil']]),
   };
 }
 
