@@ -8,7 +8,7 @@ import { TVSpin } from '../components/SpinWheel';
 import MapView from '../components/MapView';
 import { LessonBoard } from '../minigames';
 import { useLessonResults } from '../lib/lessons';
-import { actionsAt, locOf, pcsAt } from '../lib/world';
+import { actionsAt, doorsAt, locOf, pcsAt } from '../lib/world';
 import Portrait from '../components/Portrait';
 import { TVPuzzle } from '../components/Puzzles';
 import { TVShow } from '../components/Shows';
@@ -129,7 +129,8 @@ export function TVLive({ session, chars, profiles, data, title, answers, lessonR
     stage = (
       <div className="tv2-play">
         <div className="tv2-map">
-          <MapView loc={loc} tokens={session.state?.tokens} pcs={pcsAt(session, chars, loc.id)} encounter={enc} big caption={false} />
+          <MapView loc={loc} tokens={session.state?.tokens} pcs={pcsAt(session, chars, loc.id)} encounter={enc} big caption={false}
+            doors={enc ? [] : doorsAt(data, session, loc.id)} />
           {enc && (
             <ol className="tv-turns">
               <li className="tv-round">Round {enc.round}</li>

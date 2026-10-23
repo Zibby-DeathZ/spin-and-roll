@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { computeAwards, houseCup, pinClue, setShow, setSuspectMark } from '../lib/world';
+import { computeAwards, houseCup, pinClue, setShow, setSuspectMark, standingsOf } from '../lib/world';
 import { GMAccuse } from './Accuse';
+import { endAccusation } from '../lib/accuse';
 import AwardsCeremony from './AwardsCeremony';
 
 const HOUSES = ['Gryffindor', 'Hufflepuff', 'Ravenclaw', 'Slytherin'];
@@ -41,14 +42,15 @@ export function AwardsShow({ show, inline = false }) {
 
 // ---------- House Cup ----------
 export function HouseCupShow({ show }) {
-  const top = Math.max(1, ...show.standings.map(([, p]) => p));
+  const standings = standingsOf(show);
+  const top = Math.max(1, ...standings.map(([, p]) => p));
   return (
     <div className={`housecup hc-${show.winner.toLowerCase()}`}>
       <p className="hc-kicker">The House Cup goes to…</p>
       <h2 className="hc-winner">🏆 {show.winner}!</h2>
       {show.names.length > 0 && <p className="hc-names">{show.names.join(' · ')}</p>}
       <div className="hc-bars">
-        {show.standings.map(([h, p]) => (
+        {standings.map(([h, p]) => (
           <div key={h} className={`hc-bar hb-${h.toLowerCase()}`}>
             <span className="hc-fill" style={{ height: `${Math.max(6, (p / top) * 100)}%` }} />
             <strong>{p}</strong>
@@ -81,7 +83,7 @@ export function GMShows({ sid, data, session, chars }) {
   return (
     <section className="gm-shows">
       <div className="show-bar">
-        <span className="muted small">On the TV now: <strong>{show ? (show.kind === 'day' ? 'End-of-day ceremony' : { suspects: 'Suspect board', awards: 'Awards', housecup: 'House Cup' }[show.type]) : 'the map'}</strong></span>
+        <span className="muted small">On the TV now: <strong>{session.state?.accuse ? 'Accusation vote' : show ? (show.kind === 'day' ? 'End-of-day ceremony' : { suspects: 'Suspect board', awards: 'Awards', housecup: 'House Cup' }[show.type]) : 'the map'}</strong></span>
         <span className="actions">
           <button className="btn small" disabled={show?.type === 'suspects'} onClick={() => setShow(sid, { type: 'suspects' })}>🕵️ Suspect board</button>
           <button className="btn small" disabled={busy} onClick={() => go(async () => setShow(sid, { type: 'awards', awards: await computeAwards(sid, chars), at: Date.now() }))}>🎖️ Tonight’s awards</button>
@@ -89,7 +91,13 @@ export function GMShows({ sid, data, session, chars }) {
             onClick={() => confirm(`Award the House Cup to ${leader}? It goes into each ${leader} player’s trophy cabinet.`) && go(() => houseCup(sid, session, chars))}>
             🏆 House Cup ceremony
           </button>
-          {show && <button className="btn small ghost" onClick={() => setShow(sid, null)}>Back to the map</button>}
+          {(show || session.state?.accuse) && (
+            <button className="btn small ghost" disabled={busy} onClick={() => go(async () => {
+              // Clears whatever is covering the TV, including an open accusation vote.
+              if (session.state?.accuse) await endAccusation(sid, session.state.accuse);
+              await setShow(sid, null);
+            })}>Back to the map</button>
+          )}
         </span>
       </div>
 

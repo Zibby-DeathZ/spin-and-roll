@@ -45,7 +45,11 @@ export async function endOfDay(sid, data, day) {
   // Nothing happened (the prologue, say): no ceremony.
   if (!leaders.length && !awards.length) return;
   await updateDoc(sessionRef(sid), {
-    'state.show': { type: 'awards', kind: 'day', day, standings, leaders, perk: perk?.id ?? null, awards, at: Date.now() },
+    // Firestore can't store a list inside a list, so each house is saved as { house, points }.
+    'state.show': {
+      type: 'awards', kind: 'day', day, standings: standings.map(([house, pts]) => ({ house, points: pts })),
+      leaders, perk: perk?.id ?? null, awards, at: Date.now(),
+    },
   });
   if (perk) await logEvent(sid, { type: 'house_of_day', payload: { houses: leaders, perk: perk.id, name: perk.name, icon: perk.icon, day } });
 }

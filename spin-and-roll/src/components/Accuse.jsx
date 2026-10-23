@@ -48,7 +48,17 @@ export function GMAccuse({ sid, data, session, chars }) {
               return <li key={u}>{nameOf(chars, u)} → {v ? <strong>{suspectName(data, v.vote)}</strong> : <span className="muted">not yet</span>}</li>;
             })}
           </ul>
-          <button className="btn gold" disabled={busy || !votes.length} onClick={() => go(() => showVotes(sid, ac, votes, data.suspects))}>Show the votes on the TV</button>
+          <button className="btn gold" disabled={busy}
+            onClick={() => (votes.length || confirm('Nobody has voted yet. Show the (empty) result anyway?')) && go(() => showVotes(sid, ac, votes, data.suspects))}>
+            Show the votes on the TV
+          </button>
+          {!votes.length && (
+            <p className="muted small">
+              No votes arriving? Every phone shows the ballot while the vote is open. If players tap a suspect and nothing appears here,
+              the voting rules aren’t published in Firebase yet (see the DM Guide, Troubleshooting).
+            </p>
+          )}
+          <button className="linkish small" disabled={busy} onClick={() => go(() => endAccusation(sid, ac))}>Cancel the vote and clear the TV</button>
         </>
       )}
 
@@ -96,6 +106,7 @@ export function GMAccuse({ sid, data, session, chars }) {
 export function PlayerAccuse({ sid, uid, data, session }) {
   const ac = session.state?.accuse;
   const [mine, setMine] = useState(null);
+  const [failed, setFailed] = useState(false);
   if (!ac || !ac.uids.includes(uid)) return null;
   return (
     <main className="imp-phone">
@@ -106,13 +117,18 @@ export function PlayerAccuse({ sid, uid, data, session }) {
           <div className="imp-vote-grid accuse-grid">
             {data.suspects.map((s) => (
               <button key={s.id} type="button" className={`imp-pick ${mine === s.id ? 'on' : ''}`}
-                onClick={async () => { setMine(s.id); await castVote(sid, ac.round, uid, s.id); }}>
+                onClick={async () => {
+                  setMine(s.id); setFailed(false);
+                  try { await castVote(sid, ac.round, uid, s.id); } catch (e) { console.error(e); setMine(null); setFailed(true); }
+                }}>
                 <Art path={`people/${s.id}`} icon={s.icon} className="accuse-face" />
                 <span>{s.name}</span>
               </button>
             ))}
           </div>
-          <p className="muted small">{mine ? `You accused ${suspectName(data, mine)}. You can change it until the votes are shown.` : 'Tap a suspect.'}</p>
+          {failed
+            ? <p className="warn small">Your vote didn’t go through. Tell the DM: the voting rules may not be published in Firebase.</p>
+            : <p className="muted small">{mine ? `You accused ${suspectName(data, mine)}. You can change it until the votes are shown.` : 'Tap a suspect.'}</p>}
         </>
       ) : (
         <p className="imp-step">Watch the TV.</p>

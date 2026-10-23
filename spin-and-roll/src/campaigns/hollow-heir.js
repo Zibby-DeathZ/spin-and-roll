@@ -1,6 +1,7 @@
 import { extraNpcs, offers, routines, schedule, talk } from './hollow-heir-world.js';
 import darkSpells from './spellbooks/dark-spells.json' with { type: 'json' };
 import { marauders } from './hollow-heir-map.js';
+import { doors } from './hollow-heir-doors.js';
 import { addMissing, importSpellbook } from '../lib/spellbook.js';
 
 // The Hogwarts series spellbook: dark arts, blood magic and later-year spells, with Corruption and status effects.
@@ -85,6 +86,8 @@ const items = {
 };
 
 export const hollowHeir = {
+  // Door pins on each location picture (where each way out leads).
+  doors,
   // The living castle: positions, appearances, quest offers and conversations.
   routines, schedule, offers, talk,
   // Part of the Hogwarts series. Characters are saved to player profiles and carry into the next year.

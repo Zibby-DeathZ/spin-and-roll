@@ -8,13 +8,27 @@ export const isMonster = (t) => !t.npc && t.kind !== 'chest' && t.kind !== 'item
 
 // A location with its tokens and characters.
 // Images: public/maps/<location id>.jpg (or .png / .webp).
-export default function MapView({ loc, tokens = {}, pcs = [], encounter, selected, onSelect, onMove, big = false, small = false, caption = true }) {
+// More than this many people (staff, students, ghosts) at once and they move off the picture into a
+// strip along the top, so the room itself stays visible. Monsters, chests and items stay where they are.
+const CROWD = 3;
+
+export default function MapView({
+  loc, tokens = {}, pcs = [], encounter, selected, onSelect, onMove, big = false, small = false, caption = true,
+  doors = [], onDoor = null,
+}) {
   const [ext, setExt] = useState(0);
   useEffect(() => setExt(0), [loc?.id]);
   if (!loc) {
     return <div className="mapview parchment"><p className="map-empty">No location chosen yet.</p></div>;
   }
-  const here = Object.entries(tokens).filter(([, t]) => t.loc === loc.id);
+  const all = Object.entries(tokens).filter(([, t]) => t.loc === loc.id);
+  const people = all.filter(([, t]) => t.npc && !t.mimic);
+  const crowded = !small && people.length > CROWD;
+  // A person stays on the picture if they're mid-fight or selected; everyone else joins the strip.
+  const fighting = new Set((encounter?.order ?? []).map((o) => o.id));
+  const inStrip = crowded ? people.filter(([id]) => id !== selected && !fighting.has(id)) : [];
+  const stripIds = new Set(inStrip.map(([id]) => id));
+  const here = all.filter(([id]) => !stripIds.has(id));
   const current = encounter?.order?.[encounter.turn];
   const src = ext < EXTS.length ? `${import.meta.env.BASE_URL}maps/${loc.id}.${EXTS[ext]}` : null;
 
@@ -29,6 +43,32 @@ export default function MapView({ loc, tokens = {}, pcs = [], encounter, selecte
     <div className={`mapview ${src ? '' : 'parchment'} ${big ? 'big' : ''} ${small ? 'small' : ''} ${onMove ? 'editable' : ''}`} onClick={click}>
       {src && <img src={src} alt="" onError={() => setExt((n) => n + 1)} draggable={false} />}
       {!src && <span className="map-watermark" aria-hidden="true">{loc.icon}</span>}
+
+      {!small && doors.map((d) => {
+        const side = d.x > 72 ? 'left' : d.x < 28 ? 'right' : 'center';
+        const up = d.y > 80;
+        const Tag = onDoor ? 'button' : 'span';
+        return (
+          <Tag key={d.id} {...(onDoor ? { type: 'button', onClick: (e) => { e.stopPropagation(); onDoor(d); } } : {})}
+            className={`door-pin label-${side} ${up ? 'label-up' : ''} ${onDoor ? 'clickable' : ''}`}
+            style={{ left: `${d.x}%`, top: `${d.y}%` }} aria-label={`Way to ${d.name}`}>
+            <span className="door-dot" aria-hidden="true">➜</span>
+            <span className="door-label"><span aria-hidden="true">{d.icon}</span> {d.short ?? d.name}</span>
+          </Tag>
+        );
+      })}
+
+      {inStrip.length > 0 && (
+        <div className="crowd-strip" aria-label="Also here">
+          {inStrip.map(([id, t]) => (
+            <button key={id} type="button" className={`crowd-person ${selected === id ? 'sel' : ''}`}
+              onClick={pick(id)} tabIndex={onSelect ? 0 : -1} aria-label={t.name}>
+              <Art path={tokenArt(t)} icon={t.icon} className="crowd-icon" />
+              <span className="crowd-name">{t.name.replace(/^(Professor|Madam|Prefect) /, '')}</span>
+            </button>
+          ))}
+        </div>
+      )}
 
       {here.map(([id, t]) => {
         const mon = isMonster(t);

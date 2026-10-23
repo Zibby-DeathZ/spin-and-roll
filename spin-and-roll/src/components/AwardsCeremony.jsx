@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import HouseCrest, { HOUSE_STYLE } from './HouseCrest';
 import { perkById } from '../lib/houses';
 import { play } from '../lib/sound';
+import { standingsOf } from '../lib/world';
 
 // Steps through the ceremony: 0 race, 1 House of the Day, 2 awards.
 function useStage(key, hasRace) {
@@ -135,7 +136,7 @@ function AwardCards({ awards }) {
 
 export default function AwardsCeremony({ show, inline = false }) {
   const day = show.kind === 'day';
-  const standings = show.standings ?? [];
+  const standings = standingsOf(show);
   const leaders = show.leaders ?? [];
   const hasRace = day && standings.length > 0;
   const [stage, setStage] = useStage(show.at ?? show.awards?.length, hasRace);

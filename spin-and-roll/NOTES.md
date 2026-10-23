@@ -171,3 +171,8 @@ two cold braziers. The TV lists each one under "Here", so the players can plan a
 - Cipher puzzles add letters as the GM reveals them (quietly) and all on solve; `runes_learned` events toast the TV.
 - `RuneNotebook.jsx` (Bag), ClueReader `tablet` style and the notebook overlay; GM codex panel at the bottom of the Puzzles tab.
 - Rune floor: `wordInEnglish: true` shows the word in letters; GM tiles show their letter.
+
+## Door pins and crowds (v3.8)
+- `src/campaigns/hollow-heir-doors.js`: `doors[here][there] = [x%, y%]`, placed by eye on each 16:9 map picture. `doorsAt()` in world.js adds names (short ones via `doorName`), hides undiscovered secret places, and spreads any unplaced exit along the bottom.
+- MapView: `doors` + `onDoor` props (GM table: takes everyone here through). Pins and strip sizes use `cqw` (the map is a size container).
+- More than 3 NPC tokens at a place → they render in `.crowd-strip` along the top (not selected, not in the fight).

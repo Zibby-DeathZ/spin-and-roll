@@ -29,7 +29,7 @@ import { useDuelEngine } from '../lib/duel';
 import { useMaraudersEngine } from '../lib/marauders';
 import { saveHeroes } from '../lib/heroes';
 import { sendOwl } from '../lib/owls';
-import { sendToDetention } from '../lib/world';
+import { clearTheTV, sendToDetention } from '../lib/world';
 import { GMIntro, GMMusic } from '../components/GMIntro';
 import { introActive, setLock, setMusicState, skipIntro, startIntro } from '../lib/intro';
 import { useClaims } from '../lib/game';
@@ -288,6 +288,12 @@ export default function GMScreen() {
           {data.shops && (
             <button className={`btn small ${shopOpen ? 'ember' : ''}`} onClick={() => setShopOpen(sid, !shopOpen)}>
               {shopOpen ? '🛍️ Close shops' : '🛍️ Open shops'}
+            </button>
+          )}
+          {(['show', 'accuse', 'imposter', 'puzzle', 'duel', 'lock'].some((k) => session.state?.[k]) || session.state?.marauders?.open) && (
+            <button className="btn small ghost" title="Something stuck on the TV? This clears it and sends everyone back to the map."
+              onClick={() => confirm('Clear the TV and the phones? This closes any show, vote, puzzle, duel or map that is open. Classes are not affected.') && clearTheTV(sid, session).catch(console.error)}>
+              🧹 Clear the TV
             </button>
           )}
           <StatusPill status={session.status} />

@@ -1953,3 +1953,32 @@ button.status-chip.removable:hover { background: rgba(200, 60, 80, 0.3); }
 .codex-rune { font-size: 1.3rem; }
 .codex-letter { font-size: .8rem; font-weight: 700; }
 .codex-sources { display: flex; flex-wrap: wrap; gap: .4rem; }
+
+/* ===================== Door pins and the crowd strip (location maps) ===================== */
+/* Sizes follow the map's own width (cqw), so pins sit on the picture the same way on a phone, the GM screen or the TV. */
+.mapview { container-type: inline-size; }
+.door-pin { --dot: clamp(18px, 2.1cqw, 36px); position: absolute; z-index: 4; transform: translate(-50%, -50%); display: flex; align-items: center; gap: .35cqw;
+  padding: 0; border: 0; background: none; color: #fff4dc; pointer-events: none; }
+.door-pin.clickable { pointer-events: auto; cursor: pointer; }
+.door-dot { display: grid; place-items: center; flex: none; width: var(--dot); height: var(--dot); border-radius: 50%; font-size: calc(var(--dot) * .5);
+  color: #2a1a06; background: radial-gradient(circle at 35% 30%, #fff1b8, #e3b04b 60%, #a87a1f);
+  box-shadow: 0 0 0 2px rgb(23 20 42 / .7), 0 0 14px 3px rgb(255 205 110 / .55); animation: door-glow 2.6s ease-in-out infinite; }
+@keyframes door-glow { 50% { box-shadow: 0 0 0 2px rgb(23 20 42 / .7), 0 0 22px 6px rgb(255 205 110 / .75); } }
+.door-label { white-space: nowrap; padding: .15em .7em .15em .5em; border-radius: 999px; font: 600 clamp(.62rem, 1.05cqw, 1.15rem) var(--body);
+  background: rgb(18 14 34 / .82); border: 1px solid rgb(227 176 75 / .6); box-shadow: 0 2px 8px rgb(0 0 0 / .5); }
+/* Keep labels inside the picture: near the right edge the label goes left of the dot. */
+.door-pin.label-left { flex-direction: row-reverse; transform: translate(calc(-100% + var(--dot) / 2), -50%); }
+.door-pin.label-right { transform: translate(calc(var(--dot) / -2), -50%); }
+.door-pin.label-center { flex-direction: column; gap: .2cqw; transform: translate(-50%, calc(var(--dot) / -2)); }
+.door-pin.label-center.label-up { flex-direction: column-reverse; transform: translate(-50%, calc(-100% + var(--dot) / 2)); }
+.door-pin.clickable:hover .door-label, .door-pin.clickable:focus-visible .door-label { border-color: var(--gold); background: rgb(60 44 14 / .9); }
+
+.crowd-strip { position: absolute; z-index: 3; top: 0; left: 0; right: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: .3cqw .8cqw;
+  padding: .5cqw 1cqw 1.2cqw; background: linear-gradient(rgb(12 9 24 / .85), rgb(12 9 24 / .55) 70%, transparent); }
+.crowd-person { display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 0; border: 0; background: none; color: var(--bone); cursor: pointer; }
+.crowd-icon { width: clamp(26px, 3cqw, 50px); height: clamp(26px, 3cqw, 50px); border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden;
+  font-size: clamp(.9rem, 1.9cqw, 1.6rem); background: rgb(23 20 42 / .9); border: 2px solid var(--teal); }
+.crowd-icon img { width: 100%; height: 100%; object-fit: cover; }
+.crowd-name { font-size: clamp(.58rem, .85cqw, .9rem); line-height: 1.1; max-width: 9cqw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-shadow: 0 1px 3px #000; }
+.crowd-person.sel .crowd-icon { border-color: var(--gold); box-shadow: 0 0 0 3px rgb(227 176 75 / .4); }
+@media (prefers-reduced-motion: reduce) { .door-dot { animation: none; } }

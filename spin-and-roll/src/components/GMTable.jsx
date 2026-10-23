@@ -9,7 +9,7 @@ import {
   addToken, endFight, monsterAttack, moveToken, nextTurn, placeToken, removeToken, setTokenHp, startFight,
 } from '../lib/combat';
 import { doubleToken, springMimic, trunkToken } from '../lib/mimic';
-import { chestToken, hazardToken, itemToken, locOf, movePlayers, pcsAt, placeStaff, showOnTV, triggerHazard } from '../lib/world';
+import { chestToken, doorsAt, hazardToken, itemToken, locOf, movePlayers, pcsAt, placeStaff, showOnTV, triggerHazard } from '../lib/world';
 
 const KINDS = [['monsters', '👹 Monsters'], ['people', '🧑 People'], ['chests', '🧰 Chests'], ['items', '✨ Items'], ['hazards', '🔥 Hazards'], ['mimics', '👄 Mimics']];
 
@@ -70,9 +70,14 @@ export default function GMTable({ sid, data, session, chars }) {
     <div className="gm-table">
       <div className="gm-table-map">
         <MapView loc={loc} tokens={tokens} pcs={pcsAt(session, chars, map.loc)} encounter={enc} selected={sel}
-          onSelect={(id) => setSel(sel === id ? null : id)} onMove={(x, y) => sel && moveToken(sid, sel, x, y)} />
+          onSelect={(id) => setSel(sel === id ? null : id)} onMove={(x, y) => sel && moveToken(sid, sel, x, y)}
+          doors={doorsAt(data, session, map.loc)}
+          onDoor={(d) => {
+            if (!here.length) { showOnTV(sid, data, d.id); return; }
+            if (confirm(`Take ${here.map(name).join(', ')} through to ${d.name}?`)) { setSel(null); movePlayers(sid, data, d.id, here, chars, true); }
+          }} />
         <p className="muted small">
-          {sel ? 'Tap anywhere on the map to move the selected token.' : 'Tap a token or character to select it.'}
+          {sel ? 'Tap anywhere on the map to move the selected token.' : 'Tap a token or character to select it. Tap a glowing door to take everyone here through it.'}
         </p>
 
         {(t || selPc) && (

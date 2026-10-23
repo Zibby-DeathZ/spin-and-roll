@@ -1,5 +1,5 @@
 // Player positions, chests, items on the ground, and quests.
-import { arrayUnion, collection, deleteField, doc, getDoc, getDocs, runTransaction, updateDoc, writeBatch } from 'firebase/firestore';
+import { arrayUnion, collection, deleteDoc, deleteField, doc, getDoc, getDocs, runTransaction, updateDoc, writeBatch } from 'firebase/firestore';
 import { db } from '../firebase';
 import { adjust, awardPoints, giveItem, logEvent } from './game';
 import { springMimic } from './mimic';
@@ -32,6 +32,26 @@ export function exitsOf(data, locId, discovered = []) {
   return [...ids]
     .map((id) => data.locations.find((l) => l.id === id))
     .filter((l) => l && (!l.secret || discovered.includes(l.id)));
+}
+
+// The ways out of a place, with where to pin them on its picture. Any exit without a placed
+// door is spread along the bottom edge.
+// A short name for a door pin: "The Library" → "Library", "Charms classroom" → "Charms".
+export const doorName = (name) => name
+  .replace(/^The (old )?/i, '')
+  .replace(/ (classroom|common room|Village)$/i, '')
+  .replace(/^Room of Requirement$/, 'Room of Req.')
+  .replace(/^Hogwarts Express$/, 'Express')
+  .replace(/^./, (c) => c.toUpperCase());
+
+export function doorsAt(data, session, locId) {
+  const exits = exitsOf(data, locId, session?.state?.map?.discovered ?? []);
+  const placed = data.doors?.[locId] ?? {};
+  const loose = exits.filter((l) => !placed[l.id]);
+  return exits.map((l) => {
+    const at = placed[l.id] ?? [((loose.indexOf(l) + 1) / (loose.length + 1)) * 100, 93];
+    return { id: l.id, name: l.name, short: doorName(l.name), icon: l.icon, x: at[0], y: at[1] };
+  });
 }
 
 // Everything the players could choose to do at a location, for the TV and phones.
@@ -315,6 +335,26 @@ export async function sendToDetention(sid, data, uid) {
 }
 
 // ---------- TV shows: suspect board, awards, House Cup ----------
+// The GM's escape hatch: clears everything that can take over the TV and the phones
+// (a show, an accusation vote, the Painted Double game, a puzzle, a duel, the map, the main-event lock).
+// Classes and quizzes are left alone so nobody's results are lost.
+export async function clearTheTV(sid, session) {
+  const s = session?.state ?? {};
+  const rounds = [s.accuse?.round, s.imposter?.round].filter(Boolean); // read before anything is cleared
+  const upd = {};
+  for (const k of ['show', 'accuse', 'imposter', 'puzzle', 'duel', 'scare']) if (s[k]) upd[`state.${k}`] = deleteField();
+  if (s.marauders?.open) upd['state.marauders.open'] = false; // close the map, but keep today's use spent
+  if (s.lock) upd['state.lock'] = false;
+  if (Object.keys(upd).length) await updateDoc(sessionRef(sid), upd);
+  // Throw away the open vote's ballots too.
+  if (rounds.length) {
+    const all = await getDocs(collection(db, 'sessions', sid, 'imposterVotes'));
+    await Promise.all(all.docs.filter((d) => rounds.includes(d.data().round)).map((d) => deleteDoc(d.ref).catch(() => {})));
+  }
+}
+
+// A show's standings as [house, points] pairs, whether saved as pairs or as { house, points }.
+export const standingsOf = (show) => (show?.standings ?? []).map((s) => (Array.isArray(s) ? s : [s.house, s.points ?? 0]));
 export const setShow = (sid, show) => updateDoc(sessionRef(sid), { 'state.show': show ?? deleteField() });
 export const pinClue = (sid, clueId, suspectId) =>
   updateDoc(sessionRef(sid), { [`state.board.pinned.${clueId}`]: suspectId ?? deleteField() });
@@ -379,5 +419,6 @@ export async function houseCup(sid, session, chars) {
     });
   });
   await batch.commit();
-  await setShow(sid, { type: 'housecup', standings, winner, names: winners.map((c) => c.firstName ?? c.name) });
+  // Saved as { house, points }: Firestore can't store a list inside a list.
+  await setShow(sid, { type: 'housecup', standings: standings.map(([house, points]) => ({ house, points })), winner, names: winners.map((c) => c.firstName ?? c.name) });
 }

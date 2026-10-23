@@ -142,6 +142,14 @@ BLOCKS = [
         ['Creatures', 'art/creatures/&lt;id&gt;.png', 'The eleven creatures in the Befriend the Beast class game.'],
     ], [30, 52, 88]),
     ('p', 'Every picture has a ready-made prompt for an image tool in <b>docs/art/art-prompts.md</b>, with its exact file name. Pictures replace the emoji wherever that thing appears; anything without one keeps its emoji.'),
+    ('h2', 'Troubleshooting'),
+    ('list', [
+        '<b>The TV or the phones are stuck on something</b> (a vote, a show, a puzzle, the map): press <b>🧹 Clear the TV</b> in the GM header. It closes whatever is covering the screens and sends everyone back to the map. Classes and quizzes are not touched, and the map stays used up for the day.',
+        '<b>An accusation vote won’t move on:</b> you can always press <b>Show the votes on the TV</b>, even with no votes, or <b>Cancel the vote and clear the TV</b>. On the TV shows tab, <b>Back to the map</b> now closes an open vote too.',
+        '<b>Players vote or react but nothing arrives</b> (accusation votes, the Painted Double, reactions in the duel): the database rules on Firebase are older than the app. Open the Firebase console, go to <b>Firestore Database → Rules</b>, replace everything with the contents of <b>firestore.rules</b> from the project folder, and press <b>Publish</b>. Phones now say so when a vote doesn’t go through.',
+        '<b>Something didn’t change on a screen:</b> press <b>Ctrl+F5</b> on that screen to load the newest version.',
+    ]),
+
     ('h2', 'Testing on your own'),
     ('p', 'You can play a student yourself to try anything before game night, using a test student on your own account.'),
     ('list', [
@@ -161,6 +169,9 @@ BLOCKS = [
     ]),
     ('h2', 'Version log'),
     ('table', ['Version', 'Date', 'Changes'], [
+        ['3.10', 'October 2026', '🧹 Clear the TV in the GM header unsticks any screen. Accusation votes can be cancelled or shown with no votes, Back to the map closes an open vote, and phones say when a vote fails. New Troubleshooting section.'],
+        ['3.9', 'October 2026', 'Fix: the end-of-day ceremony now appears on the TV by itself every new morning, and the House Cup ceremony saves properly (both were failing to save their house standings).'],
+        ['3.8', 'October 2026', 'Door pins on every location picture showing where each way out leads (tap one on the Table tab to take the party through). Crowded places move their people into a row along the top of the map.'],
         ['3.7', 'October 2026', 'Learning the runes: a rune notebook on every phone (confirmed letters in ink, guesses in pencil), cipher puzzles fill it in, three rune tablets to decode, and the Rune Floor now shows SERPENT in English so the players must convert it. Look-alike runes moved to rare letters.'],
         ['3.6', 'October 2026', 'House specialties (Gryffindor Nerve, Ravenclaw Wit, Slytherin Cunning, Hufflepuff Steadfast) with a +2 stat each. House of the Day: the house that earns the most points in a day draws a perk for the next day. A new end-of-day ceremony on the TV (hourglasses, the House of the Day, award cards), and a quest-complete scroll on the TV and on each hero’s phone.'],
         ['3.5', 'October 2026', 'Three new families for bigger tables: Hale (healers), Penrose (a Metamorphmagus) and Okafor (curse-breakers), each with a gift, a drawback and a secret tied to Vale. The opening storybook now fits up to nine families, and page 6 no longer says six.'],

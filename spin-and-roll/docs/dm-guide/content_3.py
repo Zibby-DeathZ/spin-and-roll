@@ -207,6 +207,13 @@ BLOCKS = [
     ], [42, 128]),
     ('p', 'Hazards show on the TV under “Here” as things the players could do. When they choose one, tap it on the GM screen and press its action. Ask for a check first if it should be hard.'),
 
+    ('h2', 'Doors and crowds on the map'),
+    ('list', [
+        '<b>Door pins:</b> every way out of a place has a glowing pin on its picture, drawn where the doorway is (the portrait hole, the spiral stair, the far arch), labelled with where it leads. Where the picture shows no door, the pin sits at the bottom edge: the way you came in. A secret place’s door only appears once the party has found it. Door pins hide on the TV during a fight.',
+        '<b>Going through:</b> on the Table tab, tap a door pin to take every student standing here through it (it asks first). If nobody is here, it just shows that place on the TV.',
+        '<b>Crowds:</b> when more than three people (staff, prefects, ghosts) are in one place, they move off the picture into a row along the top, like a high table. Monsters, chests and items stay where they are. Tap someone in the row to select them as usual; anyone in a fight stays on the picture.',
+    ]),
+
     ('h2', 'Learning the runes'),
     ('p', 'Every rune in the game (the torn map edge, Vale’s diary, the rune tablets, the Rune Floor) is the same alphabet: each rune is always the same letter. Over the week the players learn it, and the Rune Floor tests it.'),
     ('list', [
