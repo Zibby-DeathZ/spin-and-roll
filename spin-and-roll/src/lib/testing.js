@@ -4,6 +4,7 @@
 import { arrayRemove, arrayUnion, deleteDoc, deleteField, doc, runTransaction, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { buildCharacter, clockOf, xpCap } from './game';
+import { studentSpots } from './floor';
 
 const sessionRef = (sid) => doc(db, 'sessions', sid);
 const charRef = (sid, uid) => doc(db, 'sessions', sid, 'characters', uid);
@@ -15,7 +16,7 @@ export async function addTestStudent(sid, data, session, uid, familyId, firstNam
   const loc = session.state?.map?.loc;
   await updateDoc(sessionRef(sid), {
     playerUids: arrayUnion(uid),
-    ...(loc ? { [`state.pcPos.${uid}`]: { loc, x: 40 + Math.random() * 20, y: 60 + Math.random() * 15 } } : {}),
+    ...(loc ? { [`state.pcPos.${uid}`]: { loc, ...studentSpots(data, loc, 1)[0] } } : {}),
   });
   await setDoc(charRef(sid, uid), { ...c, test: true, house: data.houses?.[1] ?? c.house ?? 'Unsorted', vaultOpened: true, gold: 100 });
 }

@@ -17,6 +17,7 @@ import GMTable from '../components/GMTable';
 import Portrait from '../components/Portrait';
 import GMQuests from '../components/GMQuests';
 import GMPoints from '../components/GMPoints';
+import PartyCards from '../components/PartyCards';
 import { GMPuzzles } from '../components/Puzzles';
 import { GMShows } from '../components/Shows';
 import GMSpells from '../components/GMSpells';
@@ -253,7 +254,9 @@ export default function GMScreen() {
     startIntro(sid);
   }, [sid, session, data, claims, chars]);
   const [tab, setTab] = useState('table');
-  const [feedOpen, setFeedOpen] = useState(false);
+  // The right-hand panel: the party's cards (default), the feed, or hidden.
+  const [side, setSide] = useState('party');
+  const [view, setView] = useState(null); // a place the GM is looking at on the Table tab (null = the TV's)
   const [pointsOpen, setPointsOpen] = useState(false);
   const nameOf = useCallback(
     (u) => chars?.[u]?.name ?? profiles[u]?.displayName ?? 'Someone', [chars, profiles]);
@@ -298,7 +301,7 @@ export default function GMScreen() {
           )}
           <StatusPill status={session.status} />
           <strong className="code">{session.code}</strong>
-          <button className="btn small ghost" onClick={() => setFeedOpen(!feedOpen)} aria-expanded={feedOpen}>📰 Feed</button>
+          <button className="btn small ghost" onClick={() => setSide(side ? null : 'party')} aria-expanded={!!side}>{side ? 'Hide panel' : '🧑‍🎓 Party'}</button>
         </div>
       </header>
 
@@ -331,9 +334,9 @@ export default function GMScreen() {
         <GMQuiz sid={sid} quizState={quizState} data={data} chars={chars} answers={answers} />
       )}
 
-      <div className={`gm-body ${feedOpen ? 'with-feed' : ''}`}>
+      <div className={`gm-body ${side ? 'with-feed' : ''}`}>
         <main className="gm-main">
-          {active === 'table' && <GMTable sid={sid} data={data} session={session} chars={chars} />}
+          {active === 'table' && <GMTable sid={sid} data={data} session={session} chars={chars} view={view} setView={setView} />}
           {active === 'day' && <GMClock sid={sid} data={data} session={session} clk={clockOf(session)} chars={chars} lessonResults={lessonResults} />}
           {active === 'quests' && <GMQuests sid={sid} data={data} session={session} chars={chars} />}
           {active === 'media' && <GMMedia data={data} session={session} />}
@@ -361,10 +364,16 @@ export default function GMScreen() {
             </section>
           )}
         </main>
-        {feedOpen && (
-          <aside className="gm-feed">
-            <h2>Table feed</h2>
-            <Feed sid={sid} nameOf={nameOf} />
+        {side && (
+          <aside className="gm-feed gm-side">
+            <div className="seg side-tabs" role="tablist" aria-label="Side panel">
+              <button role="tab" aria-selected={side === 'party'} className={side === 'party' ? 'on' : ''} onClick={() => setSide('party')}>🧑‍🎓 Party</button>
+              <button role="tab" aria-selected={side === 'feed'} className={side === 'feed' ? 'on' : ''} onClick={() => setSide('feed')}>📰 Feed</button>
+            </div>
+            {side === 'party'
+              ? <PartyCards sid={sid} data={data} session={session} chars={chars} view={view ?? session.state?.map?.loc}
+                  onWatch={(loc) => { setView(loc === session.state?.map?.loc ? null : loc); setTab('table'); }} />
+              : <Feed sid={sid} nameOf={nameOf} />}
           </aside>
         )}
       </div>

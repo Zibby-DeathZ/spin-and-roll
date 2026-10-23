@@ -214,6 +214,16 @@ BLOCKS = [
         '<b>Crowds:</b> when more than three people (staff, prefects, ghosts) are in one place, they move off the picture into a row along the top, like a high table. Monsters, chests and items stay where they are. Tap someone in the row to select them as usual; anyone in a fight stays on the picture.',
     ]),
 
+    ('h2', 'Standing on the floor'),
+    ('p', 'Every location picture has its floor marked out, so people stand where people can stand: staff fill a room from the back, students stand together at the front, and monsters, chests and items appear on the floor too. Anyone you move by hand stays where you put them. If a room gets messy, press <b>🧍 Tidy this room</b> under the map on the Table tab.'),
+    ('h2', 'The party panel and lights out'),
+    ('list', [
+        'The panel on the right of the GM screen shows a <b>card for every student</b>: house, level, HP and mana, any status, and where they are (and who is with them). The header button hides it; the panel’s tabs switch to the old <b>Feed</b>.',
+        '<b>Tap a card</b> to look at that student’s room on the Table tab <i>without</i> changing the TV. A gold bar says what you’re looking at, with <b>📺 Show this on the TV</b> and <b>Back to the TV’s view</b>. You can place tokens and open doors there as usual.',
+        'On a card, <b>📺</b> puts their room on the TV and <b>🚶</b> moves just that student somewhere else.',
+        '<b>🛏️ Lights out</b> (on the party panel and next to Advance time) sends every sorted student to their own common room. Unsorted students stay where they are. Then advance the clock when you’re ready.',
+    ]),
+
     ('h2', 'Learning the runes'),
     ('p', 'Every rune in the game (the torn map edge, Vale’s diary, the rune tablets, the Rune Floor) is the same alphabet: each rune is always the same letter. Over the week the players learn it, and the Rune Floor tests it.'),
     ('list', [

@@ -176,3 +176,8 @@ two cold braziers. The TV lists each one under "Here", so the players can plan a
 - `src/campaigns/hollow-heir-doors.js`: `doors[here][there] = [x%, y%]`, placed by eye on each 16:9 map picture. `doorsAt()` in world.js adds names (short ones via `doorName`), hides undiscovered secret places, and spreads any unplaced exit along the bottom.
 - MapView: `doors` + `onDoor` props (GM table: takes everyone here through). Pins and strip sizes use `cqw` (the map is a size container).
 - More than 3 NPC tokens at a place → they render in `.crowd-strip` along the top (not selected, not in the fight).
+
+## Floors, party panel, lights out (v3.11)
+- `src/campaigns/hollow-heir-floors.js`: each picture's floor as a 4-corner area. `src/lib/floor.js`: `floorPoint(u,v)`, `personSpot` (back of the room), `studentSpots` (front rows), `anywhereOnFloor`.
+- Used by the schedule (NPCs re-tidied each block unless `moved` by the GM), spawns (their x,y are read as u,v on the floor), placeStaff, professorTo, movePlayers, addToken/placeToken, the test student.
+- `lightsOut`, `tidyRoom`, `commonRoomOf` in world.js. `PartyCards.jsx` is the GM's right panel; GMTable takes `view`/`setView` to look at a place without moving the TV.

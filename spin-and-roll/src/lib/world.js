@@ -3,6 +3,7 @@ import { arrayUnion, collection, deleteDoc, deleteField, doc, getDoc, getDocs, r
 import { db } from '../firebase';
 import { adjust, awardPoints, giveItem, logEvent } from './game';
 import { springMimic } from './mimic';
+import { personSpot, studentSpots } from './floor';
 import { traitOf } from './houses';
 import { offersNow } from './schedule';
 
@@ -89,12 +90,51 @@ export async function movePlayers(sid, data, locId, uids, chars, alsoShow = true
   if (!uids.length) return;
   const loc = data.locations.find((l) => l.id === locId);
   const upd = { 'state.map.discovered': arrayUnion(locId) };
-  const start = 50 - ((uids.length - 1) * 9) / 2;
-  uids.forEach((u, i) => { upd[`state.pcPos.${u}`] = { loc: locId, x: start + i * 9, y: 78 }; });
+  // Everyone stands together at the front of the floor in that picture.
+  const spots = studentSpots(data, locId, uids.length);
+  uids.forEach((u, i) => { upd[`state.pcPos.${u}`] = { loc: locId, ...spots[i] }; });
   if (alsoShow) upd['state.map.loc'] = locId;
   await updateDoc(sessionRef(sid), upd);
   const names = uids.map((u) => chars[u]?.firstName ?? chars[u]?.name ?? 'Someone');
   await logEvent(sid, { type: 'moved', payload: { names, name: loc.name, icon: loc.icon } });
+}
+
+// A student's own common room ('gryffindor-common' for a Gryffindor), if the campaign has one.
+export function commonRoomOf(data, house) {
+  if (!house || house === 'Unsorted') return null;
+  const id = `${String(house).toLowerCase()}-common`;
+  return data.locations?.some((l) => l.id === id) ? id : null;
+}
+
+// Lights out: every sorted student goes to their own common room. Anyone unsorted stays put.
+// Returns how many were sent.
+export async function lightsOut(sid, data, session, chars) {
+  const byRoom = {};
+  for (const u of session.playerUids ?? []) {
+    const c = chars[u];
+    const room = c && !c.expelled ? commonRoomOf(data, c.house) : null;
+    if (room) (byRoom[room] ??= []).push(u);
+  }
+  for (const [room, uids] of Object.entries(byRoom)) await movePlayers(sid, data, room, uids, chars, false);
+  const n = Object.values(byRoom).flat().length;
+  if (n) await logEvent(sid, { type: 'lights_out', payload: { n } });
+  return n;
+}
+
+// Puts everyone in one place back on the floor: people from the back, students together at the front.
+// Monsters, chests and items stay where they are.
+export async function tidyRoom(sid, data, session, locId) {
+  const st = session.state ?? {};
+  const upd = {};
+  Object.entries(st.tokens ?? {}).filter(([, t]) => t.loc === locId && t.npc).forEach(([id], i) => {
+    const p = personSpot(data, locId, i);
+    upd[`state.tokens.${id}.x`] = p.x; upd[`state.tokens.${id}.y`] = p.y; upd[`state.tokens.${id}.moved`] = false;
+  });
+  const uids = Object.entries(st.pcPos ?? {}).filter(([, p]) => p.loc === locId).map(([u]) => u);
+  studentSpots(data, locId, uids.length).forEach((p, i) => {
+    upd[`state.pcPos.${uids[i]}.x`] = p.x; upd[`state.pcPos.${uids[i]}.y`] = p.y;
+  });
+  if (Object.keys(upd).length) await updateDoc(sessionRef(sid), upd);
 }
 
 // ---------- Chests and items on the ground ----------
@@ -259,12 +299,13 @@ export async function placeStaff(sid, data, session) {
     const b = data.bestiary[npc];
     if (!b) continue;
     const n = (perRoom[room] = (perRoom[room] ?? 0) + 1);
-    const pos = { loc: room, x: 50 + (n - 1) * 12, y: 30 };
+    const pos = { loc: room, ...personSpot(data, room, n - 1), moved: false };
     const existing = Object.entries(tokens).find(([, t]) => t.kind === npc);
     if (existing) {
       upd[`state.tokens.${existing[0]}.loc`] = room;
       upd[`state.tokens.${existing[0]}.x`] = pos.x;
       upd[`state.tokens.${existing[0]}.y`] = pos.y;
+      upd[`state.tokens.${existing[0]}.moved`] = false;
     } else {
       upd[`state.tokens.staff-${npc}`] = { kind: npc, name: b.name, icon: b.icon, npc: true, ...pos };
     }
@@ -280,7 +321,7 @@ export async function professorTo(sid, data, session, npc, room) {
   const existing = Object.entries(tokens).find(([, t]) => t.kind === npc);
   const id = existing ? existing[0] : `staff-${npc}`;
   await updateDoc(sessionRef(sid), {
-    [`state.tokens.${id}`]: { ...(existing?.[1] ?? { kind: npc, name: b.name, icon: b.icon, npc: true }), loc: room, x: 50, y: 28 },
+    [`state.tokens.${id}`]: { ...(existing?.[1] ?? { kind: npc, name: b.name, icon: b.icon, npc: true }), loc: room, ...personSpot(data, room, 0), moved: false },
   });
 }
 

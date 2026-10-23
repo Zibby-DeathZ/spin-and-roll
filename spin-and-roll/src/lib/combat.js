@@ -3,6 +3,7 @@ import { arrayUnion, deleteField, doc, getDoc, runTransaction, updateDoc } from 
 import { db } from '../firebase';
 import { adjust, bonuses, defenceOf, logEvent, mod, startSpin, statOf } from './game';
 import { rollD20, rollDice } from './dice';
+import { anywhereOnFloor } from './floor';
 import { mimicRemains, mirrorAttack, springMimic, trunkBonus, trunkSwallow } from './mimic';
 import { bossHp } from './accuse';
 import { addStatus, corruptionAfter, removeStatuses } from './spellbook';
@@ -38,7 +39,7 @@ export async function addToken(sid, data, kind, loc, existing = {}) {
   const token = {
     kind, loc, icon: b.icon,
     name: same ? `${b.name} ${same + 1}` : b.name,
-    x: 25 + Math.random() * 50, y: 30 + Math.random() * 35,
+    ...anywhereOnFloor(data, loc),
     npc: !!b.npc,
     ...(b.npc ? {} : { hp, maxHp: hp, defence: b.defence, boss: !!b.boss }),
   };
@@ -47,13 +48,14 @@ export async function addToken(sid, data, kind, loc, existing = {}) {
 }
 export const moveToken = (sid, id, x, y) => {
   const base = id.startsWith('pc:') ? `state.pcPos.${id.slice(3)}` : `state.tokens.${id}`;
-  return updateDoc(sessionRef(sid), { [`${base}.x`]: x, [`${base}.y`]: y });
+  // A token the GM has placed by hand stays put when the schedule moves people around.
+  return updateDoc(sessionRef(sid), { [`${base}.x`]: x, [`${base}.y`]: y, ...(id.startsWith('pc:') ? {} : { [`${base}.moved`]: true }) });
 };
 
 // Places a prepared token (chest or item) built by world.js.
-export async function placeToken(sid, token) {
+export async function placeToken(sid, token, data = null) {
   const id = `${token.kind}-${Date.now().toString(36)}`;
-  await updateDoc(sessionRef(sid), { [`state.tokens.${id}`]: { x: 30 + Math.random() * 40, y: 30 + Math.random() * 30, ...token } });
+  await updateDoc(sessionRef(sid), { [`state.tokens.${id}`]: { ...anywhereOnFloor(data, token.loc), ...token } });
   return id;
 }
 export const removeToken = (sid, id) => updateDoc(sessionRef(sid), { [`state.tokens.${id}`]: deleteField() });

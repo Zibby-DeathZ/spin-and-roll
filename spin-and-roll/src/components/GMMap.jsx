@@ -32,8 +32,8 @@ export default function GMMap({ sid, data, session, chars }) {
   const doAdd = async () => {
     const [type, id] = add.split(':');
     let newId;
-    if (type === 'chest') newId = await placeToken(sid, chestToken(data, id, loc.id));
-    else if (type === 'item') newId = await placeToken(sid, itemToken(data, id, loc.id));
+    if (type === 'chest') newId = await placeToken(sid, chestToken(data, id, loc.id), data);
+    else if (type === 'item') newId = await placeToken(sid, itemToken(data, id, loc.id), data);
     else newId = await addToken(sid, data, id, loc.id, tokens);
     setSel(newId);
   };

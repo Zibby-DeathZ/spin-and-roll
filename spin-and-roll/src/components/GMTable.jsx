@@ -9,7 +9,7 @@ import {
   addToken, endFight, monsterAttack, moveToken, nextTurn, placeToken, removeToken, setTokenHp, startFight,
 } from '../lib/combat';
 import { doubleToken, springMimic, trunkToken } from '../lib/mimic';
-import { chestToken, doorsAt, hazardToken, itemToken, locOf, movePlayers, pcsAt, placeStaff, showOnTV, triggerHazard } from '../lib/world';
+import { chestToken, doorsAt, tidyRoom, hazardToken, itemToken, locOf, movePlayers, pcsAt, placeStaff, showOnTV, triggerHazard } from '../lib/world';
 
 const KINDS = [['monsters', '👹 Monsters'], ['people', '🧑 People'], ['chests', '🧰 Chests'], ['items', '✨ Items'], ['hazards', '🔥 Hazards'], ['mimics', '👄 Mimics']];
 
@@ -25,8 +25,11 @@ function Box({ title, children, open: startOpen = true }) {
   );
 }
 
-export default function GMTable({ sid, data, session, chars }) {
+export default function GMTable({ sid, data, session, chars, view = null, setView = () => {} }) {
   const map = session.state?.map ?? {};
+  // The GM can look at any place (from a character card) while the TV stays where it is.
+  const viewId = view && data.locations.some((l) => l.id === view) ? view : map.loc;
+  const peeking = viewId !== map.loc;
   const tokens = session.state?.tokens ?? {};
   const enc = session.state?.encounter;
   const players = session.playerUids.filter((u) => chars[u]);
@@ -37,22 +40,22 @@ export default function GMTable({ sid, data, session, chars }) {
   const [target, setTarget] = useState('');
   const [copyWho, setCopyWho] = useState('flitwick');
   const movers = who ?? players;
-  const loc = data.locations.find((l) => l.id === map.loc);
+  const loc = data.locations.find((l) => l.id === viewId);
   const areas = [...new Set(data.locations.map((l) => l.area))];
   const t = sel && !sel.startsWith('pc:') ? tokens[sel] : null;
   const selPc = sel?.startsWith('pc:') ? chars[sel.slice(3)] : null;
-  const here = players.filter((u) => locOf(session, u) === map.loc);
-  const monstersHere = Object.values(tokens).filter((x) => x.loc === map.loc && isMonster(x) && x.hp > 0).length;
+  const here = players.filter((u) => locOf(session, u) === viewId);
+  const monstersHere = Object.values(tokens).filter((x) => x.loc === viewId && isMonster(x) && x.hp > 0).length;
   const current = enc?.order?.[enc.turn];
   const placeName = (id) => data.locations.find((l) => l.id === id)?.name ?? 'not placed';
   const name = (u) => chars[u]?.firstName ?? chars[u]?.name;
 
   const place = async (type, id) => {
     let newId;
-    if (type === 'chests') newId = await placeToken(sid, chestToken(data, id, loc.id));
-    else if (type === 'items') newId = await placeToken(sid, itemToken(data, id, loc.id));
-    else if (type === 'hazards') newId = await placeToken(sid, hazardToken(data, id, loc.id));
-    else if (type === 'mimics') newId = await placeToken(sid, id === 'hungry-trunk' ? trunkToken(data, loc.id) : doubleToken(data, loc.id, copyWho));
+    if (type === 'chests') newId = await placeToken(sid, chestToken(data, id, loc.id), data);
+    else if (type === 'items') newId = await placeToken(sid, itemToken(data, id, loc.id), data);
+    else if (type === 'hazards') newId = await placeToken(sid, hazardToken(data, id, loc.id), data);
+    else if (type === 'mimics') newId = await placeToken(sid, id === 'hungry-trunk' ? trunkToken(data, loc.id) : doubleToken(data, loc.id, copyWho), data);
     else newId = await addToken(sid, data, id, loc.id, tokens);
     setSel(newId);
   };
@@ -69,15 +72,25 @@ export default function GMTable({ sid, data, session, chars }) {
   return (
     <div className="gm-table">
       <div className="gm-table-map">
-        <MapView loc={loc} tokens={tokens} pcs={pcsAt(session, chars, map.loc)} encounter={enc} selected={sel}
+        {peeking && (
+          <p className="peek-bar">
+            👁️ You’re looking at <strong>{loc?.name}</strong>. The TV still shows {data.locations.find((l) => l.id === map.loc)?.name ?? 'nothing'}.
+            <span className="actions">
+              <button className="btn small gold" onClick={() => { showOnTV(sid, data, viewId); setView(null); }}>📺 Show this on the TV</button>
+              <button className="btn small ghost" onClick={() => setView(null)}>Back to the TV’s view</button>
+            </span>
+          </p>
+        )}
+        <MapView loc={loc} tokens={tokens} pcs={pcsAt(session, chars, viewId)} encounter={enc} selected={sel}
           onSelect={(id) => setSel(sel === id ? null : id)} onMove={(x, y) => sel && moveToken(sid, sel, x, y)}
-          doors={doorsAt(data, session, map.loc)}
+          doors={doorsAt(data, session, viewId)}
           onDoor={(d) => {
-            if (!here.length) { showOnTV(sid, data, d.id); return; }
-            if (confirm(`Take ${here.map(name).join(', ')} through to ${d.name}?`)) { setSel(null); movePlayers(sid, data, d.id, here, chars, true); }
+            if (!here.length) { if (peeking) setView(d.id); else showOnTV(sid, data, d.id); return; }
+            if (confirm(`Take ${here.map(name).join(', ')} through to ${d.name}?`)) { setSel(null); movePlayers(sid, data, d.id, here, chars, !peeking); if (peeking) setView(d.id); }
           }} />
         <p className="muted small">
-          {sel ? 'Tap anywhere on the map to move the selected token.' : 'Tap a token or character to select it. Tap a glowing door to take everyone here through it.'}
+          {sel ? 'Tap anywhere on the map to move the selected token.' : 'Tap a token or character to select it. Tap a glowing door to take everyone here through it.'}{' '}
+          <button className="linkish small" onClick={() => { setSel(null); tidyRoom(sid, data, session, viewId); }}>🧍 Tidy this room</button>
         </p>
 
         {(t || selPc) && (

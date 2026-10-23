@@ -985,6 +985,7 @@ export function describe(e, nameOf) {
     case 'pickup': return e.failed ? null : { icon: e.payload.icon, text: `${actor} picked up ${e.payload.name}`, tone: 'teal' };
     case 'quest_new': return { icon: e.payload.icon, text: `New quest from ${e.payload.giver}: ${e.payload.title}`, tone: 'gold', big: true };
     case 'quest_done': return { icon: '🏅', text: `Quest complete: ${e.payload.title}!`, tone: 'teal', big: true };
+    case 'lights_out': return { icon: '🛏️', text: 'Lights out! Everyone heads back to their common room.', tone: 'violet', big: true };
     case 'house_trait': {
       const w = e.payload.what;
       if (w === 'steadfast') return { icon: '🦡', text: `${target} should be down… but Hufflepuffs don’t stay down. Back up on 1 HP!`, tone: 'house-hufflepuff', big: true };

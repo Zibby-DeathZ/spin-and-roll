@@ -1,6 +1,7 @@
 // The living castle: when time advances, everyone moves to where they should be,
 // the block's monsters, items, chests and hazards appear, and passing monsters leave.
 import { collection, doc, getDoc, getDocs, updateDoc, deleteField } from 'firebase/firestore';
+import { anywhereOnFloor, floorPoint, personSpot } from './floor';
 import { db } from '../firebase';
 import { chestToken, hazardToken, itemToken } from './world';
 import { doubleToken, trunkToken } from './mimic';
@@ -63,7 +64,8 @@ export function talkNow(data, npcId, clk) {
 }
 
 function spawnToken(data, s, weakened = false) {
-  const pos = { x: s.x ?? 30 + Math.random() * 40, y: s.y ?? 30 + Math.random() * 30 };
+  // Spawns name a rough spot (x, y in %); it's mapped onto the floor of that place's picture.
+  const pos = s.x != null ? floorPoint(data, s.loc, s.x / 100, s.y / 100) : anywhereOnFloor(data, s.loc);
   let t;
   if (s.type === 'item') t = itemToken(data, s.item, s.loc);
   else if (s.type === 'chest') t = chestToken(data, s.chest, s.loc);
@@ -109,10 +111,16 @@ export async function applyWorld(sid, data, clkIn = null) {
       continue;
     }
     const i = (placed[loc] = (placed[loc] ?? -1) + 1);
-    const slot = { x: 16 + (i % 5) * 17, y: 24 + Math.floor(i / 5) * 14 };
-    if (entry && entry[1].loc === loc) continue; // already there: keep wherever the GM put them
+    const slot = personSpot(data, loc, i);
+    if (entry && entry[1].loc === loc) {
+      // Already there. Keep anyone the GM has moved by hand; tidy everyone else onto their floor spot.
+      if (!entry[1].moved && (entry[1].x !== slot.x || entry[1].y !== slot.y)) {
+        upd[`state.tokens.${id}.x`] = slot.x; upd[`state.tokens.${id}.y`] = slot.y;
+      }
+      continue;
+    }
     const b = data.bestiary[npcId];
-    upd[`state.tokens.${id}`] = { ...(entry?.[1] ?? { kind: npcId, name: b.name, icon: b.icon, npc: true }), loc, ...slot };
+    upd[`state.tokens.${id}`] = { ...(entry?.[1] ?? { kind: npcId, name: b.name, icon: b.icon, npc: true }), loc, ...slot, moved: false };
   }
   void here;
 

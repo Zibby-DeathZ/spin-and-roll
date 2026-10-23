@@ -5,7 +5,7 @@ import {
 import { endLesson, startLesson } from '../lib/lessons';
 import { LessonBoard } from '../minigames';
 import GMWorld from './GMWorld';
-import { setShow } from '../lib/world';
+import { lightsOut, setShow } from '../lib/world';
 
 // ---------- GM: the clock, today's class, and the story beat ----------
 export function GMClock({ sid, data, session, clk, chars, lessonResults }) {
@@ -43,6 +43,12 @@ export function GMClock({ sid, data, session, clk, chars, lessonResults }) {
           <button className="btn small gold" disabled={busy || info.last} onClick={() => { setPresent(null); go(() => moveClock(sid, data, clk, 1)); }}>
             Advance time ▶
           </button>
+          {data.locations?.some((l) => l.id.endsWith('-common')) && (
+            <button className="btn small" disabled={busy} title="Send every sorted student to their own common room"
+              onClick={() => confirm('Lights out? Every sorted student goes to their own common room.') && go(() => lightsOut(sid, data, session, chars))}>
+              🛏️ Lights out
+            </button>
+          )}
         </div>
       </div>
 

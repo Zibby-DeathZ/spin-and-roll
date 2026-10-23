@@ -1982,3 +1982,37 @@ button.status-chip.removable:hover { background: rgba(200, 60, 80, 0.3); }
 .crowd-name { font-size: clamp(.58rem, .85cqw, .9rem); line-height: 1.1; max-width: 9cqw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-shadow: 0 1px 3px #000; }
 .crowd-person.sel .crowd-icon { border-color: var(--gold); box-shadow: 0 0 0 3px rgb(227 176 75 / .4); }
 @media (prefers-reduced-motion: reduce) { .door-dot { animation: none; } }
+
+/* ===================== GM party panel ===================== */
+.gm-side { max-height: calc(100vh - 2rem); overflow-y: auto; }
+.side-tabs { display: flex; margin-bottom: .7rem; }
+.side-tabs button { flex: 1; }
+.party-cards ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .5rem; }
+.pc-card { position: relative; display: grid; grid-template-columns: 1fr auto; gap: .2rem .4rem; padding: .45rem .5rem; border-radius: 12px;
+  background: rgb(255 255 255 / .03); border: 1px solid var(--line); border-left: 4px solid var(--muted); }
+.pc-card.house-gryffindor { border-left-color: var(--gryffindor); } .pc-card.house-slytherin { border-left-color: var(--slytherin); }
+.pc-card.house-ravenclaw { border-left-color: var(--ravenclaw); } .pc-card.house-hufflepuff { border-left-color: var(--hufflepuff); }
+.pc-card.watching { background: rgb(227 176 75 / .1); border-color: rgb(227 176 75 / .6); }
+.pc-card.turn { box-shadow: 0 0 0 2px var(--gold); }
+.pc-card.ko { opacity: .7; }
+.pc-card-main { display: flex; gap: .55rem; align-items: center; min-width: 0; padding: 0; border: 0; background: none; color: inherit; text-align: left; cursor: pointer; }
+.pc-card-main:disabled { cursor: default; }
+.pc-card-face { position: relative; flex: none; }
+.pc-card-portrait { width: 42px; height: 42px; font-size: 1.1rem; }
+.pc-card-crest { position: absolute; right: -6px; bottom: -4px; width: 18px; height: auto; font-size: 0; }
+.pc-card-crest .crest-svg, .pc-card-crest img { width: 100%; height: auto; }
+.pc-card-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.pc-card-info strong { font-size: .95rem; line-height: 1.1; }
+.pc-card-sub { font-size: .72rem; color: var(--muted); }
+.pc-card-where { font-size: .74rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pc-tag { margin-left: .3rem; padding: 0 .35rem; border-radius: 4px; font-size: .62rem; font-weight: 700; background: var(--gold); color: #2a1a06; }
+.pc-mini { display: block; height: 4px; border-radius: 2px; background: rgb(0 0 0 / .4); overflow: hidden; }
+.pc-mini span { display: block; height: 100%; }
+.pc-mini.hp span { background: var(--ember); } .pc-mini.mana span { background: var(--violet); }
+.pc-card-actions { display: flex; flex-direction: column; gap: .25rem; }
+.btn.tiny { min-width: 34px; min-height: 30px; padding: 0 .4rem; font-size: .9rem; }
+.pc-card-move { grid-column: 1 / -1; width: 100%; }
+.lights-out { width: 100%; margin-top: .7rem; }
+.peek-bar { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin: 0 0 .5rem; padding: .5rem .7rem; border-radius: 10px;
+  background: rgb(227 176 75 / .12); border: 1px solid rgb(227 176 75 / .5); }
+.peek-bar .actions { margin-left: auto; display: flex; gap: .4rem; }

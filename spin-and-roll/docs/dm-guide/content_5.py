@@ -169,6 +169,7 @@ BLOCKS = [
     ]),
     ('h2', 'Version log'),
     ('table', ['Version', 'Date', 'Changes'], [
+        ['3.11', 'October 2026', 'Everyone stands on the floor of each picture (staff at the back, students at the front, spawns on the floor). Tidy this room button. Party panel with a card per student (look at their room without changing the TV, put it on the TV, move just them). Lights out sends everyone to their common room.'],
         ['3.10', 'October 2026', '🧹 Clear the TV in the GM header unsticks any screen. Accusation votes can be cancelled or shown with no votes, Back to the map closes an open vote, and phones say when a vote fails. New Troubleshooting section.'],
         ['3.9', 'October 2026', 'Fix: the end-of-day ceremony now appears on the TV by itself every new morning, and the House Cup ceremony saves properly (both were failing to save their house standings).'],
         ['3.8', 'October 2026', 'Door pins on every location picture showing where each way out leads (tap one on the Table tab to take the party through). Crowded places move their people into a row along the top of the map.'],
