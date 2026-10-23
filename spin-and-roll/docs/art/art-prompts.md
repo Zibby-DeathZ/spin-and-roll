@@ -185,9 +185,9 @@ A cosy crowded village inn with a crackling fire, wooden beams, tankards of foam
 
 Inside a crooked, boarded-up haunted shack, broken furniture, torn wallpaper, claw marks on the floor, moonlight through the boards. Wide game map background seen from a high three-quarter angle. Keep the middle of the floor open and uncluttered, because character tokens are placed on top. No people. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
 
-## Family portraits (6)
+## Family portraits (9)
 
-The six families on the TV, the family picker and as each player’s token on the map. Swap [boy/girl] for the player who takes that family.
+The nine families on the TV, the family picker and as each player’s token on the map. Swap [boy/girl] for the player who takes that family.
 
 Folder: `public/portraits/`  ·  Size: 1024 × 1024, JPG
 
@@ -220,6 +220,21 @@ An 11-year-old [boy/girl] from a non-magical family, wide curious eyes, round gl
 `public/portraits/marlowe.jpg`
 
 An 11-year-old [boy/girl] from a fallen noble family, sharp features, guarded expression, faded hand-me-down robes, an old iron key with a serpent on it on a cord round the neck. Square head-and-shoulders portrait, face in the centre so it still reads when cropped to a small circle, plain dark background. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Hale
+`public/portraits/hale.jpg`
+
+An 11-year-old [boy/girl] from an old family of wizarding healers, neat tied-back hair, calm steady eyes, crisp robes with a small embroidered bone-and-wand healer badge, a rolled linen bandage and a little green potion vial at the belt. Square head-and-shoulders portrait, face in the centre so it still reads when cropped to a small circle, plain dark background. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Penrose
+`public/portraits/penrose.jpg`
+
+An 11-year-old [boy/girl] from a Cornish theatre family who can change their face, a cheeky stage grin, hair shifting from brown to bright turquoise at the tips mid-portrait, a velvet theatre cloak over school robes, a painted theatre mask in one hand. Square head-and-shoulders portrait, face in the centre so it still reads when cropped to a small circle, plain dark background. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### Okafor
+`public/portraits/okafor.jpg`
+
+An 11-year-old [boy/girl] from a family of curse-breakers, clever focused eyes, short neat hair, robes with rolled-up sleeves, a leather tool roll of tiny brass picks over one shoulder, a faint glowing rune fading on one fingertip. Square head-and-shoulders portrait, face in the centre so it still reads when cropped to a small circle, plain dark background. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
 
 ## People (24)
 
@@ -716,7 +731,7 @@ A painting wrapped in grey cloth being loaded onto a scarlet steam train at nigh
 ### Page 6
 `public/story/page-6.jpg`
 
-Six sealed letters with wax seals flying through the sky towards six different houses, a castle on a hill in the distance. Storybook page illustration with warm parchment tones and a soft vignette, like an old hand-painted fairy-tale book. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+Owls carrying sealed letters with wax seals flying through a dusk sky towards scattered houses, a castle on a hill in the distance. Storybook page illustration with warm parchment tones and a soft vignette, like an old hand-painted fairy-tale book. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
 
 ## Puzzle parts (34)
 

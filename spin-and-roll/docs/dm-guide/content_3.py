@@ -184,7 +184,7 @@ BLOCKS = [
     ('table', ['Type', 'How it works', 'Items'], [
         ['Consumables', 'Used up when used. Work anywhere.', 'Food, potions, Bertie Bott’s Beans, Felix Felicis, Remembrall, Extendable Ears, Creature treats'],
         ['Key items', 'Only work in the right place. Anywhere else the button says <i>Not here</i>, which is itself a hint. The ones you keep are marked below.', 'Serpent key (Dungeons or the Undercroft, kept), Mandrake leaf (Greenhouses or Dungeons, to brew), Restorative Draught (Hospital Wing), Stolen ingredient jars (Dungeons, back to Grimsby), Rare Chocolate Frog card (Library, the collector), Pocket Sneakoscope (anywhere, kept), the Marauder’s Map (anywhere, kept)'],
-        ['Clues and keepsakes', 'Nothing to use. <b>Read</b> opens it on parchment: diary pages show their runes (one page per page held), the torn page shows its text. Players show and trade them.', 'Ring clues, diary pages, the torn page about Vale'],
+        ['Clues and keepsakes', 'Nothing to use. <b>Read</b> opens it on parchment: diary pages show their runes (one page per page held), rune tablets show pictures with rune words, the torn page shows its text. Players show and trade them.', 'Ring clues, diary pages, the torn page about Vale'],
     ], [32, 60, 78]),
     ('tip', 'When a key item is used in the right place, the TV announces it and you play out what happens: the serpent door grinds open, Grimsby snatches back his jars, the drained student stirs.'),
     ('h2', 'Chests, items and hazards'),
@@ -207,7 +207,39 @@ BLOCKS = [
     ], [42, 128]),
     ('p', 'Hazards show on the TV under “Here” as things the players could do. When they choose one, tap it on the GM screen and press its action. Ask for a check first if it should be hard.'),
 
-    ('h2', 'The six families'),
+    ('h2', 'Learning the runes'),
+    ('p', 'Every rune in the game (the torn map edge, Vale’s diary, the rune tablets, the Rune Floor) is the same alphabet: each rune is always the same letter. Over the week the players learn it, and the Rune Floor tests it.'),
+    ('list', [
+        '<b>The rune notebook</b> is at the top of every player’s Bag. It shows all 26 runes. Letters the party has <b>confirmed</b> are written in ink on every phone. Anything else, a player can <b>pencil in</b> as their own guess (only on their phone).',
+        '<b>Cipher puzzles teach letters.</b> In The Torn Edge and Vale’s Diary, every letter you reveal goes into everyone’s notebook in ink, and solving one adds all of its letters. The two given letters go in as soon as the puzzle starts.',
+        '<b>Rune tablets</b> are three clues hidden in the castle: the Library (from Day 1), the Greenhouses (Day 2 free time) and the old gamekeeper’s hut (Day 3 free time). Each shows three pictures with their names in runes (an owl over the runes for OWL), so the players can work out letters themselves. Between them they cover every letter of SERPENT.',
+        '<b>Reading with the notebook:</b> when a player reads a rune clue, they can tick “Hold my rune notebook beside it” to see the letters they know under the runes.',
+        '<b>Confirming:</b> on the Puzzles tab, open <b>📖 Rune notebook</b>. When the players work out a tablet, press its button to confirm its letters for everyone; the TV announces the new runes. You can also tap single letters on or off.',
+    ]),
+    ('tip', 'Don’t confirm a tablet the moment it’s picked up. Let them argue over it, pencil guesses in, and confirm it when they tell you what the words say.'),
+
+    ('h2', 'House specialties'),
+    ('p', 'Once a student is sorted, their house gives them a stat bonus (it shows on their sheet as +2) and a trait. The once-a-day traits come back each morning. The phone Sheet shows each student their own house card.'),
+    ('table', ['House', 'Bonus', 'Trait', 'How it works'], [
+        ['Gryffindor', '+2 STR', 'Nerve: the first natural 1 each day is re-rolled', 'Automatic on any d20 the phone rolls (dice, spells, chests). The TV says so.'],
+        ['Ravenclaw', '+2 INT', 'Wit: one free puzzle hint a day', 'They tap Ask for a hint on their house card; the TV announces it and you give the hint.'],
+        ['Slytherin', '+2 CHA', 'Cunning: half as much gold again from chests', 'Automatic when they open a chest.'],
+        ['Hufflepuff', '+2 CON', 'Steadfast: once a day, a knockout leaves them on 1 HP', 'Automatic, whatever knocked them out. The TV announces it.'],
+    ], [22, 16, 52, 70]),
+    ('h2', 'House of the Day'),
+    ('p', 'When you move the clock to a new morning, the app adds up the house points each house earned <i>that day</i> (not the overall total, so a house that is behind can still win a day). The leader becomes the <b>House of the Day</b> and draws one perk at random, which lasts until the next morning. A tie shares the day. If nobody earned anything, nobody wins.'),
+    ('table', ['Perk', 'What it does'], [
+        ['🧺 House-elf Hamper', 'A Pepperup Potion for every member (given straight away).'],
+        ['🪙 Founders’ Purse', '+15 Galleons for every member.'],
+        ['✨ Liquid Luck', 'A Felix Felicis for every member: one free re-spin.'],
+        ['⏳ Golden Hourglass', 'House points they earn that day count one and a half times (automatic).'],
+        ['📚 Restricted Section Pass', 'One free puzzle hint for the house. You give it when they ask.'],
+        ['🌙 Prefect’s Blind Eye', 'Out after curfew that day without losing points. You keep track.'],
+    ], [45, 115]),
+    ('gm', 'The <b>⏳ House points</b> panel shows how many points each house has earned today and who holds the day. From there you can <b>draw another perk</b>, pick one yourself, or set the House of the Day by hand. A new perk’s gifts are handed out straight away; ones already given stay. The house boards on the TV and phones mark the House of the Day with its perk icon.'),
+
+    ('h2', 'The nine families'),
+    ('p', 'There are nine families for up to nine players. Each can be taken once, so with fewer players some stay unclaimed. That’s fine: an unclaimed family’s secret simply never comes up.'),
     ('table', ['Family', 'Gift (always)', 'Once a day', 'Drawback'], [
         ['Blackwood', 'Portraits speak freely', 'A portrait must answer one question truthfully', 'Portraits gossip (spin Portrait gossip)'],
         ['Sinclair', 'Can’t be surprised; knows Stupefy', 'Re-roll a d20 in a fight', 'Needs a WIS check to walk away from insults'],
@@ -215,8 +247,18 @@ BLOCKS = [
         ['Thornbury', 'Creatures never attack first; advantage to calm them', 'A creature tells what it has seen', 'Will risk anything for a creature'],
         ['Quill', 'Sees through disguises and illusions', 'Ask: what here is hidden or enchanted?', 'Unwanted visions'],
         ['Marlowe', 'Parseltongue; serpent doors open; has the serpent key', 'A snake scouts, guards or carries a message', 'People fear it (spin They heard you hiss)'],
+        ['Hale', 'Reads any injury: what caused it', 'Heals a student 2d6 + 2 HP (add it on the GM screen)', 'Must help anyone near them below half HP, or pass WIS'],
+        ['Penrose', 'Changes face and hair; advantage to avoid being recognised', 'Wears the face of someone they’ve seen, for one scene', 'Hair changes colour when scared, angry or lying'],
+        ['Okafor', 'Feels curses and traps; advantage on locked and cursed chests', 'Breaks one curse, ward or trap (not puzzles, not draining)', 'Curses bite back: spin after each one'],
     ], [22, 50, 52, 46]),
     ('p', 'When a student taps their ability on the phone, the TV announces it. You decide what they learn. Abilities recharge each morning.'),
+    ('h3', 'Using the three new secrets'),
+    ('list', [
+        '<b>Hale:</b> the casebook patient is the first student Vale ever drained. When Miss Sinclair is drained, the Hale student recognises the signs from the casebook. It’s a strong lead to the painting.',
+        '<b>Penrose:</b> the undelivered portrait is one of Vale’s, and it hangs somewhere in the castle. Hang it on the Grand Staircase or down in the Undercroft. When the Penrose student sees it, their face won’t change for the rest of that scene.',
+        '<b>Okafor:</b> the painting Okafor’s mum called “Occupied” is the covered painting from the train. Their Curse-Breaker gift can’t break Vale himself, but it can tell them he’s inside.',
+        'For the drawback spin, use any wheel. A bad result costs 1d4 HP or gives a short status effect from the Status editor.',
+    ]),
 
     ('h2', 'The living castle'),
     ('p', 'Everyone in the castle keeps a timetable: the staff, prefects, Filch, Peeves, the ghost, the centaur, even the covered painting. There are 7 days with 5 blocks each, and every person has a set place in every one. When you press <b>Advance time</b>, the app moves them all there for you and puts out that block’s clues, chests, items, hazards and monsters. Passing monsters disappear when the block ends unless a fight is still going.'),

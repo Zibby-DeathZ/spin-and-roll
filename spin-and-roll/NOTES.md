@@ -10,7 +10,7 @@
 
 ### The Hollow Heir
 - **Prologue:** letters, Gringotts vaults, Diagon Alley shops, Ollivanders, the Express, the Welcome Feast.
-- **Six families** (Blackwood, Sinclair, Fenwick, Thornbury, Quill, Marlowe), locked once picked, each with
+- **Nine families** (Blackwood, Sinclair, Fenwick, Thornbury, Quill, Marlowe, Hale, Penrose, Okafor), locked once picked, each with
   stats, a vault, a secret, a signature ability with a drawback, and portraits as map tokens.
 - **Sorting Hat and Ollivander ceremonies** with real questions, live on the TV.
 - **Shopping and equipment:** wands, robes (Defence), familiars (buffs), cauldrons, books, extras.
@@ -157,3 +157,17 @@ two cold braziers. The TV lists each one under "Here", so the players can plan a
 ### Test student (DM Guide v3.0)
 - Players tab → Test student. `src/lib/testing.js` adds a character on the GM's own uid (`test: true`), so the GM can
   open `#/session/<id>/play` and act as a player. Excluded from saved heroes, history and trophies.
+
+## Houses, House of the Day, ceremonies (v3.6)
+- `src/lib/houses.js`: HOUSE_TRAITS (stat bonus + trait, added in `bonuses()`), HOUSE_PERKS, `nerveRoll` (Gryffindor re-roll on the phone, sends `nerve: true`), day standings.
+- `src/lib/houseday.js`: `endOfDay` (called from `moveClock` on a new dawn: House of the Day, perk gifts, `state.show` kind 'day'), `changePerk`, `setHouseOfDay`, `spendTrait`, `steadfast`.
+- Once-a-day house traits use `houseDawn` on the character (players can't write characters, so the GM engine spends it when an event carries `nerve`, or for Ravenclaw's `ability_used` with `payload.house`).
+- Golden Hourglass multiplies positive points in `awardPoints`. Slytherin chest gold is in `applyOpenChest`.
+- `AwardsCeremony.jsx` (TV ceremony; `inline` for previews), `QuestComplete.jsx` (TV overlay from the `quest_done` event; phone scroll for heroes in `payload.uids`).
+
+## Runes (v3.7)
+- One alphabet everywhere: `RUNES`/`ORDER` in `src/lib/puzzles.js` (`runeFor`, `RUNE_ALPHABET`). Look-alike runes ᚬ ᚭ ᚾ are on Q, X, J.
+- `src/lib/runes.js`: party letters in `state.runes.known` (`learnRunes`, `forgetRune`), `lettersOfClue`, `usePencil` (a player's guesses in localStorage).
+- Cipher puzzles add letters as the GM reveals them (quietly) and all on solve; `runes_learned` events toast the TV.
+- `RuneNotebook.jsx` (Bag), ClueReader `tablet` style and the notebook overlay; GM codex panel at the bottom of the Puzzles tab.
+- Rune floor: `wordInEnglish: true` shows the word in letters; GM tiles show their letter.

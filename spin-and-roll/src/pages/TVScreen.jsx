@@ -12,6 +12,7 @@ import { actionsAt, locOf, pcsAt } from '../lib/world';
 import Portrait from '../components/Portrait';
 import { TVPuzzle } from '../components/Puzzles';
 import { TVShow } from '../components/Shows';
+import { TVQuestComplete } from '../components/QuestComplete';
 import TVIntro from '../components/Intro';
 import SoundGate from '../components/SoundGate';
 import JumpScare from '../components/JumpScare';
@@ -76,6 +77,7 @@ export default function TVScreen() {
 export function TVLive({ session, chars, profiles, data, title, answers, lessonResults, nameOf, sid, claims = {} }) {
   // A big crest moment when the Sorting Hat calls a house.
   const [reveal, setReveal] = useState(null);
+  const [questDone, setQuestDone] = useState(null);
   useEffect(() => {
     if (!reveal) return undefined;
     const t = setTimeout(() => setReveal(null), 5200);
@@ -176,7 +178,7 @@ export function TVLive({ session, chars, profiles, data, title, answers, lessonR
       <header className="tv2-top">
         <span className="tv2-title">{title}</span>
         {data.clock && <ClockChip data={data} clk={clockOf(session)} scenes={session.state?.scenes} />}
-        {data.quizzes && <HouseBoard points={session.state?.housePoints} compact />}
+        {data.quizzes && <HouseBoard points={session.state?.housePoints} hod={session.state?.houseOfDay} compact />}
       </header>
       <div className="tv2-stage">{stage}</div>
       <footer className="tv2-party">
@@ -198,8 +200,8 @@ export function TVLive({ session, chars, profiles, data, title, answers, lessonR
           );
         })}
       </footer>
-      {sid && <EventToasts sid={sid} nameOf={nameOf} big skip={['wheel', 'duel']}
-        onNew={(e) => { if (e.type === 'sorted') setReveal({ house: e.payload.house, name: nameOf(e.targetUid), id: e.id }); const s2 = soundForEvent(e); (Array.isArray(s2) ? s2 : s2 ? [s2] : []).forEach((n, i) => setTimeout(() => play(n), i * 180)); }} />}
+      {sid && <EventToasts sid={sid} nameOf={nameOf} big skip={['wheel', 'duel', 'quest_done']}
+        onNew={(e) => { if (e.type === 'quest_done') setQuestDone({ id: e.id, ...e.payload }); if (e.type === 'sorted') setReveal({ house: e.payload.house, name: nameOf(e.targetUid), id: e.id }); const s2 = soundForEvent(e); (Array.isArray(s2) ? s2 : s2 ? [s2] : []).forEach((n, i) => setTimeout(() => play(n), i * 180)); }} />}
       {reveal && (
         <div key={reveal.id} className={`sort-reveal house-${String(reveal.house).toLowerCase()}`} role="alert">
           <HouseCrest house={reveal.house} className="sort-crest" />
@@ -207,6 +209,7 @@ export function TVLive({ session, chars, profiles, data, title, answers, lessonR
           <h2 className="sort-house">{String(reveal.house).toUpperCase()}!</h2>
         </div>
       )}
+      {questDone && <TVQuestComplete key={questDone.id} q={questDone} currency={data.currency} onDone={() => setQuestDone(null)} />}
       {session.state?.marauders && <TVMarauders data={data} session={session} chars={chars} />}
       {session.state?.duel && <TVDuel session={session} />}
       <JumpScare scare={session.state?.scare} />

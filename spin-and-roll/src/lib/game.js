@@ -1,5 +1,5 @@
 import {
-  addDoc, collection, deleteDoc, deleteField, doc, getDocs, increment, limit, onSnapshot, orderBy, query,
+  addDoc, collection, deleteDoc, deleteField, doc, getDoc, getDocs, increment, limit, onSnapshot, orderBy, query,
   runTransaction, serverTimestamp, setDoc, updateDoc, where, writeBatch,
 } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
@@ -10,6 +10,9 @@ import { applyWorld, owlMissedQuests } from './schedule';
 import { addStatus, corruptionAfter, removeStatuses } from './spellbook';
 import { duelText } from './duel';
 import { openState } from './marauders';
+import { traitOf } from './houses';
+import { runeFor as runeOf } from './puzzles';
+import { endOfDay, perkFor, spendTrait, steadfast } from './houseday';
 
 // ---------- Rules of the game ----------
 
@@ -59,6 +62,8 @@ export function bonuses(c) {
     t.defence += b.defence ?? 0;
     t.spellPower += b.spellPower ?? 0;
   }
+  // The student's house specialty (Ravenclaw +2 INT and so on).
+  for (const [k, v] of Object.entries(traitOf(c)?.stats ?? {})) t.stats[k] = (t.stats[k] ?? 0) + v;
   return t;
 }
 export const statOf = (c, k) => (c.stats?.[k] ?? 10) + (bonuses(c).stats[k] ?? 0);
@@ -258,6 +263,9 @@ export const claimFamily = (sid, uid, familyId, firstName, carry = false) =>
 export const useAbility = (sid, uid, ability) =>
   logEvent(sid, { type: 'ability_used', actorUid: uid, processed: false, payload: { name: ability.name, icon: ability.icon } });
 
+// A house's once-a-day trait that the DM acts on (Ravenclaw's Wit). Shares the ability event type.
+export const useHouseTrait = (sid, uid, house, t) =>
+  logEvent(sid, { type: 'ability_used', actorUid: uid, processed: false, payload: { name: `${house} ${t.name}`, icon: t.icon, house: t.trait } });
 export const castSpell = (sid, uid, spellId, extra = {}) =>
   logEvent(sid, { type: 'spell_cast', actorUid: uid, processed: false, payload: { spellId, ...extra } });
 
@@ -357,6 +365,8 @@ export async function moveClock(sid, data, clk, dir) {
   }
   const next = { day, block, dawn };
   await updateDoc(doc(db, 'sessions', sid), { 'state.clock': next, 'state.scenes': sceneBudget(data, next) });
+  // The day that just ended: House of the Day, its perk, and the awards ceremony on the TV.
+  if (newDawn) await endOfDay(sid, data, clk.day).catch(console.error);
   if (newDawn) await restEveryone(sid);
   await applyWorld(sid, data, next).catch(console.error);
   if (dir > 0) await owlMissedQuests(sid, data).catch(console.error);
@@ -555,6 +565,15 @@ export async function sortInto(sid, uid, house) {
 
 export async function awardPoints(sid, uid, house, delta, reason = '') {
   if (!house || house === 'Unsorted') return;
+  // House of the Day with the Golden Hourglass: points earned count one and a half times.
+  if (delta > 0) {
+    const perk = perkFor((await getDoc(doc(db, 'sessions', sid))).data(), house);
+    if (perk?.pointsX) {
+      const extra = Math.round(delta * perk.pointsX) - delta;
+      delta += extra;
+      if (extra > 0) reason = `${reason.trim()}${reason.trim() ? ' ' : ''}(⏳ +${extra} Golden Hourglass)`;
+    }
+  }
   await updateDoc(doc(db, 'sessions', sid), { [`state.housePoints.${house}`]: increment(delta) });
   await logEvent(sid, { type: 'points', targetUid: uid, payload: { house, delta, reason: reason.trim() || null } });
 }
@@ -796,11 +815,13 @@ async function applyAbility(sid, eid) {
     const sSnap = await tx.get(doc(db, 'sessions', sid));
     const cSnap = await tx.get(charRef(sid, e.actorUid));
     const dawn = clockOf(sSnap.data()).dawn;
-    if (!cSnap.exists() || cSnap.data().abilityDawn === dawn) {
+    // A house trait (Ravenclaw's Wit) uses the house's daily charge, not the family ability's.
+    const field = e.payload?.house ? 'houseDawn' : 'abilityDawn';
+    if (!cSnap.exists() || cSnap.data()[field] === dawn) {
       tx.update(eRef, { processed: true, failed: true });
       return;
     }
-    tx.update(cSnap.ref, { abilityDawn: dawn });
+    tx.update(cSnap.ref, { [field]: dawn });
     tx.update(eRef, { processed: true });
   });
 }
@@ -813,6 +834,8 @@ const HANDLERS = {
   attack: (sid, id, data) => applyAttack(sid, id, data),
   open_chest: (sid, id, data) => applyOpenChest(sid, id, data),
   pickup: (sid, id, data) => applyPickup(sid, id, data),
+  // A roll only needs the GM screen when Gryffindor's Nerve re-rolled it (handled below).
+  roll: (sid, id) => updateDoc(doc(db, 'sessions', sid, 'events', id), { processed: true }),
 };
 
 export function useGameEngine(sid, data) {
@@ -828,13 +851,20 @@ export function useGameEngine(sid, data) {
       (snap) => snap.docs.forEach((d) => run(d.id, () => executeTrade(sid, d.id))));
     const stopEvents = onSnapshot(query(col(sid, 'events'), where('processed', '==', false)),
       (snap) => snap.docs.forEach((d) => {
-        const handler = HANDLERS[d.data().type];
-        if (handler) run(d.id, () => handler(sid, d.id, data));
+        const e = d.data();
+        const handler = HANDLERS[e.type];
+        // Gryffindor's Nerve re-rolled a natural 1 on the phone: use up today's charge first.
+        const nerve = e.payload?.nerve && e.actorUid ? () => spendTrait(sid, e.actorUid, 'nerve') : async () => {};
+        if (handler) run(d.id, () => nerve().then(() => handler(sid, d.id, data)));
       }));
+    // Hufflepuff's Steadfast: whoever knocked them out, they get back up on 1 HP once a day.
+    const stopSteadfast = onSnapshot(col(sid, 'characters'), (snap) => snap.docs
+      .filter((d) => d.data().hp <= 0 && traitOf(d.data())?.trait === 'steadfast')
+      .forEach((d) => run(`steadfast-${d.id}`, () => steadfast(sid, d.id))));
     const stopClaims = onSnapshot(col(sid, 'claims'),
       (snap) => snap.docs.filter((d) => !d.data().status)
         .forEach((d) => run(`claim-${d.id}`, () => processClaim(sid, d.id, data))));
-    return () => { stopTrades(); stopEvents(); stopClaims(); };
+    return () => { stopTrades(); stopEvents(); stopClaims(); stopSteadfast(); };
   }, [sid, data]);
 }
 
@@ -892,7 +922,7 @@ export function describe(e, nameOf) {
       if (p.forbidden) {
         return { icon: '💚', text: `A flash of green light…${p.hit ? ` ${p.targetName} falls.` : ' It misses.'}`, tone: 'house-slytherin', big: true };
       }
-      const crit = p.nat === 20 ? ' Natural 20!' : p.nat === 1 ? ' Natural 1!' : '';
+      const crit = (p.nerve ? ' 🦁 A natural 1, re-rolled with Gryffindor nerve!' : '') + (p.nat === 20 ? ' Natural 20!' : p.nat === 1 ? ' Natural 1!' : '');
       return {
         icon: p.icon,
         text: `${actor} → ${p.targetName}: ${p.name}, ${p.hitTotal} vs Defence ${p.defence}.${crit} ${p.hit ? (p.dmg ? `Hit for ${p.dmg}!` : 'Hit!') : 'Miss.'}${p.statuses?.length ? ` ${p.targetName}: ${p.statuses.join(', ')}.` : ''}${p.healed ? ` ${actor} drinks back ${p.healed} HP.` : ''}${p.defeated ? ` ${p.targetName} is down!` : ''}${p.twist ? ` ${p.twist}.` : ''}`,
@@ -934,7 +964,9 @@ export function describe(e, nameOf) {
     case 'roll': {
       const p = e.payload;
       const detail = `${p.rolls.join(p.mode === 'normal' ? ' + ' : ' / ')}${p.mod ? ` ${p.mod > 0 ? '+' : '−'} ${Math.abs(p.mod)}` : ''}`;
-      return { icon: '🎲', text: `${actor} rolled ${p.label}: ${p.total} (${detail})`, tone: 'gold' };
+      return p.nerve
+        ? { icon: '🦁', text: `Natural 1… but ${actor}’s Gryffindor nerve holds! Re-rolled ${p.label}: ${p.total} (${detail})`, tone: 'house-gryffindor', big: true }
+        : { icon: '🎲', text: `${actor} rolled ${p.label}: ${p.total} (${detail})`, tone: 'gold' };
     }
     case 'hazard': return { icon: e.payload.icon, text: `${e.payload.action}! ${e.payload.desc}`, tone: 'ember', big: true };
     case 'detention': return { icon: '🔦', text: `${target} has detention with ${e.payload.npc} in the ${e.payload.place}`, tone: 'ember', big: true };
@@ -946,13 +978,23 @@ export function describe(e, nameOf) {
       const p = e.payload;
       if (p.ok) {
         const loot = [...(p.gold ? [`${p.gold} Galleons`] : []), ...p.items].join(', ');
-        return { icon: '🧰', text: `${actor} opened the ${p.name} (${p.total} vs ${p.dc}): ${loot || 'it was empty'}!`, tone: 'gold', big: true };
+        return { icon: '🧰', text: `${actor} opened the ${p.name} (${p.total} vs ${p.dc}): ${loot || 'it was empty'}!${p.cunning ? ' 🐍 A Slytherin always finds a little extra.' : ''}${p.nerve ? ' 🦁 (a natural 1, re-rolled with Gryffindor nerve)' : ''}`, tone: 'gold', big: true };
       }
       return { icon: '🔒', text: `${actor} couldn’t open the ${p.name} (${p.total} vs ${p.dc})${p.trap ? `. A curse bites for ${p.trap} damage!` : ''}`, tone: 'ember', big: true };
     }
     case 'pickup': return e.failed ? null : { icon: e.payload.icon, text: `${actor} picked up ${e.payload.name}`, tone: 'teal' };
     case 'quest_new': return { icon: e.payload.icon, text: `New quest from ${e.payload.giver}: ${e.payload.title}`, tone: 'gold', big: true };
     case 'quest_done': return { icon: '🏅', text: `Quest complete: ${e.payload.title}!`, tone: 'teal', big: true };
+    case 'house_trait': {
+      const w = e.payload.what;
+      if (w === 'steadfast') return { icon: '🦡', text: `${target} should be down… but Hufflepuffs don’t stay down. Back up on 1 HP!`, tone: 'house-hufflepuff', big: true };
+      return null; // Nerve shows on the roll itself; Wit on the ability.
+    }
+    case 'runes_learned': {
+      const ls = e.payload.letters;
+      return { icon: '📖', text: `${ls.length === 1 ? 'A new rune' : `${ls.length} new runes`} for the notebook${e.payload.source ? ` (${e.payload.source})` : ''}: ${ls.map((l) => `${runeOf(l)} ${l}`).join(' · ')}`, tone: 'violet', big: ls.length > 2 };
+    }
+    case 'house_of_day': return { icon: e.payload.icon, text: `House of the Day: ${e.payload.houses.join(' & ')}! ${e.payload.name}`, tone: `house-${e.payload.houses[0].toLowerCase()}`, big: true };
     case 'travel': return { icon: '📍', text: e.payload.name, tone: 'gold', big: true };
     case 'fight_start': return { icon: '⚔️', text: `Roll for initiative! ${e.payload.order.join(', ')}`, tone: 'ember', big: true };
     case 'fight_end': return { icon: '🏁', text: `The fight is over.${e.payload.xp ? ` Everyone gains ${e.payload.xp} XP.` : ''}`, tone: 'gold', big: true };

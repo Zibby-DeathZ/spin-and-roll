@@ -5,6 +5,7 @@ import {
 import { endLesson, startLesson } from '../lib/lessons';
 import { LessonBoard } from '../minigames';
 import GMWorld from './GMWorld';
+import { setShow } from '../lib/world';
 
 // ---------- GM: the clock, today's class, and the story beat ----------
 export function GMClock({ sid, data, session, clk, chars, lessonResults }) {
@@ -45,6 +46,12 @@ export function GMClock({ sid, data, session, clk, chars, lessonResults }) {
         </div>
       </div>
 
+      {session.state?.show?.kind === 'day' && (
+        <p className="beat">
+          🕯️ The end-of-day ceremony is on the TV (house race, House of the Day, awards).{' '}
+          <button className="btn small" onClick={() => setShow(sid, null)}>Back to the map</button>
+        </p>
+      )}
       <SceneControl sid={sid} data={data} clk={clk} scenes={session.state?.scenes} />
       {beat && <p className="beat"><strong>Story beat:</strong> {beat}</p>}
       {data.routines && <GMWorld sid={sid} data={data} session={session} chars={chars} />}

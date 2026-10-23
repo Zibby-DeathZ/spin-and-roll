@@ -3,6 +3,7 @@ import { arrayUnion, collection, deleteField, doc, getDoc, getDocs, runTransacti
 import { db } from '../firebase';
 import { adjust, awardPoints, giveItem, logEvent } from './game';
 import { springMimic } from './mimic';
+import { traitOf } from './houses';
 import { offersNow } from './schedule';
 
 const sessionRef = (sid) => doc(db, 'sessions', sid);
@@ -115,6 +116,7 @@ export async function applyOpenChest(sid, eid, data) {
   const eRef = doc(db, 'sessions', sid, 'events', eid);
   let sprung = null;
   await runTransaction(db, async (tx) => {
+    let gold = 0;
     const e = (await tx.get(eRef)).data();
     if (!e || e.processed) return;
     const sess = (await tx.get(sessionRef(sid))).data();
@@ -137,7 +139,8 @@ export async function applyOpenChest(sid, eid, data) {
     if (ok) {
       let inv = c.inventory ?? [];
       for (const it of t.contents.items) inv = addToInv(inv, { id: it, ...data.items[it] });
-      tx.update(cSnap.ref, { inventory: inv, gold: c.gold + t.contents.gold });
+      gold = t.contents.gold + Math.round(t.contents.gold * (traitOf(c)?.goldBonus ?? 0));
+      tx.update(cSnap.ref, { inventory: inv, gold: c.gold + gold });
       tx.update(sessionRef(sid), { [`state.tokens.${id}.opened`]: true, [`state.tokens.${id}.icon`]: '📭' });
     } else {
       tx.update(sessionRef(sid), { [`state.tokens.${id}.tried`]: [...(t.tried ?? []), e.actorUid] });
@@ -147,7 +150,7 @@ export async function applyOpenChest(sid, eid, data) {
       processed: true,
       payload: {
         ...e.payload, name: t.name, ok, dc: t.dc, trap: ok ? 0 : t.trap,
-        gold: ok ? t.contents.gold : 0, items: ok ? t.contents.items.map((i) => data.items[i]?.name ?? i) : [],
+        gold: ok ? gold : 0, cunning: ok && gold > t.contents.gold, items: ok ? t.contents.items.map((i) => data.items[i]?.name ?? i) : [],
       },
     });
   });
@@ -195,7 +198,18 @@ export async function completeQuest(sid, data, qid, qs, chars) {
   const q = data.quests.find((x) => x.id === qid);
   const r = q.reward ?? {};
   await updateDoc(sessionRef(sid), { [`state.quests.${qid}.status`]: 'done', [`state.quests.${qid}.done`]: q.objectives.map((_, i) => i) });
-  await logEvent(sid, { type: 'quest_done', payload: { title: q.title, icon: q.icon } });
+  // Everything the TV and the phones need for the quest-complete moment.
+  await logEvent(sid, {
+    type: 'quest_done',
+    payload: {
+      title: q.title, icon: q.icon, giver: q.giver ?? null, uids: qs.uids,
+      names: qs.uids.map((u) => chars[u]?.firstName ?? chars[u]?.name ?? '?'),
+      reward: {
+        xp: r.xp ?? 0, gold: r.gold ?? 0, points: r.points ?? 0, manual: q.manual ?? null,
+        items: (r.items ?? []).map((it) => ({ id: it, name: data.items[it]?.name ?? it, icon: data.items[it]?.icon ?? '🎁' })),
+      },
+    },
+  });
   for (const uid of qs.uids) {
     if (r.xp) await adjust(sid, uid, 'xp', r.xp);
     if (r.gold) await adjust(sid, uid, 'gold', r.gold);
@@ -308,13 +322,16 @@ export const setSuspectMark = (sid, suspectId, mark) =>
   updateDoc(sessionRef(sid), { [`state.board.marks.${suspectId}`]: mark ?? deleteField() });
 
 // Works out the night's awards from everything that happened.
-export async function computeAwards(sid, chars) {
+// `since` (milliseconds) limits the awards to events after that moment, e.g. one in-game day.
+const msOf = (t) => (typeof t === 'number' ? t : t?.toMillis?.() ?? 0);
+export async function computeAwards(sid, chars, since = 0) {
   const snap = await getDocs(collection(db, 'sessions', sid, 'events'));
   const tally = {};
   const add = (key, uid, n = 1) => { if (!uid || !chars[uid]) return; (tally[key] ??= {}); tally[key][uid] = (tally[key][uid] ?? 0) + n; };
   snap.docs.forEach((d) => {
     const e = d.data();
     if (e.failed) return;
+    if (since && msOf(e.createdAt) < since) return;
     const p = e.payload ?? {};
     if (e.type === 'attack') {
       add('damage', e.actorUid, p.dmg ?? 0);

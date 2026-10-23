@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { computeAwards, houseCup, pinClue, setShow, setSuspectMark } from '../lib/world';
 import { GMAccuse } from './Accuse';
+import AwardsCeremony from './AwardsCeremony';
 
 const HOUSES = ['Gryffindor', 'Hufflepuff', 'Ravenclaw', 'Slytherin'];
 
@@ -33,24 +34,9 @@ export function SuspectBoard({ data, board = {} }) {
   );
 }
 
-// ---------- End-of-night awards ----------
-export function AwardsShow({ show }) {
-  return (
-    <div className="awards">
-      <h2>🎖️ Tonight’s awards</h2>
-      {!show.awards.length && <p className="muted">Not much happened tonight… yet.</p>}
-      <div className="award-grid">
-        {show.awards.map((a, i) => (
-          <div key={a.title} className="award" style={{ animationDelay: `${i * 0.35}s` }}>
-            <span className="award-icon">{a.icon}</span>
-            <strong>{a.title}</strong>
-            <span className="award-name">{a.name}</span>
-            <span className="muted small">{a.value} {a.unit}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+// ---------- End-of-night awards (and the end-of-day ceremony) ----------
+export function AwardsShow({ show, inline = false }) {
+  return <AwardsCeremony show={show} inline={inline} />;
 }
 
 // ---------- House Cup ----------
@@ -95,10 +81,10 @@ export function GMShows({ sid, data, session, chars }) {
   return (
     <section className="gm-shows">
       <div className="show-bar">
-        <span className="muted small">On the TV now: <strong>{show ? { suspects: 'Suspect board', awards: 'Awards', housecup: 'House Cup' }[show.type] : 'the map'}</strong></span>
+        <span className="muted small">On the TV now: <strong>{show ? (show.kind === 'day' ? 'End-of-day ceremony' : { suspects: 'Suspect board', awards: 'Awards', housecup: 'House Cup' }[show.type]) : 'the map'}</strong></span>
         <span className="actions">
           <button className="btn small" disabled={show?.type === 'suspects'} onClick={() => setShow(sid, { type: 'suspects' })}>🕵️ Suspect board</button>
-          <button className="btn small" disabled={busy} onClick={() => go(async () => setShow(sid, { type: 'awards', awards: await computeAwards(sid, chars) }))}>🎖️ Tonight’s awards</button>
+          <button className="btn small" disabled={busy} onClick={() => go(async () => setShow(sid, { type: 'awards', awards: await computeAwards(sid, chars), at: Date.now() }))}>🎖️ Tonight’s awards</button>
           <button className="btn small gold" disabled={busy}
             onClick={() => confirm(`Award the House Cup to ${leader}? It goes into each ${leader} player’s trophy cabinet.`) && go(() => houseCup(sid, session, chars))}>
             🏆 House Cup ceremony

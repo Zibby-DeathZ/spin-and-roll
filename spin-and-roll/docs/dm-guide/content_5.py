@@ -45,8 +45,10 @@ BLOCKS = [
     ('p', 'Record a <b>loss</b>. It stings, and that is fine. The players can still win the House Cup, and the awards still happen.'),
 
     ('chapter', 'Part 7', 'Ending the Night', 'The last fifteen minutes are what they will talk about tomorrow.'),
+    ('h2', 'The end-of-day ceremony'),
+    ('p', 'Every time the clock rolls over to a new morning, the TV dims to the Great Hall at night: floating candles and drifting gold. First each house’s points for the day pour into its hourglass. Then the House of the Day is revealed with its crest and its perk. Then the day’s awards are dealt out as cards. The dots at the bottom of the TV jump between the three parts. When you’re done, press <b>Back to the map</b> (on the Day &amp; class tab, or the TV shows tab).'),
     ('h2', 'Tonight’s awards'),
-    ('gm', 'TV shows tab: <b>🎖️ Tonight’s awards</b>. The TV fills with awards worked out from the whole night: Heaviest Hitter, Unbreakable, Point Machine, Luckiest Wand, Glorious Disaster, Top of the Class, Treasure Hunter, Wand Never Rests.'),
+    ('gm', 'TV shows tab: <b>🎖️ Tonight’s awards</b>. The same ceremony, without the house race, with awards worked out from the whole night: Heaviest Hitter, Unbreakable, Point Machine, Luckiest Wand, Glorious Disaster, Top of the Class, Treasure Hunter, Wand Never Rests.'),
     ('tip', 'Read each one out like an award ceremony. Ask the winner for a one-line speech.'),
     ('h2', 'The House Cup'),
     ('gm', 'TV shows tab: <b>🏆 House Cup ceremony</b>. The winning house takes over the TV with the standings, and the House Cup goes into each winner’s trophy cabinet on their account.'),
@@ -159,6 +161,9 @@ BLOCKS = [
     ]),
     ('h2', 'Version log'),
     ('table', ['Version', 'Date', 'Changes'], [
+        ['3.7', 'October 2026', 'Learning the runes: a rune notebook on every phone (confirmed letters in ink, guesses in pencil), cipher puzzles fill it in, three rune tablets to decode, and the Rune Floor now shows SERPENT in English so the players must convert it. Look-alike runes moved to rare letters.'],
+        ['3.6', 'October 2026', 'House specialties (Gryffindor Nerve, Ravenclaw Wit, Slytherin Cunning, Hufflepuff Steadfast) with a +2 stat each. House of the Day: the house that earns the most points in a day draws a perk for the next day. A new end-of-day ceremony on the TV (hourglasses, the House of the Day, award cards), and a quest-complete scroll on the TV and on each hero’s phone.'],
+        ['3.5', 'October 2026', 'Three new families for bigger tables: Hale (healers), Penrose (a Metamorphmagus) and Okafor (curse-breakers), each with a gift, a drawback and a secret tied to Vale. The opening storybook now fits up to nine families, and page 6 no longer says six.'],
         ['3.4', 'October 2026', 'Harder puzzles: The Serpent in the Stars now has twelve stars and a nearest-higher-number rule; The Rune Floor is bigger, spells SERPENT and has a long false trail.'],
         ['3.3', 'October 2026', 'Read button for clues: diary pages show their runes, the torn page about Vale has its own text, the map half shows the runes on its edge. Test kit for every clue.'],
         ['3.2', 'October 2026', 'Item types: consumables, key items that only work in the right place, and clues. Info buttons on every item and stat. Slimmer TV announcements.'],

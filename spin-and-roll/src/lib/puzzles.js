@@ -2,6 +2,7 @@
 import { deleteField, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { logEvent } from './game';
+import { learnRunes } from './runes';
 
 const sessionRef = (sid) => doc(db, 'sessions', sid);
 
@@ -22,8 +23,11 @@ export const PIECE_NAME = { k: 'King', q: 'Queen', r: 'Rook', b: 'Bishop', n: 'K
 
 // ---- Cipher helpers: a fixed letter → rune substitution ----
 const RUNES = 'ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟᚬᚭ';
-const ORDER = 'QWXZJKVBPYGFMUCLDRHSNIOATE';
+// Look-alike runes (ᚬ ᚭ ᚾ) are kept for rare letters, so common letters on the Rune Floor are easy to tell apart.
+const ORDER = 'TWEZYKVBPJGFMUCLDRHSNIOAQX';
 export const runeFor = (ch) => (/[A-Z]/.test(ch) ? RUNES[ORDER.indexOf(ch)] : ch);
+// Every rune in the order they're carved (not alphabetical, so the order gives nothing away), with its letter.
+export const RUNE_ALPHABET = RUNES.split('').map((rune, i) => ({ rune, letter: ORDER[i] }));
 export const lettersIn = (msg) => [...new Set(msg.replace(/[^A-Z]/g, '').split(''))].sort();
 
 // ---- Torches ----
@@ -112,12 +116,15 @@ export function isSolved(p, st) {
 
 export async function startPuzzle(sid, p) {
   await updateDoc(sessionRef(sid), { 'state.puzzle': { id: p.id, solved: false, ...initialState(p) } });
+  // A cipher's given letters go straight into everyone's rune notebook.
+  if (p.type === 'cipher' && p.given?.length) await learnRunes(sid, p.given, p.title, true);
   await logEvent(sid, { type: 'puzzle_start', payload: { title: p.title, icon: p.icon } });
 }
 export const setPuzzle = (sid, patch) =>
   updateDoc(sessionRef(sid), Object.fromEntries(Object.entries(patch).map(([k, v]) => [`state.puzzle.${k}`, v])));
 export async function markSolved(sid, p) {
   await updateDoc(sessionRef(sid), { 'state.puzzle.solved': true });
+  if (p.type === 'cipher') await learnRunes(sid, lettersIn(p.message), p.title);
   await logEvent(sid, { type: 'puzzle_solved', payload: { title: p.title, icon: p.icon } });
 }
 export const closePuzzle = (sid) => updateDoc(sessionRef(sid), { 'state.puzzle': deleteField() });

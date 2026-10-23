@@ -60,13 +60,16 @@ SECTIONS = [
         ('three-broomsticks', 'The Three Broomsticks', 'A cosy crowded village inn with a crackling fire, wooden beams, tankards of foaming drink on the tables, a long bar.'),
         ('shrieking-shack', 'The Shrieking Shack', 'Inside a crooked, boarded-up haunted shack, broken furniture, torn wallpaper, claw marks on the floor, moonlight through the boards.'),
     ]),
-    ('portraits', 'Family portraits', 'public/portraits', 'The six families on the TV, the family picker and as each player’s token on the map. Swap [boy/girl] for the player who takes that family.', [
+    ('portraits', 'Family portraits', 'public/portraits', 'The nine families on the TV, the family picker and as each player’s token on the map. Swap [boy/girl] for the player who takes that family.', [
         ('blackwood', 'Blackwood', 'An 11-year-old [boy/girl] from an old, rich wizarding family, dark neatly combed hair, elegant black robes with a silver brooch, confident, faintly haughty smile, a gilded portrait frame behind.'),
         ('sinclair', 'Sinclair', 'An 11-year-old [boy/girl] from a family of dark-wizard hunters, determined eyes, short practical hair, sturdy robes with a scuffed leather wand holster, brave and serious.'),
         ('fenwick', 'Fenwick', 'An 11-year-old [boy/girl] from a joke-shop family, messy hair, mischievous grin, a smudge of soot on one cheek, a fizzing firework sparkler and a folded old paper map peeking from a pocket.'),
         ('thornbury', 'Thornbury', 'An 11-year-old [boy/girl] from a family of magical-creature breeders in the hills, windswept hair with a feather caught in it, freckles, warm kind eyes, a well-worn woollen jumper under robes.'),
         ('quill', 'Quill', 'An 11-year-old [boy/girl] from a non-magical family, wide curious eyes, round glasses, brand-new robes slightly too big, clutching a fresh spellbook, a faint shiver of something watching behind them.'),
         ('marlowe', 'Marlowe', 'An 11-year-old [boy/girl] from a fallen noble family, sharp features, guarded expression, faded hand-me-down robes, an old iron key with a serpent on it on a cord round the neck.'),
+        ('hale', 'Hale', 'An 11-year-old [boy/girl] from an old family of wizarding healers, neat tied-back hair, calm steady eyes, crisp robes with a small embroidered bone-and-wand healer badge, a rolled linen bandage and a little green potion vial at the belt.'),
+        ('penrose', 'Penrose', 'An 11-year-old [boy/girl] from a Cornish theatre family who can change their face, a cheeky stage grin, hair shifting from brown to bright turquoise at the tips mid-portrait, a velvet theatre cloak over school robes, a painted theatre mask in one hand.'),
+        ('okafor', 'Okafor', 'An 11-year-old [boy/girl] from a family of curse-breakers, clever focused eyes, short neat hair, robes with rolled-up sleeves, a leather tool roll of tiny brass picks over one shoulder, a faint glowing rune fading on one fingertip.'),
     ]),
     ('people', 'People', 'public/art/people', 'Everyone the players can meet. They show on the map and in the Here tab.', [
         ('headmaster', 'The Headmaster', 'A very old, kind headmaster with a long white beard, half-moon spectacles, deep plum robes with silver stars, tired eyes hiding worry.'),
@@ -171,7 +174,7 @@ SECTIONS = [
         ('page-3', 'Page 3', 'Dawn in an old castle corridor: students lying grey and silent as if painted in ash, the painted eyes of portraits watching.'),
         ('page-4', 'Page 4', 'A noble wizarding family raising their wands together, sealing a furious painter inside his own canvas in a burst of light.'),
         ('page-5', 'Page 5', 'A painting wrapped in grey cloth being loaded onto a scarlet steam train at night, steam curling, a single eye glinting under the cloth.'),
-        ('page-6', 'Page 6', 'Six sealed letters with wax seals flying through the sky towards six different houses, a castle on a hill in the distance.'),
+        ('page-6', 'Page 6', 'Owls carrying sealed letters with wax seals flying through a dusk sky towards scattered houses, a castle on a hill in the distance.'),
     ]),
     ('puzzles', 'Puzzle parts', 'public/art/puzzles', 'Pictures for the TV puzzles. The game moves these pieces itself, so each one is a separate picture. Until you add them, the game draws its own.', [
         ('chess-light', 'Chessboard light stone', 'A seamless top-down texture of a huge pale cream flagstone floor, worn smooth, faint cracks and chalky dust, one continuous slab with no grid lines or squares drawn on it.'),

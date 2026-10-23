@@ -246,7 +246,7 @@ export const sendAttack = (sid, uid, payload) =>
   logEvent(sid, { type: 'attack', actorUid: uid, processed: false, payload });
 
 export const sendRoll = (sid, uid, payload) =>
-  logEvent(sid, { type: 'roll', actorUid: uid, payload });
+  logEvent(sid, { type: 'roll', actorUid: uid, payload, ...(payload.nerve ? { processed: false } : {}) });
 
 // ---------- The forbidden curse ----------
 

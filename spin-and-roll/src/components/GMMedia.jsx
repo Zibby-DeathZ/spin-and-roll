@@ -4,6 +4,7 @@ import JumpScare from './JumpScare';
 import MainEventLock from './MainEventLock';
 import { OwlArrival } from './OwlPost';
 import { AwardsShow, HouseCupShow } from './Shows';
+import { QuestScroll } from './QuestComplete';
 import { IDENT_MS, TITLE_MS } from '../lib/intro';
 import { play, playFile, setMusic, SFX, unlockAudio } from '../lib/sound';
 
@@ -96,7 +97,7 @@ function Preview({ kind, data, session, onClose }) {
   if (kind === 'lock') body = <div className="media-phone"><MainEventLock /></div>;
   if (kind === 'awards') {
     body = (
-      <div className="media-preview tv2-center"><AwardsShow show={{ awards: [
+      <div className="media-preview tv2-center"><AwardsShow inline show={{ kind: 'day', day: 2, at: 1, standings: [...standings].map(([h], i) => [h, [42, 30, 18, 5][i]]), leaders: [standings[0][0]], perk: 'luck', awards: [
         { icon: '⚔️', title: 'Heaviest Hitter', unit: 'damage dealt', name: 'Leo', value: 47 },
         { icon: '⏳', title: 'Point Machine', unit: 'house points earned', name: 'Zibby', value: 45 },
         { icon: '🍀', title: 'Luckiest Wand', unit: 'natural 20s', name: 'Ari', value: 3 },
@@ -104,6 +105,10 @@ function Preview({ kind, data, session, onClose }) {
       ] }} /></div>
     );
   }
+  const sampleQuest = { id: 'p', title: 'The Missing Ingredients', icon: '🫙', giver: 'Professor Grimsby', names: ['Ada', 'Rook', 'Femi'],
+    reward: { xp: 60, gold: 25, points: 20, items: [{ id: 'wiggenweld', name: 'Wiggenweld Potion', icon: '💚' }] } };
+  if (kind === 'quest') body = <QuestScroll q={sampleQuest} currency={data.currency} onClose={onClose} />;
+  if (kind === 'quest-phone') body = <div className="media-phone"><QuestScroll q={sampleQuest} currency={data.currency} phone onClose={onClose} /></div>;
   if (kind === 'housecup') body = <div className="media-preview tv2-center"><HouseCupShow show={{ winner: standings[0][0], names: ['Zibby', 'Mia'], standings }} /></div>;
   return (
     <>
@@ -166,6 +171,8 @@ export default function GMMedia({ data, session }) {
         <button className="btn" onClick={() => open('owl')}>🦉 Owl arrival (phone)</button>
         <button className="btn" onClick={() => open('lock')}>🔒 Main event lock (phone)</button>
         <button className="btn" onClick={() => open('awards')}>🎖️ Awards</button>
+        <button className="btn" onClick={() => open('quest')}>📜 Quest complete</button>
+        <button className="btn" onClick={() => open('quest-phone')}>📜 Quest complete (phone)</button>
         <button className="btn" onClick={() => open('housecup')}>🏆 House Cup</button>
       </div>
 

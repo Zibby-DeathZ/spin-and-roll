@@ -657,6 +657,14 @@
      "y": 40
     },
     {
+     "id": "tablet-1",
+     "type": "item",
+     "item": "rune-tablet-1",
+     "loc": "library",
+     "x": 28,
+     "y": 62
+    },
+    {
      "id": "ring-moon",
      "type": "item",
      "item": "ring-clue-moon",
@@ -751,6 +759,14 @@
   "2-Free time": {
    "spawn": [
     {
+     "id": "tablet-2",
+     "type": "item",
+     "item": "rune-tablet-2",
+     "loc": "greenhouses",
+     "x": 72,
+     "y": 60
+    },
+    {
      "id": "duelist-2",
      "type": "monster",
      "kind": "rival-duelist",
@@ -783,6 +799,14 @@
      "loc": "restricted-section",
      "x": 75,
      "y": 35
+    },
+    {
+     "id": "tablet-3",
+     "type": "item",
+     "item": "rune-tablet-3",
+     "loc": "hagrids-hut",
+     "x": 30,
+     "y": 60
     },
     {
      "id": "boar-3",
@@ -1784,6 +1808,9 @@
    "ring-clue-moon": "Star chart (second ring)",
    "ring-clue-owl": "Feathered card (last ring)",
    "diary-page": "Page of Vale’s diary",
+   "rune-tablet-1": "Rune tablet (beasts and sky)",
+   "rune-tablet-2": "Rune tablet (garden)",
+   "rune-tablet-3": "Rune tablet (hearth)",
    "stolen-jars": "Stolen ingredient jars"
   },
   "chests": {

@@ -276,7 +276,7 @@ export default function GMScreen() {
           {data.clock && <ClockChip data={data} clk={clockOf(session)} />}
         </div>
         <div className="gm-top-right">
-          {data.quizzes && <HouseBoard points={session.state?.housePoints} compact />}
+          {data.quizzes && <HouseBoard points={session.state?.housePoints} hod={session.state?.houseOfDay} compact />}
           {data.music && <GMMusic sid={sid} data={data} session={session} setMusicState={setMusicState} />}
           <button className={`btn small ${session.state?.lock ? 'ember' : ''}`} onClick={() => setLock(sid, !session.state?.lock)}
             title="Lock every phone so everyone watches the TV">
@@ -319,7 +319,7 @@ export default function GMScreen() {
           </p>
         </section>
       )}
-      {pointsOpen && <GMPoints sid={sid} session={session} chars={chars} onClose={() => setPointsOpen(false)} />}
+      {pointsOpen && <GMPoints sid={sid} data={data} session={session} chars={chars} onClose={() => setPointsOpen(false)} />}
 
       {quizState && data.quizzes?.[quizState.id] && (
         <GMQuiz sid={sid} quizState={quizState} data={data} chars={chars} answers={answers} />

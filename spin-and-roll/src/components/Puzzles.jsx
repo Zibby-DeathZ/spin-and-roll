@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import Art, { useArtUrl } from './Art';
+import { clearRunes, forgetRune, knownRunes, learnRunes, lettersOfClue } from '../lib/runes';
 import {
-  closePuzzle, edgeKey, flipTorches, GLYPH, initialState, isSolved, lettersIn, markSolved, PIECE_NAME, rotMask, runeFor,
+  closePuzzle, edgeKey, flipTorches, GLYPH, initialState, isSolved, lettersIn, markSolved, PIECE_NAME, rotMask, RUNE_ALPHABET, runeFor,
   runeStepOk, setPuzzle, startPuzzle, stairsConnected,
 } from '../lib/puzzles';
 
@@ -280,12 +281,15 @@ export function PuzzleView({ p, st, gm = false, onAct, sel }) {
     const cols = p.grid[0].length;
     return (
       <div className="runefloor-wrap">
-        <p className="runeword">{p.word.split('').map((l) => runeFor(l)).join(' ')}</p>
+        {p.wordInEnglish
+          ? <p className="runeword english" aria-label={`The word: ${p.word}`}>{p.word.split('').join(' ')}</p>
+          : <p className="runeword">{p.word.split('').map((l) => runeFor(l)).join(' ')}</p>}
         <div className="runefloor" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
           {p.grid.join('').split('').map((l, i) => (
             <button key={i} type="button" disabled={!gm} onClick={() => onAct?.(i)}
               className={`rtile ${st.path.includes(i) ? 'stepped' : ''} ${st.trapped === i ? 'trap' : ''} ${st.path[st.path.length - 1] === i ? 'here' : ''}`}>
               {runeFor(l)}
+              {gm && <span className="rtile-gm">{l}</span>}
             </button>
           ))}
         </div>
@@ -460,7 +464,11 @@ function ActivePuzzle({ sid, p, st, chars, players }) {
         <div className="cipher-keys">
           {lettersIn(p.message).map((l) => (
             <button key={l} className={`btn small ${st.revealed.includes(l) ? 'teal' : ''}`}
-              onClick={() => setPuzzle(sid, { revealed: st.revealed.includes(l) ? st.revealed.filter((x) => x !== l) : [...st.revealed, l] })}>
+              onClick={() => {
+                const on = !st.revealed.includes(l);
+                setPuzzle(sid, { revealed: on ? [...st.revealed, l] : st.revealed.filter((x) => x !== l) });
+                if (on) learnRunes(sid, [l], p.title, true).catch(console.error); // quietly into everyone's rune notebook
+              }}>
               {runeFor(l)} = {l}
             </button>
           ))}
@@ -496,6 +504,47 @@ export function GMPuzzles({ sid, data, session, chars }) {
           </div>
         </>
       )}
+      <GMRuneCodex sid={sid} data={data} session={session} />
     </section>
+  );
+}
+
+// The party's rune notebook: which letters every phone shows in ink.
+function GMRuneCodex({ sid, data, session }) {
+  const known = knownRunes(session);
+  const sources = Object.entries(data.items ?? {})
+    .filter(([, it]) => it.kind === 'clue' && (it.read?.style === 'tablet' || it.read?.style === 'runes'))
+    .map(([id, it]) => ({ id, name: it.name, letters: lettersOfClue(it) }));
+  return (
+    <details className="gm-codex" open={known.length > 0}>
+      <summary>📖 Rune notebook: {known.length} of 26 letters confirmed</summary>
+      <p className="muted small">
+        Confirmed letters show in ink on every phone’s rune notebook. Letters revealed in a cipher puzzle are added by themselves.
+        When the players work out a tablet or a rune clue, confirm its letters here. Tap a letter to add or remove it.
+      </p>
+      <div className="codex-grid">
+        {RUNE_ALPHABET.map(({ rune, letter }) => {
+          const on = known.includes(letter);
+          return (
+            <button key={rune} className={`codex-cell ${on ? 'on' : ''}`} aria-pressed={on}
+              onClick={() => (on ? forgetRune(sid, letter) : learnRunes(sid, [letter], 'the DM'))}>
+              <span className="codex-rune">{rune}</span><span className="codex-letter">{letter}</span>
+            </button>
+          );
+        })}
+      </div>
+      <div className="codex-sources">
+        {sources.map((src) => {
+          const missing = src.letters.filter((l) => !known.includes(l));
+          return (
+            <button key={src.id} className="btn small" disabled={!missing.length} onClick={() => learnRunes(sid, src.letters, src.name)}
+              title={src.letters.join(' ')}>
+              {missing.length ? `✓ They worked out: ${src.name} (+${missing.length})` : `${src.name}: all known`}
+            </button>
+          );
+        })}
+        {known.length > 0 && <button className="btn small ghost" onClick={() => confirm('Wipe the rune notebook for everyone?') && clearRunes(sid)}>Clear notebook</button>}
+      </div>
+    </details>
   );
 }

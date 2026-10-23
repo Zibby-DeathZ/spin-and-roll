@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { isMonster } from '../components/MapView';
-import { fmtMod, mod, statOf } from '../lib/game';
-import { rollD20 } from '../lib/dice';
+import { clockOf, fmtMod, mod, statOf } from '../lib/game';
+import { nerveRoll } from '../lib/houses';
 import { exitsOf, locOf, pcsAt, rewardText, sendOpenChest, sendPickup } from '../lib/world';
 import Art, { tokenArt } from '../components/Art';
 
-function ChestRoll({ sid, c, id, t, onClose }) {
+function ChestRoll({ sid, c, id, t, onClose, dawn }) {
   const knowsAlohomora = (c.spells ?? []).some((s) => s.id === 'alohomora');
   const mode = knowsAlohomora ? 'adv' : 'normal';
   const [roll, setRoll] = useState(null);
@@ -14,10 +14,10 @@ function ChestRoll({ sid, c, id, t, onClose }) {
 
   const go = async () => {
     setBusy(true);
-    const r = rollD20(mode);
+    const r = nerveRoll(c, mode, dawn);
     const total = r.nat + bonus;
     setRoll({ ...r, total });
-    await sendOpenChest(sid, c.uid, { tokenId: id, nat: r.nat, rolls: r.rolls, total, mode });
+    await sendOpenChest(sid, c.uid, { tokenId: id, nat: r.nat, rolls: r.rolls, total, mode, ...(r.nerve ? { nerve: true } : {}) });
     setBusy(false);
   };
 
@@ -31,6 +31,7 @@ function ChestRoll({ sid, c, id, t, onClose }) {
           <div className="roll-out">
             <span className="big-die">{roll.nat}</span>
             <span className="muted">{roll.rolls.length > 1 ? `Rolled ${roll.rolls.join(' and ')}, kept ${roll.nat}. ` : ''}Total {roll.total}</span>
+            {roll.nerve && <span className="nerve-note">🦁 Natural 1, re-rolled with Gryffindor nerve!</span>}
             <span className="muted small">Watch the TV…</span>
           </div>
         ) : (
@@ -140,7 +141,7 @@ export default function HereTab({ sid, c, data, session, chars }) {
         )}
       </section>
 
-      {chest && tokens[chest] && <ChestRoll sid={sid} c={c} id={chest} t={tokens[chest]} onClose={() => setChest(null)} />}
+      {chest && tokens[chest] && <ChestRoll sid={sid} c={c} id={chest} t={tokens[chest]} dawn={clockOf(session).dawn} onClose={() => setChest(null)} />}
     </>
   );
 }

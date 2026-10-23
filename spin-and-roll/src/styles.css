@@ -899,13 +899,6 @@ select.wide { width: 100%; background: var(--ink); color: var(--bone); border: 1
 .stamp { position: absolute; top: .6rem; right: .8rem; font: 700 1.1rem var(--display); padding: .1rem .6rem; border: 3px solid; border-radius: 6px; transform: rotate(8deg); }
 .stamp.cleared { color: var(--teal); } .stamp.accused { color: var(--ember); }
 
-.awards { text-align: center; width: 100%; }
-.awards h2 { font-size: 2.6rem; color: var(--bone); }
-.award-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1rem; }
-.award { display: flex; flex-direction: column; align-items: center; gap: .2rem; background: var(--panel); border: 2px solid var(--gold); border-radius: 16px; padding: 1.2rem .8rem; opacity: 0; animation: award-in .6s ease-out forwards; }
-.award-icon { font-size: 3rem; }
-.award strong { font: 700 1.3rem var(--display); color: var(--gold); }
-.award-name { font: 700 1.8rem var(--display); }
 @keyframes award-in { from { opacity: 0; transform: translateY(20px) scale(.9); } to { opacity: 1; transform: none; } }
 
 .housecup { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .4rem; border-radius: 20px; padding: 1.5rem; }
@@ -1023,6 +1016,12 @@ select.wide { width: 100%; background: var(--ink); color: var(--bone); border: 1
 .fam-name { font: 700 clamp(1.2rem, 2.2vw, 2rem) 'Cinzel', serif; color: #3a2614; }
 .fam-sub { font: italic 1rem 'Grenze', serif; color: #8a6a3e; }
 .fam-card.claimed { background: rgb(227 176 75 / .25); }
+/* More than 3 a page (8 or 9 families): tighter cards so they still fit. */
+.fam-col.n4, .fam-col.n5 { gap: 2.5%; }
+.fam-col.n4 .fam-card, .fam-col.n5 .fam-card { padding: 1% 4%; }
+.fam-col.n4 .fam-portrait, .fam-col.n5 .fam-portrait { width: min(7vh, 5vw); height: min(7vh, 5vw); }
+.fam-col.n5 .fam-name { font-size: clamp(1rem, 1.8vw, 1.6rem); }
+.fam-col.n5 .fam-sub { font-size: .85rem; }
 .fam-stamp { position: absolute; right: 4%; top: 50%; transform: translateY(-50%) rotate(-8deg); font: 700 clamp(1.2rem, 2.2vw, 2rem) 'Cinzel', serif;
   color: #8a2a1e; border: 3px solid #8a2a1e; border-radius: 6px; padding: .1em .5em; animation: stamp .45s cubic-bezier(.3,1.6,.5,1); }
 @keyframes stamp { from { transform: translateY(-50%) rotate(-8deg) scale(2.2); opacity: 0; } to { transform: translateY(-50%) rotate(-8deg) scale(1); opacity: 1; } }
@@ -1687,3 +1686,270 @@ button.status-chip.removable:hover { background: rgba(200, 60, 80, 0.3); }
 .ring-dial .sym-on { filter: drop-shadow(0 0 6px rgb(255 214 120 / .95)) drop-shadow(0 0 14px rgb(255 190 80 / .6)); }
 .pc.b.has-art img { filter: drop-shadow(0 0 3px rgb(255 240 210 / .6)) drop-shadow(0 6px 4px rgb(0 0 0 / .6)); }
 .tv-puzzle .sky-svg { width: min(calc((100vh - 240px) * 1.25), 92vw); }
+
+/* ===================== End-of-day ceremony (TV) ===================== */
+.day-cer { position: fixed; inset: 0; z-index: 30; overflow: hidden; display: flex; flex-direction: column; align-items: center;
+  padding: 4vh 4vw 6vh; color: var(--bone); text-align: center; --glow: rgb(227 176 75 / .22);
+  background: radial-gradient(ellipse 70% 55% at 50% 38%, var(--glow), transparent 70%),
+    radial-gradient(ellipse at 50% 120%, #2b1a3e 0%, transparent 60%), linear-gradient(#0b0918, #15102a 60%, #0d0a1c); }
+.day-cer.inline { position: relative; inset: auto; width: 100%; height: 100%; min-height: 70vh; border-radius: 18px; }
+.day-cer.glow-gryffindor { --glow: rgb(190 40 30 / .35); }
+.day-cer.glow-slytherin { --glow: rgb(40 140 80 / .32); }
+.day-cer.glow-ravenclaw { --glow: rgb(60 100 210 / .35); }
+.day-cer.glow-hufflepuff { --glow: rgb(235 185 60 / .32); }
+.cer-air { position: absolute; inset: 0; pointer-events: none; }
+.cer-mote { position: absolute; bottom: -10px; border-radius: 50%; background: #ffd98a; box-shadow: 0 0 8px 2px rgb(255 210 120 / .7);
+  opacity: 0; animation: mote-rise linear infinite; }
+@keyframes mote-rise { 0% { transform: translate(0, 0); opacity: 0; } 10% { opacity: .9; } 80% { opacity: .6; } 100% { transform: translate(30px, -105vh); opacity: 0; } }
+.cer-candle { position: absolute; width: 9px; height: var(--h); border-radius: 2px; opacity: .85;
+  background: linear-gradient(90deg, #d9cbb0, #fff6e4 45%, #c9b996); animation: candle-bob 5s ease-in-out infinite; }
+.cer-candle .flame { position: absolute; left: 50%; top: -15px; width: 9px; height: 14px; transform: translateX(-50%); border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: radial-gradient(circle at 50% 70%, #fff7c8, #ffb93d 55%, rgb(255 120 30 / 0) 75%); box-shadow: 0 0 18px 6px rgb(255 190 80 / .45);
+  animation: flicker .18s ease-in-out infinite alternate; }
+@keyframes candle-bob { 50% { transform: translateY(-10px); } }
+@keyframes flicker { to { transform: translateX(-50%) scale(.9, 1.08); opacity: .85; } }
+
+.cer-head { position: relative; z-index: 1; }
+.cer-eyebrow { margin: 0; font: italic 1.4rem 'IM Fell English', Georgia, serif; color: #cbbfa6; animation: sort-up .8s both; }
+.cer-title-main { margin: .2rem 0 0; font: 700 clamp(2.4rem, 5vw, 4.4rem) 'Cinzel Decorative', 'Cinzel', serif; letter-spacing: .04em;
+  background: linear-gradient(100deg, #b8862e 20%, #ffe9a8 40%, #d9a441 55%, #ffe9a8 70%, #b8862e 90%); background-size: 250% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent; animation: sort-up .9s .2s both, shimmer 6s linear infinite;
+  filter: drop-shadow(0 4px 18px rgb(0 0 0 / .6)); }
+@keyframes shimmer { to { background-position: -250% 0; } }
+.cer-kicker { margin: 0; font: 500 1.3rem 'Cinzel', serif; letter-spacing: .35em; text-transform: uppercase; color: #e8d6a8; }
+
+/* The race: hourglasses */
+.cer-race { position: relative; z-index: 1; flex: 1; width: 100%; display: flex; align-items: center; justify-content: center; gap: 4vw; transition: gap .8s; }
+.hg-row { display: flex; align-items: flex-end; justify-content: center; gap: 3vw; transition: transform 1s cubic-bezier(.4, 0, .2, 1), gap 1s; }
+.cer-race.with-hod .hg-row { gap: 1.2vw; }
+.cer-race.with-hod .hg { width: min(8.5vw, 125px); }
+.cer-race.with-hod .hg-pts { font-size: 1.6rem; }
+.cer-race.with-hod .hg-name { font-size: .8rem; }
+.hg { position: relative; display: flex; flex-direction: column; align-items: center; gap: .3rem; width: min(13vw, 190px);
+  animation: hg-in .7s calc(var(--i) * .15s) cubic-bezier(.2, 1.3, .4, 1) both; transition: filter .8s, transform .8s, opacity .8s, width 1s cubic-bezier(.4, 0, .2, 1); }
+.cer-race.with-hod .hg:not(.win) { opacity: .5; filter: saturate(.6); }
+.hg.win { transform: translateY(-14px); filter: drop-shadow(0 0 24px rgb(255 214 120 / .65)); }
+.hg svg { width: 100%; height: auto; overflow: visible; }
+.hg-top, .hg-bot { transform-box: fill-box; transform-origin: 50% 100%; }
+.hg-top { opacity: .6; animation: sand-out 3s calc(.3s + var(--i) * .15s) cubic-bezier(.3, 0, .4, 1) forwards; }
+.hg-bot { animation: sand-in 3s calc(.3s + var(--i) * .15s) cubic-bezier(.3, 0, .4, 1) both; }
+.hg-stream { opacity: 0; animation: stream 3s calc(.3s + var(--i) * .15s) linear; }
+@keyframes sand-out { to { transform: scaleY(var(--left)); } }
+@keyframes sand-in { from { transform: scaleY(0); } }
+@keyframes stream { 5%, 90% { opacity: .9; stroke-dashoffset: -40; } 100% { opacity: 0; stroke-dashoffset: -44; } }
+@keyframes hg-in { from { opacity: 0; transform: translateY(40px) scale(.9); } }
+.hg-crest { position: absolute; top: 34%; width: 34%; height: auto; font-size: 0; filter: drop-shadow(0 2px 6px rgb(0 0 0 / .6)); }
+.hg-crest .crest-svg, .hg-crest img { width: 100%; height: auto; }
+.hg-pts { font: 700 clamp(1.8rem, 3vw, 2.8rem) 'Cinzel', serif; color: #ffe1a0; text-shadow: 0 0 14px rgb(255 190 80 / .5); }
+.hg-name { font: 500 1.1rem 'Cinzel', serif; letter-spacing: .14em; text-transform: uppercase; color: #d9ccb2; }
+
+/* The House of the Day */
+.hod-reveal { display: flex; flex-direction: column; align-items: center; gap: 1vh; max-width: 42vw; animation: sort-up .8s both; }
+.hod-crests { display: flex; gap: 2vw; }
+.hod-crest-wrap { position: relative; width: min(18vw, 24vh); aspect-ratio: 100 / 120; display: grid; place-items: center; }
+.hod-rays { position: absolute; inset: -55%; border-radius: 50%;
+  background: repeating-conic-gradient(rgb(255 225 150 / .28) 0 6deg, transparent 6deg 18deg);
+  mask: radial-gradient(circle, #000 18%, transparent 66%); -webkit-mask: radial-gradient(circle, #000 18%, transparent 66%);
+  animation: rays 18s linear infinite, fadein 1.2s both; }
+@keyframes rays { to { transform: rotate(1turn); } }
+.hod-crest { position: relative; width: 100%; height: 100%; font-size: 0; animation: sort-in 1.1s cubic-bezier(.2, 1.4, .4, 1) both;
+  filter: drop-shadow(0 6px 30px rgb(0 0 0 / .7)); }
+.hod-crest .crest-svg, .hod-crest img { width: 100%; height: 100%; object-fit: contain; }
+.hod-name { margin: 0; font: 700 clamp(2.6rem, 5vw, 4.4rem) 'Cinzel Decorative', 'Cinzel', serif; color: var(--gold);
+  text-shadow: 0 0 30px rgb(255 200 90 / .45); animation: sort-up .7s .6s both; }
+.perk-card { position: relative; display: flex; align-items: center; gap: 1.2rem; margin-top: 1.2vh; padding: 1.1rem 1.8rem 1.1rem 1.1rem; text-align: left;
+  color: #3a2614; background: linear-gradient(160deg, #f6ead0, #e5d2a6); border-radius: 6px;
+  box-shadow: 0 14px 40px rgb(0 0 0 / .55), inset 0 0 30px rgb(140 100 40 / .35); animation: perk-in .9s 1.2s cubic-bezier(.2, 1.2, .4, 1) both; }
+.perk-seal { flex: none; display: grid; place-items: center; width: 4.6rem; height: 4.6rem; font-size: 2.2rem; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #c8443a, #8a1f17 70%); box-shadow: 0 3px 0 #5e140f, inset 0 -4px 8px rgb(0 0 0 / .3);
+  animation: seal-stamp .5s 1.9s cubic-bezier(.3, 1.6, .5, 1) both; }
+.perk-text { display: flex; flex-direction: column; gap: .2rem; }
+.perk-text strong { font: 700 1.7rem 'Cinzel', serif; color: #6e1813; }
+.perk-text span { font: 1.25rem 'IM Fell English', Georgia, serif; }
+@keyframes perk-in { from { opacity: 0; transform: translateY(30px) rotate(-3deg) scale(.9); } }
+@keyframes seal-stamp { from { opacity: 0; transform: scale(2.4) rotate(-30deg); } }
+
+/* The awards */
+.cer-hod-line { position: relative; z-index: 1; display: flex; align-items: center; gap: .6rem; margin: 1.2vh 0 0;
+  font: 500 1.35rem 'Cinzel', serif; color: #e8d6a8; animation: sort-up .6s both; }
+.cer-mini-crest { width: 2.2rem; height: auto; font-size: 0; }
+.cer-mini-crest .crest-svg, .cer-mini-crest img { width: 100%; height: auto; }
+.cer-awards { position: relative; z-index: 1; flex: 1; width: 100%; max-width: 1500px; display: grid; grid-template-columns: repeat(4, 1fr);
+  align-content: center; gap: 2.4vh 1.6vw; perspective: 1200px; }
+.cer-award { position: relative; display: flex; flex-direction: column; align-items: center; gap: .35rem; padding: 2.6rem 1rem 1.3rem;
+  border-radius: 14px; background: linear-gradient(170deg, #2c2347, #1a1530); border: 2px solid #b88a35;
+  box-shadow: inset 0 0 0 5px #1a1530, inset 0 0 0 6px rgb(227 176 75 / .5), 0 14px 30px rgb(0 0 0 / .5);
+  animation: card-deal .8s calc(.3s + var(--i) * .45s) cubic-bezier(.2, 1, .3, 1) both; }
+.cer-award::after { content: ''; position: absolute; inset: 0; border-radius: 14px; pointer-events: none;
+  background: linear-gradient(115deg, transparent 35%, rgb(255 240 200 / .22) 50%, transparent 65%); background-size: 250% 100%;
+  animation: card-shine 1.4s calc(1s + var(--i) * .45s) ease-out both; }
+.cer-medal { position: absolute; top: -2.2rem; display: grid; place-items: center; width: 4.4rem; height: 4.4rem; font-size: 2.1rem; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffe7a3, #c38b2c 60%, #7a5214); box-shadow: 0 4px 14px rgb(0 0 0 / .5), inset 0 0 0 3px rgb(255 245 210 / .5); }
+.cer-title { font: 700 1.05rem 'Cinzel', serif; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
+.cer-who { font: 700 clamp(1.6rem, 2.4vw, 2.4rem) 'Cinzel Decorative', 'Cinzel', serif; color: #fff4dc; }
+.cer-val { font: italic 1.1rem 'IM Fell English', Georgia, serif; color: #cbbfa6; }
+@keyframes card-deal { from { opacity: 0; transform: translateY(-50px) rotateY(-100deg) scale(.85); } 60% { opacity: 1; } }
+@keyframes card-shine { from { background-position: 150% 0; } to { background-position: -100% 0; } }
+.cer-empty { position: relative; z-index: 1; margin: auto; font: italic 1.6rem 'IM Fell English', Georgia, serif; color: #cbbfa6; }
+.cer-dots { position: absolute; bottom: 2.4vh; left: 50%; transform: translateX(-50%); z-index: 2; display: flex; gap: .7rem; }
+.cer-dots button { width: 12px; height: 12px; padding: 0; border-radius: 50%; border: 1px solid #b88a35; background: transparent; cursor: pointer; }
+.cer-dots button.on { background: var(--gold); box-shadow: 0 0 10px rgb(255 200 90 / .7); }
+@media (max-width: 900px) { .cer-awards { grid-template-columns: repeat(2, 1fr); } .cer-race { flex-direction: column; } .hod-reveal { max-width: 90vw; } }
+@media (prefers-reduced-motion: reduce) {
+  .day-cer *, .day-cer *::after { animation-duration: .01s !important; animation-iteration-count: 1 !important; }
+  .cer-mote, .cer-candle { display: none; }
+}
+
+/* House of the Day on the house boards, and the house card on the phone */
+.houseboard li.hod { box-shadow: 0 0 0 2px var(--gold), 0 0 16px rgb(227 176 75 / .45); }
+.hod-badge { margin-left: .2rem; font-size: 1rem; }
+.house-card { display: flex; gap: .9rem; align-items: flex-start; padding: .9rem; margin: 1rem 0; border-radius: 14px;
+  background: var(--panel); border: 1px solid var(--line); border-left: 5px solid currentColor; }
+.house-card h2 { margin: 0 0 .3rem; font-size: 1.25rem; color: var(--bone); }
+.house-card p { margin: .2rem 0; color: var(--bone); }
+.hcard-gryffindor { color: var(--gryffindor); } .hcard-slytherin { color: var(--slytherin); }
+.hcard-ravenclaw { color: var(--ravenclaw); } .hcard-hufflepuff { color: var(--hufflepuff); }
+.hcard-crest { flex: none; width: 3.2rem; height: auto; font-size: 0; }
+.hcard-crest .crest-svg, .hcard-crest img { width: 100%; height: auto; }
+.hcard-body { flex: 1; min-width: 0; }
+.hcard-perk { padding: .5rem .6rem; border-radius: 8px; background: rgb(227 176 75 / .12); border: 1px solid rgb(227 176 75 / .4); }
+.nerve-note { display: block; color: #ff9d7a; font-weight: 700; }
+.hod-gm { margin-top: 1rem; padding-top: .8rem; border-top: 1px solid var(--line); }
+.hod-gm h3 { margin: 0 0 .3rem; }
+.hod-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin: .4rem 0; }
+
+/* ===================== Quest complete (TV and phone) ===================== */
+.qc { position: fixed; inset: 0; z-index: 46; display: grid; place-items: center; overflow: hidden; padding: 3vh 4vw;
+  background: radial-gradient(ellipse 60% 55% at 50% 45%, rgb(255 205 110 / .28), transparent 70%), rgb(8 6 18 / .82);
+  animation: fadein .5s both; }
+.qc-burst { position: absolute; left: 50%; top: 45%; width: 160vmax; height: 160vmax; transform: translate(-50%, -50%);
+  background: repeating-conic-gradient(rgb(255 220 140 / .16) 0 4deg, transparent 4deg 16deg);
+  mask: radial-gradient(circle, #000 5%, transparent 45%); -webkit-mask: radial-gradient(circle, #000 5%, transparent 45%);
+  animation: rays 40s linear infinite, fadein 1.5s 1s both; }
+.qc-scroll { position: relative; z-index: 1; width: min(860px, 92vw); display: flex; flex-direction: column; align-items: center;
+  filter: drop-shadow(0 30px 50px rgb(0 0 0 / .65)); }
+.qc-roller { position: relative; z-index: 2; display: block; width: 104%; height: 30px; border-radius: 15px;
+  background: linear-gradient(#8a5a2b, #d9a35c 35%, #7a4b20 70%, #4f2f12); box-shadow: inset 0 -3px 6px rgb(0 0 0 / .35); }
+.qc-roller::before, .qc-roller::after { content: ''; position: absolute; top: -5px; width: 26px; height: 40px; border-radius: 8px;
+  background: radial-gradient(circle at 40% 35%, #ffe3a3, #b98a33 60%, #6e4a12); }
+.qc-roller::before { left: -14px; } .qc-roller::after { right: -14px; }
+.qc-roller.top { margin-bottom: -6px; }
+.qc-roller.bottom { margin-top: -6px; }
+/* The paper unrolls: its row grows from nothing, and the bottom roller rides down with it. */
+.qc-unroll { display: grid; grid-template-rows: 0fr; width: 100%; overflow: hidden;
+  background: radial-gradient(ellipse at 50% 0%, rgb(255 255 255 / .35), transparent 60%),
+    radial-gradient(ellipse at 20% 80%, rgb(160 110 50 / .18), transparent 50%), linear-gradient(#f3e3bf, #e8d09d);
+  box-shadow: inset 0 0 50px rgb(130 85 30 / .45); animation: qc-unroll 1.4s .3s cubic-bezier(.3, .7, .3, 1) forwards; }
+.qc-unroll > .qc-paper { min-height: 0; }
+.qc-paper { position: relative; width: 100%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; text-align: center; overflow: hidden;
+  padding: 3.6rem 2.4rem 2.2rem; color: #3a2614; }
+@keyframes qc-unroll { to { grid-template-rows: 1fr; } }
+.qc-seal { position: absolute; top: 1rem; right: 1.6rem; display: grid; place-items: center; width: 5.2rem; height: 5.2rem; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #d2493d, #8f1d15 65%, #6a120c); font-size: 2.4rem;
+  box-shadow: 0 4px 0 #5e140f, 0 8px 18px rgb(0 0 0 / .35), inset 0 -5px 10px rgb(0 0 0 / .3);
+  animation: seal-stamp .55s 1.5s cubic-bezier(.3, 1.6, .5, 1) both; }
+.qc-seal::before { content: ''; position: absolute; inset: 7px; border-radius: 50%; border: 2px dashed rgb(255 200 180 / .4); }
+.qc-kicker { margin: 0; font: 700 1.05rem 'Cinzel', serif; letter-spacing: .4em; text-transform: uppercase; color: #8a2a1e; animation: sort-up .6s 1s both; }
+.qc-title { margin: .3rem 0 0; font: 700 clamp(2rem, 4.4vw, 3.6rem) 'Cinzel Decorative', 'Cinzel', serif; line-height: 1.1; color: #4a2a10;
+  text-shadow: 0 1px 0 rgb(255 255 255 / .5); animation: sort-up .7s 1.15s both; }
+.qc-giver { margin: .2rem 0 0; font: italic 1.25rem 'IM Fell English', Georgia, serif; color: #7a5a30; animation: sort-up .6s 1.3s both; }
+.qc-heroes { margin: .7rem 0 0; font: 500 1.3rem 'Cinzel', serif; color: #3a2614; animation: sort-up .6s 1.45s both; }
+.qc-rule { display: block; width: 60%; height: 12px; margin: 1.1rem 0 .4rem;
+  background: radial-gradient(circle, #8a6a3e 2.5px, transparent 3px) center / 12px 12px repeat-x,
+    linear-gradient(90deg, transparent, #8a6a3e 20%, #8a6a3e 80%, transparent) center / 100% 1px no-repeat;
+  animation: fadein .6s 1.6s both; }
+.qc-rewards { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.2rem 1.6rem; margin-top: .8rem; }
+.qc-token { display: flex; flex-direction: column; align-items: center; gap: .15rem; min-width: 7.5rem; max-width: 14rem;
+  animation: token-pop .6s cubic-bezier(.2, 1.6, .4, 1) both; }
+.qc-token.wide { max-width: 22rem; }
+.qc-orb { display: grid; place-items: center; width: 5rem; height: 5rem; border-radius: 50%; font-size: 2.4rem; overflow: hidden;
+  box-shadow: 0 6px 14px rgb(80 50 10 / .35), inset 0 0 0 3px rgb(255 255 255 / .45); animation: orb-glow 2.4s ease-in-out infinite; }
+.rt-xp .qc-orb { background: radial-gradient(circle at 35% 30%, #fff1b8, #e3a92c 60%, #9a6a10); }
+.rt-gold .qc-orb { background: radial-gradient(circle at 35% 30%, #fff1b8, #d9a33a 55%, #8a5f14); }
+.rt-pts .qc-orb { background: radial-gradient(circle at 35% 30%, #e6dcff, #8e7cc3 60%, #4a3a80); }
+.rt-item .qc-orb { background: radial-gradient(circle at 35% 30%, #ffffff, #e2ecdf 60%, #8fae8a); }
+.qc-art { display: grid; place-items: center; width: 100%; height: 100%; font-size: 2.4rem; }
+.qc-art img { width: 82%; height: 82%; object-fit: contain; }
+.qc-token strong { font: 700 1.6rem 'Cinzel', serif; color: #4a2a10; line-height: 1.15; }
+.rt-item strong { font-size: 1.15rem; }
+.qc-token span:last-child { font: italic 1rem 'IM Fell English', Georgia, serif; color: #7a5a30; }
+.qc-none { font: italic 1.2rem 'IM Fell English', Georgia, serif; color: #7a5a30; animation: fadein .6s 2.2s both; }
+.qc-tap { margin: 1.4rem 0 0; font: italic .95rem 'IM Fell English', Georgia, serif; color: #8a6a3e; animation: fadein .6s 4s both; }
+@keyframes token-pop { from { opacity: 0; transform: scale(.3) translateY(20px); } }
+@keyframes orb-glow { 50% { box-shadow: 0 6px 20px rgb(255 190 70 / .55), inset 0 0 0 3px rgb(255 255 255 / .6); } }
+.qc-shower { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+.qc-coin, .qc-spark { position: absolute; top: -40px; animation: fall linear both; }
+.qc-coin { width: 26px; height: 26px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff1b8, #d9a33a 55%, #8a5f14);
+  box-shadow: inset 0 0 0 3px rgb(255 240 190 / .5), 0 0 10px rgb(255 200 80 / .5); }
+.qc-spark { width: 6px; height: 6px; border-radius: 50%; background: #ffe3a0; box-shadow: 0 0 12px 3px rgb(255 210 120 / .8); }
+@keyframes fall { 0% { transform: translateY(0) rotateY(0); opacity: 0; } 10% { opacity: 1; } 85% { opacity: 1; }
+  100% { transform: translateY(110vh) rotateY(calc(var(--spin) * 720deg)); opacity: 0; } }
+.qc-phone { padding: 1rem; cursor: pointer; }
+.qc-phone .qc-paper { padding: 1.4rem 1.2rem 1.4rem; }
+.qc-phone .qc-kicker { letter-spacing: .25em; }
+.qc-phone .qc-seal { position: relative; top: auto; right: auto; flex: none; margin: 0 0 .7rem; width: 3.6rem; height: 3.6rem; font-size: 1.7rem; }
+.qc-phone .qc-shower { z-index: 0; }
+.qc-phone .qc-art { font-size: 1.8rem; }
+.qc-phone .qc-title { font-size: 1.8rem; }
+.qc-phone .qc-orb { width: 3.8rem; height: 3.8rem; font-size: 1.8rem; }
+.qc-phone .qc-token { min-width: 5.5rem; }
+.qc-phone .qc-token strong { font-size: 1.25rem; }
+@media (prefers-reduced-motion: reduce) {
+  .qc *, .qc { animation-duration: .01s !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; }
+  .qc-shower, .qc-burst { display: none; }
+}
+
+/* ===================== Rune notebook and tablets ===================== */
+.notebook-btn { display: flex; align-items: center; gap: .8rem; width: 100%; margin: 0 0 1rem; padding: .7rem .9rem; text-align: left; cursor: pointer;
+  color: #3b2414; border: 1px solid #8a6a3d; border-radius: 10px; background: radial-gradient(circle at 30% 30%, #f6ead0, #d9bf8a);
+  box-shadow: inset 0 0 18px rgb(110 70 20 / .35); }
+.notebook-btn strong { display: block; font: 1.1rem 'IM Fell English SC', Georgia, serif; }
+.notebook-btn .muted { color: #6b4a2a; }
+.nb-btn-icon { font-size: 1.8rem; }
+.notebook { width: min(460px, 100%); }
+.nb-count { margin: .2rem 0 .7rem; text-align: center; font: italic .95rem 'IM Fell English', Georgia, serif; color: #6b4a2a; }
+.nb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(3.4rem, 1fr)); gap: .4rem; }
+.nb-cell { display: flex; flex-direction: column; align-items: center; gap: .1rem; min-height: 3.6rem; padding: .3rem 0; cursor: pointer;
+  border: 1px dashed rgb(110 70 20 / .45); border-radius: 6px; background: rgb(255 250 235 / .35); color: #2a1a0e; }
+.nb-cell:disabled { cursor: default; }
+.nb-rune { font-size: 1.6rem; line-height: 1; }
+.nb-rune.inline { font-size: 1.3rem; }
+.nb-letter { font: 700 1.05rem 'Cinzel', serif; color: #a08a6a; }
+.nb-cell.ink { border-style: solid; border-color: #6b4a2a; background: rgb(255 250 235 / .7); }
+.nb-cell.ink .nb-letter { color: #7a1e14; }
+.nb-cell.pencil .nb-letter { font: italic 500 1.1rem 'IM Fell English', Georgia, serif; color: #4a4a52; }
+.nb-cell.picking { outline: 3px solid #a9813e; outline-offset: 1px; }
+.nb-picker { margin-top: .8rem; padding-top: .6rem; border-top: 1px solid rgb(110 70 20 / .3); text-align: center; }
+.nb-picker p { margin: 0 0 .4rem; }
+.nb-keys { display: grid; grid-template-columns: repeat(7, 1fr); gap: .3rem; }
+.nb-keys button { min-height: 44px; padding: 0; font: 700 1rem 'Cinzel', serif; color: #3b2414; border: 1px solid #8a6a3d; border-radius: 6px; background: rgb(255 250 235 / .6); }
+.nb-keys button.on { background: #a9813e; color: #fff8e6; }
+.nb-keys button:disabled { opacity: .3; }
+.nb-keys .nb-erase { grid-column: span 2; font: italic .9rem 'IM Fell English', Georgia, serif; }
+.tablet-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: .8rem; margin: .4rem 0; }
+.tablet-cell { display: flex; flex-direction: column; align-items: center; gap: .3rem; padding: .7rem .4rem; border-radius: 8px;
+  background: radial-gradient(circle at 40% 30%, #6b6470, #3e3944); box-shadow: inset 0 0 14px rgb(0 0 0 / .5); }
+.tablet-pic { font-size: 2.6rem; filter: sepia(.35) drop-shadow(0 2px 3px rgb(0 0 0 / .5)); }
+.tablet-cell .clue-runes { color: #e6dcf5; text-shadow: 0 0 6px rgb(170 140 240 / .5); }
+.clue-tablet { background: radial-gradient(circle at 50% 35%, #e9e2d3, #b9ad97); }
+.clue-rune-word { display: inline-flex; gap: .05em; }
+.clue-rune-ch { display: inline-flex; flex-direction: column; align-items: center; }
+.clue-under { font: 700 .75rem 'Cinzel', serif; line-height: 1.1; color: #a08a6a; }
+.clue-under.ink { color: #7a1e14; }
+.clue-under.pencil { font: italic .8rem 'IM Fell English', Georgia, serif; color: #4a4a52; }
+.tablet-cell .clue-under { color: #cfc4b2; }
+.tablet-cell .clue-under.ink { color: #ffd98a; }
+.tablet-cell .clue-under.pencil { color: #e0e0ea; }
+.clue-nb-toggle { display: flex; align-items: center; justify-content: center; gap: .5rem; min-height: 44px; font: italic .95rem 'IM Fell English', Georgia, serif; color: #3b2414; }
+.runeword.english { font-family: 'Cinzel', serif; letter-spacing: .5em; color: #f2e6c8; }
+.rtile { position: relative; }
+.rtile-gm { position: absolute; right: 4px; bottom: 2px; font: 700 .7rem 'Figtree', sans-serif; color: #ffd98a; text-shadow: none; }
+.gm-codex { margin-top: 1.2rem; padding: .8rem; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+.gm-codex summary { cursor: pointer; font-weight: 700; }
+.codex-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(3rem, 1fr)); gap: .35rem; margin: .6rem 0; }
+.codex-cell { display: flex; flex-direction: column; align-items: center; padding: .25rem 0; border-radius: 6px; cursor: pointer;
+  border: 1px solid var(--line); background: transparent; color: var(--muted); }
+.codex-cell.on { border-color: var(--gold); background: rgb(227 176 75 / .15); color: var(--bone); }
+.codex-rune { font-size: 1.3rem; }
+.codex-letter { font-size: .8rem; font-weight: 700; }
+.codex-sources { display: flex; flex-wrap: wrap; gap: .4rem; }

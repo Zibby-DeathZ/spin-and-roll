@@ -16,7 +16,7 @@ def puzzle(title, where, intro_note, how, hints, answer, fail):
 
 BLOCKS = [
     ('chapter', 'Part 4', 'Quests', 'Eight quests to hand out, and four that stay secret until earned.'),
-    ('gm', 'Quests tab: tick who the quest is for and press <b>Give quest</b>. Tick objectives as they happen. <b>Complete</b> hands out the rewards automatically. Secret quests sit under <b>🔒 Secret quests</b> and only appear on phones once you press <b>Reveal to them</b>.'),
+    ('gm', 'Quests tab: tick who the quest is for and press <b>Give quest</b>. Tick objectives as they happen. <b>Complete</b> hands out the rewards automatically. Secret quests sit under <b>🔒 Secret quests</b> and only appear on phones once you press <b>Reveal to them</b>. A scroll unrolls on the TV with the quest, the heroes and every reward, and each hero gets their own reward scroll on their phone.'),
     ('h2', 'The main quest'),
     *quest('The Hollow Heir', 'Give it to everyone after the first victim (Day 2, Curfew).',
            'Somebody, or something, is feeding on the students of Hogwarts. The teachers are frightened. The portraits are hiding. If anyone is going to find out what is happening, it is going to be you.',
@@ -134,9 +134,9 @@ BLOCKS = [
             'Pieces 1 to 8 in order, gap last. The shortest solution is 16 slides.',
             'No failure. When it is whole, the portrait says: “He did not arrive on the train. He was brought.”'),
     *puzzle('The Rune Floor', 'The Trials Beneath, or the Undercroft approach.',
-            'The floor is made of stone tiles, each carved with a rune. Above the far door, seven runes are cut deep into the stone. The air smells of old blood.',
-            'They say which tile the walker steps on; tap it. A wrong step flashes red and sends them back to the start. The word is SERPENT, and two of its runes are the same (the two Es), which makes false trails.',
-            ['“The seven runes above the door are the only safe ones, in that order, over and over.”', '“Three tiles on the bottom row could be the first step. Only one leads all the way.”', '“Start on the fourth tile, and go right before you go up.”'],
+            'The floor is made of stone tiles, each carved with a rune. Above the far door, one word is cut into the stone in plain letters: SERPENT. The floor itself only speaks in runes. The air smells of old blood.',
+            'This is where the rune notebook pays off. The TV shows SERPENT in English; the players have to turn each letter into its rune (from their notebooks, or from memory) and walk only on those. They say which tile the walker steps on; tap it. On your screen each tile has its letter in the corner. A wrong step flashes red and sends them back to the start. Two of its runes are the same (the two Es), which makes false trails.',
+            ['“Open your rune notebooks. Which rune is S?”', '“Three tiles on the bottom row could be the first step. Only one leads all the way.”', '“Start on the fourth tile, and go right before you go up.”'],
             'Bottom row 4th tile, then (row from the bottom, column): 1-5, 1-6, 2-6, 2-5, 2-4, 3-4, 3-3, 4-3, 4-2, 4-1, 5-1, 5-2, 6-2, 6-1, 7-1, 7-2, 7-3, 8-3. Nineteen steps.',
-            'A wrong step: the floor bites for d4 damage (adjust HP). The walker goes back to the start.'),
+            'A wrong step: the floor bites for d4 damage (adjust HP). The walker goes back to the start. If they reach the floor with gaps in their notebook, let them guess, or confirm a letter in exchange for a wrong step’s damage.'),
 ]

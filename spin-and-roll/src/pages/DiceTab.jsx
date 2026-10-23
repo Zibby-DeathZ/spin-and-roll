@@ -1,7 +1,8 @@
 import { useRef, useState } from 'react';
-import { castSpell, defenceOf, fmtMod, mod, statOf, STATS } from '../lib/game';
+import { castSpell, clockOf, defenceOf, fmtMod, mod, statOf, STATS } from '../lib/game';
+import { nerveRoll } from '../lib/houses';
 import { damageBonus, sendAttack, sendRoll, spellDef, STRIKE } from '../lib/combat';
-import { DICE, diceLabel, rollD20, rollDice, rollDie } from '../lib/dice';
+import { DICE, diceLabel, rollDice, rollDie } from '../lib/dice';
 import { locOf } from '../lib/world';
 import { isMonster } from '../components/MapView';
 import { StatusChips } from '../components/Status';
@@ -38,7 +39,7 @@ function ModeToggle({ mode, setMode }) {
   );
 }
 
-function FreeRoller({ sid, c, feared }) {
+function FreeRoller({ sid, c, feared, dawn }) {
   const [die, setDie] = useState(20);
   const [stat, setStat] = useState('');
   const [mode, setMode] = useState(feared ? 'dis' : 'normal');
@@ -47,14 +48,14 @@ function FreeRoller({ sid, c, feared }) {
 
   const go = async () => {
     const m = stat ? mod(statOf(c, stat)) : 0;
-    let rolls, nat;
-    if (die === 20) ({ rolls, nat } = rollD20(mode));
+    let rolls, nat, nerve = false;
+    if (die === 20) ({ rolls, nat, nerve = false } = nerveRoll(c, mode, dawn));
     else { rolls = rollDice({ die }).rolls; nat = rolls[0]; }
     await tumble(die, nat);
     const total = nat + m;
     const label = `d${die}${stat ? ` + ${stat.toUpperCase()}` : ''}`;
-    setLast({ total, label, rolls, m });
-    await sendRoll(sid, c.uid, { label, rolls, mod: m, total, mode: die === 20 ? mode : 'normal' });
+    setLast({ total, label, rolls, m, nerve });
+    await sendRoll(sid, c.uid, { label, rolls, mod: m, total, mode: die === 20 ? mode : 'normal', ...(nerve ? { nerve: true } : {}) });
   };
 
   return (
@@ -76,6 +77,7 @@ function FreeRoller({ sid, c, feared }) {
       <div className="roll-out">
         <span className={`big-die ${rolling ? 'rolling' : ''}`}>{shown ?? '–'}</span>
         {last && !rolling && <span className="muted">{last.label} = <strong>{last.total}</strong></span>}
+        {last?.nerve && !rolling && <span className="nerve-note">🦁 Natural 1, re-rolled with Gryffindor nerve!</span>}
       </div>
       <button className="btn gold big" disabled={rolling} onClick={go}>Roll d{die}</button>
     </section>
@@ -104,7 +106,7 @@ function badges(sp, c, defs) {
 }
 
 // The step-by-step cast: pick a target, roll to hit, roll the spell's die.
-function CastFlow({ sid, c, sp, targets, friends, feared, onClose }) {
+function CastFlow({ sid, c, sp, targets, friends, feared, onClose, dawn }) {
   const [target, setTarget] = useState(null);
   const [mode, setMode] = useState(feared ? 'dis' : 'normal');
   const [hit, setHit] = useState(null); // { nat, total, rolls, success }
@@ -115,14 +117,14 @@ function CastFlow({ sid, c, sp, targets, friends, feared, onClose }) {
   const finishAttack = async (h, d) => {
     await sendAttack(sid, c.uid, {
       spellId: sp.id, targetKind: target.kind, targetId: target.id,
-      nat: h.nat, hitTotal: h.total, hitRolls: h.rolls, mode,
+      nat: h.nat, hitTotal: h.total, hitRolls: h.rolls, mode, ...(h.nerve ? { nerve: true } : {}),
       dmgRolls: d?.rolls ?? [], dmgTotal: d?.total ?? 0,
     });
     setDone(true);
   };
 
   const rollHit = async () => {
-    const r = rollD20(mode);
+    const r = nerveRoll(c, mode, dawn);
     await tumble(20, r.nat);
     const total = r.nat + mod(statOf(c, sp.hit));
     const success = r.nat === 20 || (r.nat !== 1 && total >= target.defence);
@@ -141,9 +143,10 @@ function CastFlow({ sid, c, sp, targets, friends, feared, onClose }) {
 
   // Non-attack spells: a check or an effect die, then announce.
   const rollUtility = async () => {
-    let rolled = null, rollLabel = '';
+    let rolled = null, rollLabel = '', nerve = false;
     if (sp.check) {
-      const r = rollD20(mode);
+      const r = nerveRoll(c, mode, dawn);
+      nerve = !!r.nerve;
       await tumble(20, r.nat);
       rolled = r.nat + mod(statOf(c, sp.check));
       rollLabel = `on the ${sp.check.toUpperCase()} check`;
@@ -155,6 +158,7 @@ function CastFlow({ sid, c, sp, targets, friends, feared, onClose }) {
     }
     await castSpell(sid, c.uid, sp.id, {
       ...(rolled != null ? { rolled, rollLabel } : {}),
+      ...(nerve ? { nerve: true } : {}),
       ...(sp.targetAlly && target ? { targetUid: target.id } : {}),
     });
     setDmg({ total: rolled });
@@ -197,7 +201,7 @@ function CastFlow({ sid, c, sp, targets, friends, feared, onClose }) {
               {hit && !rolling && (
                 <span className={hit.success ? 'hit' : 'miss'}>
                   {hit.total} vs {target.defence}: {hit.success ? 'HIT!' : 'MISS'}
-                  {hit.nat === 20 && ' Natural 20!'}{hit.nat === 1 && ' Natural 1!'}
+                  {hit.nerve && ' 🦁 Nerve: your natural 1 was re-rolled!'}{hit.nat === 20 && ' Natural 20!'}{hit.nat === 1 && ' Natural 1!'}
                 </span>
               )}
               {dmg && !rolling && <span className="muted">{sp.attack ? `${dmg.total} damage` : `Rolled ${dmg.total}`}</span>}
@@ -247,7 +251,7 @@ export default function DiceTab({ sid, c, data, session, chars }) {
 
   return (
     <>
-      <FreeRoller sid={sid} c={c} feared={feared} />
+      <FreeRoller sid={sid} c={c} feared={feared} dawn={clockOf(session).dawn} />
       <section className="spells">
         <h2>Spells and attacks</h2>
         <p className="muted small">Mana: {c.mana} / {c.maxMana}</p>
@@ -273,7 +277,7 @@ export default function DiceTab({ sid, c, data, session, chars }) {
         </ul>
         {ko && <p className="warn">You’re knocked out. Someone needs to heal you.</p>}
       </section>
-      {casting && <CastFlow sid={sid} c={c} sp={casting} targets={targets} friends={friends} feared={feared} onClose={() => setCasting(null)} />}
+      {casting && <CastFlow sid={sid} c={c} sp={casting} targets={targets} friends={friends} feared={feared} dawn={clockOf(session).dawn} onClose={() => setCasting(null)} />}
     </>
   );
 }

@@ -6,17 +6,20 @@ import { useSession } from '../lib/sessions';
 import {
   bonuses, bonusText, cancelTrade, consumeItem, defenceOf, fmtMod, levelFor, mod, nextLevelAt,
   answerKey, clockOf, offerTrade, respondTrade, statOf, STATS, useAbility, useAnswers, useCharacters, useClaims, useTrades,
+  useHouseTrait,
 } from '../lib/game';
 import FamilyPicker from './FamilyPicker';
 import Shop from './Shop';
 import DiceTab from './DiceTab';
 import HereTab from './HereTab';
 import { locOf } from '../lib/world';
+import { perkById, traitOf } from '../lib/houses';
 import Portrait from '../components/Portrait';
 import Art, { itemArt } from '../components/Art';
 import MainEventLock from '../components/MainEventLock';
 import JumpScare from '../components/JumpScare';
 import { OwlArchive, OwlArrival } from '../components/OwlPost';
+import { PlayerQuestReward } from '../components/QuestComplete';
 import { useMyOwls } from '../lib/owls';
 import { PlayerImposter } from '../components/Imposter';
 import { PlayerAccuse } from '../components/Accuse';
@@ -35,6 +38,8 @@ import { PlayerMapScreen } from '../components/Marauders';
 import HouseCrest from '../components/HouseCrest';
 import Info from '../components/Info';
 import ClueReader from '../components/ClueReader';
+import RuneNotebook, { readerFor } from '../components/RuneNotebook';
+import { knownRunes, usePencil } from '../lib/runes';
 
 function AbilityCard({ sid, c, ability, dawn }) {
   const [used, setUsed] = useState(false);
@@ -62,7 +67,39 @@ function AbilityCard({ sid, c, ability, dawn }) {
   );
 }
 
-function Sheet({ sid, c, currency, data, points, clk, scenes = null, loc, discovered, owls = [] }) {
+// The student's house specialty, and today's House of the Day perk if their house won yesterday.
+function HouseCard({ sid, c, dawn, hod }) {
+  const [sent, setSent] = useState(false);
+  const t = traitOf(c);
+  if (!t) return null;
+  const usedToday = c.houseDawn === dawn;
+  const perk = hod?.houses?.includes(c.house) ? perkById(hod.perk) : null;
+  const ask = async () => {
+    if (!confirm(`Use ${c.house} ${t.name} now? It's once per day.`)) return;
+    setSent(true);
+    await useHouseTrait(sid, c.uid, c.house, t);
+  };
+  return (
+    <section className={`house-card hcard-${c.house.toLowerCase()}`}>
+      <HouseCrest house={c.house} className="hcard-crest" />
+      <div className="hcard-body">
+        <h2>{t.icon} {c.house} {t.name}</h2>
+        <p>{t.text}</p>
+        {t.daily && !t.button && <p className="muted small">{usedToday ? 'Used today. It comes back after you sleep.' : 'Ready today. It happens on its own.'}</p>}
+        {t.button && (
+          <button className="btn gold" disabled={usedToday || sent} onClick={ask}>
+            {usedToday ? 'Used today. Recharges after you sleep' : sent ? 'Announced on the TV' : t.button}
+          </button>
+        )}
+        {perk && (
+          <p className="hcard-perk"><span className="tag">House of the Day</span>{perk.icon} <b>{perk.name}:</b> {perk.text}</p>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function Sheet({ sid, c, currency, data, points, clk, scenes = null, loc, discovered, owls = [], hod = null }) {
   const lvl = levelFor(c.xp);
   const next = nextLevelAt(c.xp, c.levelCap ?? Infinity);
   const b = bonuses(c);
@@ -118,10 +155,11 @@ function Sheet({ sid, c, currency, data, points, clk, scenes = null, loc, discov
       {c.house && c.house !== 'Unsorted' && points && (
         <section className="sheet-houses">
           <h2>House points</h2>
-          <HouseBoard points={points} compact />
+          <HouseBoard points={points} hod={hod} compact />
         </section>
       )}
       {fam?.ability && <AbilityCard sid={sid} c={c} ability={fam.ability} dawn={clk.dawn} />}
+      <HouseCard sid={sid} c={c} dawn={clk.dawn} hod={hod} />
       <OwlArchive owls={owls} />
       {fam && (
         <details className="secret">
@@ -164,9 +202,13 @@ function itemInfo(def, i, kind) {
   return bits.join(' ');
 }
 
-function Bag({ c, sid, others, data, onGive, onOpenMap, here }) {
+function Bag({ c, sid, others, data, onGive, onOpenMap, here, runesKnown = [] }) {
   const [used, setUsed] = useState(null);
   const [reading, setReading] = useState(null);
+  const [notebook, setNotebook] = useState(false);
+  const [pencil, setPencil] = usePencil(sid, c.uid);
+  const hasRunes = (data?.puzzles ?? []).some((p) => p.type === 'cipher' || p.type === 'runefloor');
+  const read = readerFor(runesKnown, pencil);
   const use = async (item) => {
     setUsed(item.id);
     try { await consumeItem(sid, c.uid, item.id); } finally { setTimeout(() => setUsed(null), 1200); }
@@ -193,6 +235,12 @@ function Bag({ c, sid, others, data, onGive, onOpenMap, here }) {
         </>
       )}
       <h2>Bag</h2>
+      {hasRunes && (
+        <button className="notebook-btn" onClick={() => setNotebook(true)}>
+          <span className="nb-btn-icon" aria-hidden="true">📖</span>
+          <span><strong>Rune notebook</strong><span className="muted small">{runesKnown.length} of 26 runes known. Tap to read or pencil in guesses.</span></span>
+        </button>
+      )}
       {inv.length === 0 && <p className="muted">Your bag is empty.</p>}
       {KINDS.map(([k, label, help]) => {
         const list = inv.filter((i) => kindOf(data, i) === k);
@@ -230,7 +278,8 @@ function Bag({ c, sid, others, data, onGive, onOpenMap, here }) {
           </section>
         );
       })}
-      {reading && <ClueReader item={reading} def={data?.items?.[reading.id] ?? {}} qty={reading.qty} onClose={() => setReading(null)} />}
+      {reading && <ClueReader item={reading} def={data?.items?.[reading.id] ?? {}} qty={reading.qty} read={hasRunes ? read : null} onClose={() => setReading(null)} />}
+      {notebook && <RuneNotebook known={runesKnown} pencil={pencil} onPencil={setPencil} onClose={() => setNotebook(false)} />}
     </>
   );
 }
@@ -417,6 +466,7 @@ export default function PlayerScreen() {
       {locked && <MainEventLock />}
       <JumpScare scare={session.state?.scare} phone />
       {unread && <OwlArrival sid={sid} owl={unread} />}
+      <PlayerQuestReward sid={sid} uid={user.uid} currency={data.currency ?? { icon: '🪙', name: 'gold' }} />
       {me.expelled && <div className="banner bad">📜 You have been expelled from Hogwarts.</div>}
       {enc && (
         <div className={`banner ${turnOf?.id === me.uid ? 'mine' : ''}`}>
@@ -424,14 +474,14 @@ export default function PlayerScreen() {
         </div>
       )}
       <main className="phone-body">
-        {tab === 'sheet' && <Sheet sid={sid} c={me} currency={currency} data={data} points={session.state?.housePoints ?? {}} clk={clockOf(session)} scenes={session.state?.scenes}
+        {tab === 'sheet' && <Sheet sid={sid} c={me} currency={currency} data={data} hod={session.state?.houseOfDay} points={session.state?.housePoints ?? {}} clk={clockOf(session)} scenes={session.state?.scenes}
           loc={data.locations?.find((l) => l.id === locOf(session, user.uid))}
           discovered={session.state?.map?.discovered ?? []} owls={owls} />}
         {tab === 'here' && <HereTab sid={sid} c={me} data={data} session={session} chars={chars} />}
         {tab === 'dice' && <DiceTab sid={sid} c={me} data={data} session={session} chars={chars} />}
         {tab === 'shop' && <Shop sid={sid} c={me} data={data} open={shopOpen} />}
         {tab === 'bag' && (
-          <Bag c={me} sid={sid} others={others} data={data} here={locOf(session, user.uid) ?? session.state?.map?.loc}
+          <Bag c={me} sid={sid} others={others} data={data} runesKnown={knownRunes(session)} here={locOf(session, user.uid) ?? session.state?.map?.loc}
             onGive={() => setTab('party')} onOpenMap={() => setMapOpen(true)} />
         )}
         {tab === 'party' && pending > 0 && <Trades sid={sid} me={me} chars={chars} trades={trades} currency={currency} />}

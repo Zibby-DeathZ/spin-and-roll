@@ -79,6 +79,7 @@ function Spread({ intro, page }) {
 
 function ChooseSpread({ intro, data, claims }) {
   const fams = data.families;
+  const half = Math.ceil(fams.length / 2); // 6 families: 3 + 3; 9 families: 5 + 4
   const card = (f) => {
     const c = claims[f.id];
     return (
@@ -94,11 +95,11 @@ function ChooseSpread({ intro, data, claims }) {
     <div className="spread choose">
       <div className="leaf left">
         <p className="choose-title">{intro.choose}</p>
-        <div className="fam-col">{fams.slice(0, 3).map(card)}</div>
+        <div className={`fam-col n${half}`}>{fams.slice(0, half).map(card)}</div>
       </div>
       <div className="leaf right">
         <p className="choose-title muted-ink">Pick on your phone</p>
-        <div className="fam-col">{fams.slice(3).map(card)}</div>
+        <div className={`fam-col n${half}`}>{fams.slice(half).map(card)}</div>
       </div>
     </div>
   );

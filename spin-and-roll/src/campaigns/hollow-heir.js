@@ -56,6 +56,31 @@ const items = {
       footer: 'Each rune is always the same letter. With all three pages, show the DM: the whole diary goes up on the TV.',
     },
   },
+  // Rune tablets: pictures with their names carved in runes. Working out the letters fills the rune notebook.
+  'rune-tablet-1': {
+    name: 'Rune tablet (beasts and sky)', icon: '🪨', note: 'Pictures, each with a word in runes underneath', kind: 'clue',
+    read: {
+      style: 'tablet', heading: 'A cracked slate from the Ancient Runes shelf',
+      words: [{ pic: '🦉', word: 'OWL' }, { pic: '🌙', word: 'MOON' }, { pic: '⭐', word: 'STAR' }],
+      footer: 'Each rune is always the same letter. Pencil what you work out into your rune notebook.',
+    },
+  },
+  'rune-tablet-2': {
+    name: 'Rune tablet (garden)', icon: '🪨', note: 'Pictures, each with a word in runes underneath', kind: 'clue',
+    read: {
+      style: 'tablet', heading: 'A mossy slate wedged under a seed tray',
+      words: [{ pic: '🍎', word: 'APPLE' }, { pic: '🌲', word: 'PINE' }, { pic: '🐸', word: 'TOAD' }],
+      footer: 'Each rune is always the same letter. Pencil what you work out into your rune notebook.',
+    },
+  },
+  'rune-tablet-3': {
+    name: 'Rune tablet (hearth)', icon: '🪨', note: 'Pictures, each with a word in runes underneath', kind: 'clue',
+    read: {
+      style: 'tablet', heading: 'A soot-black slate from beside a fireplace',
+      words: [{ pic: '🔥', word: 'FIRE' }, { pic: '🗝️', word: 'KEY' }, { pic: '🐟', word: 'FISH' }],
+      footer: 'Each rune is always the same letter. Pencil what you work out into your rune notebook.',
+    },
+  },
   'stolen-jars': { name: 'Stolen ingredient jars', icon: '🫙', note: 'Labelled in Grimsby’s spiky handwriting', kind: 'key', usableAt: ['dungeons'] },
 };
 
@@ -153,6 +178,43 @@ export const hollowHeir = {
       stats: { str: 15, dex: 14, con: 13, int: 10, wis: 12, cha: 8 },
       story: 'Once as grand as the Blackwoods, the Marlowes lost everything in a scandal nobody will explain. People still whisper when they hear your name.',
       secret: 'Your vault holds only a few coins and an old iron key with a serpent on it. An ancestor served a dark wizard, and only a Parseltongue can open the door that key belongs to.',
+    },
+    // Families 7 to 9, for bigger tables.
+    {
+      id: 'hale', name: 'Hale', startItems: ['wiggenweld'], blood: 'Pureblood', wealth: 'Comfortable vault', vault: 240,
+      ability: {
+        name: 'Healer’s Hands', icon: '🩹',
+        passive: 'You can read an injury at a glance. Ask the DM and they tell you what hurt someone: a spell, a poison, a curse, or something worse.',
+        active: 'Once per day, lay your hands on a student and heal them 2d6 + 2 HP, no potion needed. The DM adds it on the GM screen.',
+        drawback: 'You can’t walk past someone who’s hurt. While anyone near you is below half HP, you spend your turn helping them unless you pass a WIS roll.',
+      },
+      stats: { str: 9, dex: 11, con: 13, int: 13, wis: 15, cha: 11 },
+      story: 'Five generations of Healers at St Mungo’s. You grew up in the waiting room of the Spell Damage ward, and you can bandage a wand-burn faster than most trainees.',
+      secret: 'Your great-grandmother kept a casebook. One page describes a Hogwarts student brought in long ago, alive but empty, “as if someone had painted over her”. She kept whispering one word: Vale. The case was closed by order of the Headmaster.',
+    },
+    {
+      id: 'penrose', name: 'Penrose', blood: 'Half-blood', wealth: 'Healthy vault', vault: 180,
+      ability: {
+        name: 'Metamorphmagus', icon: '🎭',
+        passive: 'You can change your hair, eyes and face at will. You roll with advantage to avoid being recognised or blamed.',
+        active: 'Once per day, take on the face of someone you have seen, for one scene. Only your voice and your wand can give you away.',
+        drawback: 'Strong feelings show. When you’re frightened, angry or lying, your hair changes colour, and the DM tells the table.',
+      },
+      stats: { str: 9, dex: 14, con: 11, int: 12, wis: 10, cha: 16 },
+      story: 'A noisy Cornish family who run a wizarding theatre in Penzance. Half your relatives can change their faces, and family photos are a nightmare.',
+      secret: 'Your great-great-grandmother once sat for a famous portrait painter. She came home unable to change her face ever again. The painting was never delivered, and nobody knows where it went.',
+    },
+    {
+      id: 'okafor', name: 'Okafor', blood: 'Half-blood', wealth: 'Healthy vault', vault: 280,
+      ability: {
+        name: 'Curse-Breaker', icon: '🔓',
+        passive: 'You feel curses, wards and traps before you trigger them: the DM warns you when one is close. You roll with advantage to open locked or cursed chests.',
+        active: 'Once per day, break one curse, ward or magical trap outright: a cursed chest opens safely, a hex fades, a trap fizzles. It can’t solve a puzzle lock or wake a drained student.',
+        drawback: 'Curses bite back. Each time you break one, the DM spins: sometimes a little of it sticks to you.',
+      },
+      stats: { str: 11, dex: 13, con: 12, int: 15, wis: 12, cha: 9 },
+      story: 'Your mum breaks curses on ancient tombs for Gringotts, and your dad is a Muggle engineer who still can’t quite believe any of it. You’ve been picking enchanted locks since you were six.',
+      secret: 'Last month Gringotts sent your mum to inspect a painting before it was shipped to Hogwarts. She refused to unwrap it and wrote one word in her report: Occupied. It was sent anyway.',
     },
   ],
 
@@ -776,7 +838,7 @@ export const hollowHeir = {
       { icon: '🌑', text: 'To finish it, he needed the light of the young. Students began to be found at dawn, grey and silent, as if someone had painted them in ash.' },
       { icon: '🔒', text: 'A family called Blackwood stopped him. They sealed Vale inside his own unfinished canvas, and hid it where no one would ever think to look.' },
       { icon: '🚂', text: 'For three centuries, the painting slept. Until this summer, when someone found it, wrapped it in grey cloth, and put it on a train to Hogwarts.' },
-      { icon: '✉️', text: 'Six families are about to receive a letter. Six children are about to begin their first year. None of them know that the painting is waiting for them.' },
+      { icon: '✉️', text: 'The owls are already flying. Each carries a letter to a child about to begin their first year. None of them know that the painting is waiting for them.' },
     ],
     choose: 'Choose your family',
   },
@@ -809,7 +871,7 @@ export const hollowHeir = {
     },
   },
   // Items a mimic can never swallow (the story needs them).
-  unswallowable: ['serpent-key', 'map-half', 'diary-page', 'ring-clue-serpent', 'ring-clue-moon', 'ring-clue-owl', 'vale-page'],
+  unswallowable: ['serpent-key', 'map-half', 'diary-page', 'rune-tablet-1', 'rune-tablet-2', 'rune-tablet-3', 'ring-clue-serpent', 'ring-clue-moon', 'ring-clue-owl', 'vale-page'],
 
   // ---------- Detention: where it happens and what it quietly starts ----------
   detention: { loc: 'trophy-room', npc: 'filch', quest: 'old-cup' },
@@ -942,8 +1004,8 @@ export const hollowHeir = {
     },
     {
       id: 'rune-floor', type: 'runefloor', icon: '🪨', title: 'The Rune Floor',
-      intro: 'Above the far door, seven runes are carved. Cross the floor from the bottom row to the top, stepping only up, left or right, on those runes in that order, again and again. One wrong step and the floor bites.',
-      word: 'SERPENT',
+      intro: 'Above the far door, one word is carved in plain letters: SERPENT. But the floor only speaks in runes. Cross from the bottom row to the top, stepping only up, left or right, on the runes that spell it, in order, again and again. One wrong step and the floor bites.',
+      word: 'SERPENT', wordInEnglish: true,
       grid: ['NIEPNN', 'ERPESM', 'STSRPE', 'ENIUEE', 'PREEEP', 'MUSTSI', 'EIANEP', 'SSASER'],
       solution: 'Start on the bottom row, tile 4. Path (row counted from the bottom, column): 1-4, 1-5, 1-6, 2-6, 2-5, 2-4, 3-4, 3-3, 4-3, 4-2, 4-1, 5-1, 5-2, 6-2, 6-1, 7-1, 7-2, 7-3, 8-3. Checked: it is the only safe path. Beware the long false trail that starts from another S and dies near the top.',
     },

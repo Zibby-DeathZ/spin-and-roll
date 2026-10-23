@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { perkById } from '../lib/houses';
 import HouseCrest from './HouseCrest';
 import {
   answerKey, assignWand, endQuiz, hatVerdict, saveAnswers, scoreQuiz, sortInto, wandVerdict,
@@ -144,13 +145,16 @@ export function GMQuiz({ sid, quizState, data, chars, answers }) {
 }
 
 // ---------- House standings ----------
-export function HouseBoard({ points = {}, compact = false }) {
+export function HouseBoard({ points = {}, compact = false, hod = null }) {
   const rows = HOUSES.map((h) => [h, points[h] ?? 0]).sort((a, b) => b[1] - a[1]);
+  const perk = perkById(hod?.perk);
   return (
     <ul className={`houseboard ${compact ? 'compact' : ''}`}>
       {rows.map(([h, p]) => (
-        <li key={h} className={`hb-${h.toLowerCase()}`}>
+        <li key={h} className={`hb-${h.toLowerCase()} ${hod?.houses?.includes(h) ? 'hod' : ''}`}
+          title={hod?.houses?.includes(h) && perk ? `House of the Day: ${perk.name}` : undefined}>
           <HouseCrest house={h} /><span>{h}</span><strong>{p}</strong>
+          {hod?.houses?.includes(h) && perk && <span className="hod-badge" aria-label={`House of the Day: ${perk.name}`}>{perk.icon}</span>}
         </li>
       ))}
     </ul>

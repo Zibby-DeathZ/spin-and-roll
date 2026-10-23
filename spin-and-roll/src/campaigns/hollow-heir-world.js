@@ -78,6 +78,7 @@ export const schedule = {
   '1-Morning class': {
     spawn: [
       { id: 'ring-serpent', type: 'item', item: 'ring-clue-serpent', loc: 'trophy-room', x: 78, y: 40 },
+      { id: 'tablet-1', type: 'item', item: 'rune-tablet-1', loc: 'library', x: 28, y: 62 },
       { id: 'ring-moon', type: 'item', item: 'ring-clue-moon', loc: 'astronomy-tower', x: 70, y: 45 },
       { id: 'ring-owl', type: 'item', item: 'ring-clue-owl', loc: 'owlery', x: 30, y: 50 },
       { id: 'chest-library', type: 'chest', chest: 'locked-chest', loc: 'library', x: 82, y: 35 },
@@ -92,10 +93,11 @@ export const schedule = {
     { id: 'pixies-1a', type: 'monster', kind: 'cornish-pixie', loc: 'grand-staircase', transient: true, x: 35, y: 35 },
     { id: 'pixies-1b', type: 'monster', kind: 'cornish-pixie', loc: 'grand-staircase', transient: true, x: 55, y: 30 },
   ] },
-  '2-Free time': { spawn: [{ id: 'duelist-2', type: 'monster', kind: 'rival-duelist', loc: 'great-hall', transient: true, x: 60, y: 40 }] },
+  '2-Free time': { spawn: [{ id: 'tablet-2', type: 'item', item: 'rune-tablet-2', loc: 'greenhouses', x: 72, y: 60 }, { id: 'duelist-2', type: 'monster', kind: 'rival-duelist', loc: 'great-hall', transient: true, x: 60, y: 40 }] },
   '3-Lunch': { spawn: [{ id: 'victim-2', type: 'npc', npc: 'victim', name: 'A drained fourth-year', loc: 'library', x: 40, y: 45 }] },
   '3-Free time': { spawn: [
     { id: 'diary-1', type: 'item', item: 'diary-page', loc: 'restricted-section', x: 75, y: 35 },
+    { id: 'tablet-3', type: 'item', item: 'rune-tablet-3', loc: 'hagrids-hut', x: 30, y: 60 },
     { id: 'boar-3', type: 'monster', kind: 'thornback-boar', loc: 'forbidden-forest', transient: true, x: 70, y: 30 },
   ] },
   '3-Curfew': { spawn: [{ id: 'trunk', type: 'mimic', mimic: 'hungry-trunk', loc: 'trophy-room', x: 35, y: 55 }] },
