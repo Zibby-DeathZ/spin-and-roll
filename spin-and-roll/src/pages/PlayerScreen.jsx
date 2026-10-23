@@ -27,6 +27,7 @@ import { canChooseFamily, mainEvent } from '../lib/intro';
 import { LessonScreen } from '../minigames';
 import { useLessonResults } from '../lib/lessons';
 import { HouseBoard, PlayerQuiz } from '../components/Ceremony';
+import { resolveQuiz } from '../lib/quiz';
 import { ClockChip, Timetable } from '../components/Clock';
 import { Splash } from '../components/Gate';
 import Bar from '../components/Bar';
@@ -421,7 +422,7 @@ export default function PlayerScreen() {
   const q = session.state?.quiz;
   if (q?.uid === user.uid && data.quizzes?.[q.id]) {
     return (
-      <PlayerQuiz sid={sid} uid={user.uid} quizId={q.id} quiz={data.quizzes[q.id]}
+      <PlayerQuiz sid={sid} uid={user.uid} quizId={q.id} quiz={resolveQuiz(data.quizzes[q.id], q)}
         answer={answers[answerKey(q.id, user.uid)]} />
     );
   }

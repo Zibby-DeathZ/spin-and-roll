@@ -13,6 +13,7 @@ import { openState } from './marauders';
 import { traitOf } from './houses';
 import { runeFor as runeOf } from './puzzles';
 import { endOfDay, perkFor, spendTrait, steadfast } from './houseday';
+import { drawQuestions } from './quiz';
 
 // ---------- Rules of the game ----------
 
@@ -548,9 +549,16 @@ export function wandVerdict(quiz, answer) {
   return { wood: top(s.wood), core: top(s.core), scores: s };
 }
 
-export async function startQuiz(sid, quizId, uid) {
+// Starts a ceremony for one student with a fresh random draw of questions.
+export async function startQuiz(sid, quizId, uid, data) {
   await deleteDoc(doc(db, 'sessions', sid, 'answers', answerKey(quizId, uid))).catch(() => {});
-  await updateDoc(doc(db, 'sessions', sid), { 'state.quiz': { id: quizId, uid } });
+  const quiz = data?.quizzes?.[quizId];
+  const snap = quiz?.pool ? await getDoc(doc(db, 'sessions', sid)) : null;
+  const { qs, used } = drawQuestions(quiz, snap?.data()?.state?.quizUsed?.[quizId] ?? []);
+  await updateDoc(doc(db, 'sessions', sid), {
+    'state.quiz': qs ? { id: quizId, uid, qs } : { id: quizId, uid },
+    ...(qs ? { [`state.quizUsed.${quizId}`]: used } : {}),
+  });
   await logEvent(sid, { type: 'quiz_started', targetUid: uid, payload: { quiz: quizId } });
 }
 export const endQuiz = (sid) => updateDoc(doc(db, 'sessions', sid), { 'state.quiz': deleteField() });

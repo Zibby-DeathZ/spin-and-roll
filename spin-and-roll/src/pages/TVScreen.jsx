@@ -21,6 +21,7 @@ import { introActive, skipToBook } from '../lib/intro';
 import { useEffect, useState } from 'react';
 import { useClaims } from '../lib/game';
 import { HouseBoard, TVQuiz } from '../components/Ceremony';
+import { resolveQuiz } from '../lib/quiz';
 import { Splash } from '../components/Gate';
 import Wheel from '../components/Wheel';
 import EventToasts from '../components/EventToasts';
@@ -47,7 +48,7 @@ export default function TVScreen() {
   const title = getCampaign(session.campaignId)?.title;
   const data = getCampaignData(session.campaignId);
   const q = session.state?.quiz;
-  const quiz = q && data.quizzes?.[q.id];
+  const quiz = q && resolveQuiz(data.quizzes?.[q.id], q);
   const spin = session.state?.spin;
   const showSpin = spin && !spin.hidden && data.wheels?.[spin.wheelId];
   const loc = data.locations?.find((l) => l.id === session.state?.map?.loc);
@@ -93,7 +94,7 @@ export function TVLive({ session, chars, profiles, data, title, answers, lessonR
   }, [opening, music?.track, music?.playing, music?.volume]);
 
   const q = session.state?.quiz;
-  const quiz = q && data.quizzes?.[q.id];
+  const quiz = q && resolveQuiz(data.quizzes?.[q.id], q);
   const spin = session.state?.spin;
   const showSpin = spin && !spin.hidden && data.wheels?.[spin.wheelId];
   const loc = data.locations?.find((l) => l.id === session.state?.map?.loc);

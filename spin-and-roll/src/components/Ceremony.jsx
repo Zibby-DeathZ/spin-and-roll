@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { perkById } from '../lib/houses';
 import HouseCrest from './HouseCrest';
+import { bookRef, resolveQuiz } from '../lib/quiz';
 import {
   answerKey, assignWand, endQuiz, hatVerdict, saveAnswers, scoreQuiz, sortInto, wandVerdict,
 } from '../lib/game';
@@ -81,7 +82,7 @@ export function TVQuiz({ quiz, answer, name }) {
 
 // ---------- GM: live answers, the verdict, and the final call ----------
 export function GMQuiz({ sid, quizState, data, chars, answers }) {
-  const quiz = data.quizzes[quizState.id];
+  const quiz = resolveQuiz(data.quizzes[quizState.id], quizState);
   const c = chars[quizState.uid];
   const answer = answers[answerKey(quizState.id, quizState.uid)];
   const { picks, done } = progress(quiz, answer);
@@ -90,6 +91,15 @@ export function GMQuiz({ sid, quizState, data, chars, answers }) {
   const scores = scoreQuiz(quiz, picks);
   const shown = isSorting ? scores.house : { ...scores.wood, ...scores.core };
   const woodName = (id) => data.wandWoods.find((w) => w.id === id)?.name;
+  // The line to read aloud right now: the reply to the latest answer, or the verdict.
+  const lastQ = picks.length - 1;
+  const lastReply = lastQ >= 0 ? quiz.questions[lastQ]?.options[picks[lastQ]]?.reply : null;
+  const wishReply = isSorting && answer?.wish ? quiz.wish?.replies?.[answer.wish] : null;
+  const verdictLine = !done ? null : isSorting
+    ? quiz.verdicts?.[verdict.house]?.[(c?.name?.length ?? 0) % 2]
+    : [quiz.verdicts?.wood?.[verdict.wood], quiz.verdicts?.core?.[verdict.core]].filter(Boolean).join(' ');
+  const sayNow = verdictLine ? (wishReply ? `${wishReply} … ${verdictLine}` : verdictLine) : lastReply;
+  const nowQ = !done && quiz.questions[picks.length];
   const coreName = (id) => data.wandCores.find((w) => w.id === id)?.name;
 
   const giveWand = async () => {
@@ -103,10 +113,23 @@ export function GMQuiz({ sid, quizState, data, chars, answers }) {
         <h2>{quiz.icon} {quiz.title}: {c?.name}</h2>
         <button className="btn small ghost" onClick={() => endQuiz(sid)}>Cancel</button>
       </div>
+      {nowQ && <p className="gm-quiz-now">On screen now: <b>{bookRef(nowQ.id)}</b> {nowQ.q}</p>}
+      {sayNow && (
+        <blockquote className="gm-say">
+          <span className="gm-say-who">{quiz.voice ?? quiz.title} says</span>
+          {sayNow}
+        </blockquote>
+      )}
       <ol className="gm-answers">
         {quiz.questions.map((q, i) => (
-          <li key={q.q} className={picks[i] === undefined ? 'muted' : ''}>
-            {picks[i] === undefined ? 'Waiting…' : q.options[picks[i]].text}
+          <li key={q.id ?? q.q} className={picks[i] === undefined ? 'muted' : ''}>
+            {q.id && <span className="gm-qref">{bookRef(q.id)}</span>}
+            {picks[i] === undefined ? 'Waiting…' : (
+              <>
+                <b>{q.options[picks[i]].text}</b>
+                {q.options[picks[i]].reply && <span className="gm-reply">{q.options[picks[i]].reply}</span>}
+              </>
+            )}
           </li>
         ))}
         {isSorting && <li className={answer?.wish ? '' : 'muted'}>Wish: {answer?.wish ?? 'Waiting…'}</li>}

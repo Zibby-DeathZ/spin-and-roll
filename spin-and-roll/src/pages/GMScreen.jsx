@@ -129,10 +129,10 @@ function CharacterControls({ sid, c, data, playerName, quizBusy, forbiddenLearne
 
       {data.quizzes && (
         <div className="actions ceremony-btns">
-          <button className="btn small" disabled={quizBusy} onClick={() => startQuiz(sid, 'sorting', c.uid)}>
+          <button className="btn small" disabled={quizBusy} onClick={() => startQuiz(sid, 'sorting', c.uid, data)}>
             🎩 {c.house === 'Unsorted' ? 'Sorting Hat' : 'Re-sort'}
           </button>
-          <button className="btn small" disabled={quizBusy} onClick={() => startQuiz(sid, 'wand', c.uid)}>
+          <button className="btn small" disabled={quizBusy} onClick={() => startQuiz(sid, 'wand', c.uid, data)}>
             🪄 Wand questions
           </button>
         </div>

@@ -181,3 +181,13 @@ two cold braziers. The TV lists each one under "Here", so the players can plan a
 - `src/campaigns/hollow-heir-floors.js`: each picture's floor as a 4-corner area. `src/lib/floor.js`: `floorPoint(u,v)`, `personSpot` (back of the room), `studentSpots` (front rows), `anywhereOnFloor`.
 - Used by the schedule (NPCs re-tidied each block unless `moved` by the GM), spawns (their x,y are read as u,v on the floor), placeStaff, professorTo, movePlayers, addToken/placeToken, the test student.
 - `lightsOut`, `tidyRoom`, `commonRoomOf` in world.js. `PartyCards.jsx` is the GM's right panel; GMTable takes `view`/`setView` to look at a place without moving the TV.
+
+## Printable books (docs/guidebook)
+- `Guidebook.pdf`: the Prologue to Day 4, scene by scene, with what to say, every character, and what is in every barrel. Includes the Quest Guide as Part 7.
+- `Quest-Guide.pdf`: the Quest Guide on its own.
+- `Player-Notebook.pdf`: printable player sheets (character, friends, clues, suspects, rune notebook, places, quests, a diary page per day).
+- Rebuild with `python3 build_guidebook.py` and `python3 build_notebook.py` (they reuse the DM Guide's fonts and boxes). When quests, clues or the schedule change, update `gb_*.py` / `qg.py` too.
+
+## Random ceremony questions (v3.12)
+- Ollivanders and the Sorting Hat draw from pools in `src/campaigns/hollow-heir-quizzes.js` (24 wood, 15 core, 30 Sorting questions). `src/lib/quiz.js` draws a set per student with shuffled answers and stores it as codes like `s12:2031` on `state.quiz.qs`; `state.quizUsed` stops repeats until a pool runs out.
+- Every answer has a `reply`; the GM panel shows it in a purple box. `docs/guidebook/build_ceremony.py` prints them all to `Ceremony-Book.pdf` (needs Node, reads the quiz file directly).

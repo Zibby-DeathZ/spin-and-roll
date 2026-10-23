@@ -130,7 +130,7 @@ BLOCKS = [
     ('h2', '1.4 Ollivanders'),
     ('read', 'A bell tinkles somewhere deep in the shop. The place smells of dust and old wood. Thousands of narrow boxes are piled to the ceiling. Then an old man with wide, pale eyes is simply there, as if he has been standing behind the counter all along. “Ah,” he says softly. “I wondered when I would be seeing you.”'),
     ('p', 'Do one student at a time while the others watch. This is the moment the physical wands come out.'),
-    ('gm', 'Players tab: on a student’s card press <b>🪄 Wand questions</b>. Their phone and the TV show five questions. Read each question aloud as it appears, in Ollivander’s voice. When they finish, a GM panel suggests the wood and core. Press <b>Give this wand</b>.'),
+    ('gm', 'Players tab: on a student’s card press <b>🪄 Wand questions</b>. Their phone and the TV show five questions, drawn at random so every student hears different ones (three about the wood, two about the core). Read each question aloud in Ollivander’s voice. After each answer, the purple box on the GM panel shows what he says back; the Ceremony Book has every line on paper. When they finish, the panel suggests the wood and core. Press <b>Give this wand</b>.'),
     ('tip', 'For comedy, before the real wand, hand them a wrong one and spin the <b>Wand misfire</b> wheel for them (Wheels tab). Then: “No, no. Not that one.”'),
     ('read', '“Curious,” Ollivander murmurs, as the wand warms in your hand and a ribbon of light curls from its tip. “Very curious. The wand chooses the wizard, you see. It is not always clear why. But I think we can expect great things from you. Or terrible ones. Often it is the same thing.”'),
     ('table', ['Wood', 'Bonus', 'Physical wand to hand over'], [
@@ -172,7 +172,7 @@ BLOCKS = [
         'the sharp of mind to blue and bronze, / the hungry-hearted, green and silver. / And if you think you know your place, / I promise you: I’ll know it better.”',
     ]),
     ('p', 'Call the students up one at a time, in alphabetical order by family name: Blackwood, Fenwick, Marlowe, Quill, Sinclair, Thornbury.'),
-    ('gm', 'Players tab: press <b>🎩 Sorting Hat</b> on that student’s card. Read each question aloud in the Hat’s voice as it appears on the TV. The last question asks if they want a particular house: if their wish is close to their best score, the Hat listens. Press the highlighted house to confirm, or choose another.'),
+    ('gm', 'Players tab: press <b>🎩 Sorting Hat</b> on that student’s card. Every student gets five different questions, drawn at random. Read each one aloud in the Hat’s voice as it appears on the TV, then read the Hat’s reply from the purple box on the GM panel (or the Ceremony Book). The last question asks if they want a particular house: if their wish is close to their best score, the Hat listens. Press the highlighted house to confirm, or choose another.'),
     ('tip', 'Give the Hat personality. Before the verdict, mutter something about their answers: “Brave, yes, but you chose the runes over the ticking box. Interesting.” The bigger the pause, the bigger the cheer.'),
     ('read', 'The Hat shouts the name of your house, and one of the four tables explodes into applause. You stumble to your seat, your ears still ringing.'),
     ('h3', 'The Welcome Feast'),
