@@ -9,8 +9,11 @@ import {
 } from '../lib/sessions';
 import TopBar from '../components/TopBar';
 import StatusPill from '../components/StatusPill';
+import NightSky from '../components/NightSky';
+import HideButton from '../components/HideButton';
+import { hiddenSet } from '../lib/hidden';
 
-function SessionRow({ s }) {
+function SessionRow({ s, uid, hidden = false }) {
   const campaign = getCampaign(s.campaignId);
   const profiles = useProfiles(s.playerUids);
   const names = s.playerUids.map((u) => profiles[u]?.displayName ?? '…');
@@ -31,12 +34,15 @@ function SessionRow({ s }) {
             {open ? <>Join code <strong className="code">{s.code}</strong></> : 'Finished'}
           </p>
         </div>
-        <StatusPill status={s.status} />
+        <div className="session-tools">
+          <StatusPill status={s.status} />
+          <HideButton uid={uid} sid={s.id} title={campaign?.title} hidden={hidden} />
+        </div>
       </div>
       <p className="players">
         {names.length ? names.join(', ') : 'No players have joined yet.'}
       </p>
-      {open && (
+      {open && !hidden && (
         <div className="actions">
           <Link className="btn" to={`/session/${s.id}/gm`} target="_blank">Open GM screen</Link>
           <Link className="btn" to={`/session/${s.id}/tv`} target="_blank">Open TV screen</Link>
@@ -58,13 +64,17 @@ function SessionRow({ s }) {
 }
 
 export default function DMDashboard() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [busy, setBusy] = useState('');
+  const [showHidden, setShowHidden] = useState(false);
   const sessions = useQueryList(
     query(collection(db, 'sessions'), where('dmUid', '==', user.uid)),
     [user.uid]
   );
-  const sorted = (sessions ?? []).slice().sort(byNewest);
+  const hidden = hiddenSet(profile);
+  const all = (sessions ?? []).slice().sort(byNewest);
+  const sorted = all.filter((s) => !hidden.has(s.id));
+  const hiddenGames = all.filter((s) => hidden.has(s.id));
   const open = sorted.filter((s) => OPEN.includes(s.status));
   const past = sorted.filter((s) => !OPEN.includes(s.status));
 
@@ -74,11 +84,22 @@ export default function DMDashboard() {
   };
 
   return (
-    <>
+    <div className="dash">
+      <NightSky />
       <TopBar />
       <main className="page">
+        <section className="dash-hero">
+          <p className="dash-kicker">The Game Master’s tower</p>
+          <h1 className="dash-title">Choose your next tale</h1>
+          <div className="dash-seals">
+            <div className="seal"><strong>{open.length}</strong><span>Open games</span></div>
+            <div className="seal seal-won"><strong>{past.filter((s) => s.status === 'won').length}</strong><span>Won</span></div>
+            <div className="seal seal-lost"><strong>{past.filter((s) => s.status === 'lost').length}</strong><span>Lost</span></div>
+          </div>
+        </section>
+
         <section>
-          <h2>Campaign library</h2>
+          <h2 className="dash-h">Campaign library</h2>
           <ul className="library">
             {campaigns.map((c) => (
               <li key={c.id} className={`campaign campaign-${c.status}`}>
@@ -100,19 +121,30 @@ export default function DMDashboard() {
         </section>
 
         <section>
-          <h2>Open games</h2>
+          <h2 className="dash-h">Open games</h2>
           {sessions === null ? <p className="muted">Loading…</p>
-            : open.length ? <ul className="sessions">{open.map((s) => <SessionRow key={s.id} s={s} />)}</ul>
+            : open.length ? <ul className="sessions">{open.map((s) => <SessionRow key={s.id} s={s} uid={user.uid} />)}</ul>
             : <p className="muted">Create a game from the library, then share its join code.</p>}
         </section>
 
         {past.length > 0 && (
           <section>
-            <h2>Past games</h2>
-            <ul className="sessions">{past.map((s) => <SessionRow key={s.id} s={s} />)}</ul>
+            <h2 className="dash-h">Past games</h2>
+            <ul className="sessions">{past.map((s) => <SessionRow key={s.id} s={s} uid={user.uid} />)}</ul>
+          </section>
+        )}
+
+        {hiddenGames.length > 0 && (
+          <section className="hidden-games">
+            <button className="btn ghost small" onClick={() => setShowHidden((v) => !v)} aria-expanded={showHidden}>
+              {showHidden ? 'Close the hidden list' : `Show hidden (${hiddenGames.length})`}
+            </button>
+            {showHidden && (
+              <ul className="sessions">{hiddenGames.map((s) => <SessionRow key={s.id} s={s} uid={user.uid} hidden />)}</ul>
+            )}
           </section>
         )}
       </main>
-    </>
+    </div>
   );
 }

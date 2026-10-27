@@ -2170,3 +2170,91 @@ button.status-chip.removable:hover { background: rgba(200, 60, 80, 0.3); }
   .gate-star { opacity: .6; }
   .gate-embers { display: none; }
 }
+
+/* ---------- Dashboards (after sign-in): the adventurer's hall and the GM's tower ---------- */
+.dash {
+  position: relative; min-height: 100vh; min-height: 100dvh; isolation: isolate;
+  background: radial-gradient(120% 60% at 50% 0%, #2c2456 0%, #1a1636 40%, #0f0d22 100%);
+}
+.night-sky { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+.night-sky span { position: absolute; border-radius: 50%; background: #fff8e1; opacity: .5; animation: gate-twinkle 4s ease-in-out infinite; }
+.dash .topbar {
+  background: rgba(15, 13, 34, .82); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(227, 176, 75, .28);
+}
+.dash .brand span {
+  font: 700 1.25rem 'Cinzel Decorative', 'Cinzel', serif; letter-spacing: .02em;
+  background: linear-gradient(100deg, #f6d98a, #e3b04b 60%, #b98a2c); -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.dash .brand em { font: italic 400 .9em 'IM Fell English', serif; }
+.dash .role-tag { font: 700 .72rem 'Cinzel', serif; letter-spacing: .12em; text-transform: uppercase; border: 1px solid rgba(227, 176, 75, .5); border-radius: 999px; padding: .1rem .5rem; }
+
+.dash-hero { text-align: center; padding: 1.2rem 0 .4rem; }
+.dash-kicker { margin: 0 0 .3rem; font: 500 .78rem 'Cinzel', serif; letter-spacing: .26em; text-transform: uppercase; color: #cdbb8a; }
+.dash-title {
+  margin: 0 0 1.1rem; font: 700 clamp(1.9rem, 7vw, 3rem)/1.1 'Cinzel', serif; letter-spacing: .02em;
+  background: linear-gradient(100deg, #f1e6c8 0%, #f6d98a 45%, #e3b04b 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 2px 0 rgba(40, 25, 0, .5));
+}
+.dash-seals { display: flex; flex-wrap: wrap; justify-content: center; gap: .7rem; }
+.seal {
+  width: 92px; aspect-ratio: 1; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: radial-gradient(circle at 35% 30%, #3a3168, #221e3a 70%);
+  border: 1.5px solid rgba(227, 176, 75, .55); box-shadow: inset 0 0 0 4px rgba(15, 13, 34, .6), inset 0 0 0 5px rgba(227, 176, 75, .2), 0 6px 18px rgba(0, 0, 0, .4);
+}
+.seal strong { font: 700 1.7rem/1 'Cinzel', serif; color: #f1e6c8; }
+.seal span { margin-top: .2rem; font: 500 .62rem 'Cinzel', serif; letter-spacing: .14em; text-transform: uppercase; color: #a69fbe; }
+.seal-won strong { color: var(--teal); } .seal-lost strong { color: var(--ember); } .seal-trophy strong { color: var(--gold); }
+
+.dash-h {
+  display: flex; align-items: center; gap: .7rem; margin: 0 0 .9rem;
+  font: 700 1.25rem 'Cinzel', serif; letter-spacing: .08em; color: #f1e6c8;
+}
+.dash-h::before { content: '◆'; color: var(--gold); font-size: .7em; }
+.dash-h::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(227, 176, 75, .5), transparent); }
+.dash-empty { font-style: italic; font-family: 'IM Fell English', Georgia, serif; font-size: 1.05rem; }
+
+.dash-card {
+  position: relative; padding: 1.2rem 1.2rem 1rem; border-radius: 14px;
+  background: linear-gradient(180deg, rgba(43, 36, 80, .75), rgba(23, 20, 42, .85));
+  border: 1px solid rgba(227, 176, 75, .4);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, .45), inset 0 0 0 4px rgba(23, 20, 42, .55), inset 0 0 0 5px rgba(227, 176, 75, .14);
+}
+.dash-card .dash-h { margin-bottom: .3rem; }
+.dash .join input { background: rgba(15, 13, 34, .7); border-color: rgba(227, 176, 75, .35); font-family: 'Cinzel', serif; }
+.dash .join input:focus { border-color: var(--gold); outline: none; box-shadow: 0 0 0 3px rgba(227, 176, 75, .2); }
+
+.dash .session {
+  background: linear-gradient(180deg, rgba(43, 36, 80, .7), rgba(30, 26, 56, .8));
+  border: 1px solid rgba(227, 176, 75, .22); border-left: 4px solid var(--gold); backdrop-filter: blur(3px);
+}
+.dash .session h3 { font: 700 1.15rem 'Cinzel', serif; letter-spacing: .03em; }
+.session-tools { display: inline-flex; align-items: center; gap: .5rem; flex-shrink: 0; }
+.hide-btn {
+  min-width: 32px; min-height: 32px; padding: 0 .55rem; border-radius: 999px; cursor: pointer;
+  background: transparent; border: 1px solid rgba(166, 159, 190, .35); color: #a69fbe; font: 500 .85rem var(--body);
+}
+.hide-btn:hover:not(:disabled) { border-color: var(--ember); color: var(--ember); }
+.hide-btn.is-hidden:hover:not(:disabled) { border-color: var(--teal); color: var(--teal); }
+.hide-btn:disabled { opacity: .5; }
+
+.dash .campaign {
+  padding: 1.1rem 1.2rem; margin-bottom: .8rem; border: 1px solid rgba(227, 176, 75, .25); border-radius: 14px;
+  background: linear-gradient(135deg, rgba(43, 36, 80, .8), rgba(23, 20, 42, .85)); box-shadow: 0 10px 28px rgba(0, 0, 0, .35);
+}
+.dash .campaign h3 { font: 700 1.3rem 'Cinzel', serif; color: #f6d98a; letter-spacing: .03em; }
+.dash .campaign .muted { font-family: 'IM Fell English', Georgia, serif; font-style: italic; font-size: 1.02rem; }
+
+.dash .hero-card { background: linear-gradient(135deg, rgba(43, 36, 80, .85), rgba(23, 20, 42, .9)); border: 1px solid rgba(227, 176, 75, .25); border-left: 4px solid var(--gold); }
+.dash .hero-name { font: 700 1.15rem 'Cinzel', serif; }
+.dash .trophy {
+  background: radial-gradient(circle at 50% 20%, rgba(227, 176, 75, .18), rgba(23, 20, 42, .85) 70%);
+  border: 1px solid rgba(227, 176, 75, .6); box-shadow: 0 8px 22px rgba(0, 0, 0, .4); font-family: 'Cinzel', serif;
+}
+.dash .trophy-icon { filter: drop-shadow(0 0 10px rgba(227, 176, 75, .55)); }
+.dash .history li { border-bottom-color: rgba(227, 176, 75, .15); }
+.dash .history li > span:first-child { font-family: 'Cinzel', serif; letter-spacing: .02em; }
+.hidden-games { margin-top: 1rem; }
+.hidden-games .history { margin-top: .6rem; }
+@media (max-width: 560px) { .seal { width: 76px; } .seal strong { font-size: 1.4rem; } .dash-hero { padding-top: .6rem; } }
+@media (prefers-reduced-motion: reduce) { .night-sky span { animation: none; } }

@@ -8,12 +8,12 @@ export default function TopBar() {
     <header className="topbar">
       <Link to="/" className="brand">
         <Wheel size={30} spin={false} />
-        <span>Spin & Roll</span>
+        <span>Spin <em>&amp;</em> Roll</span>
       </Link>
       <div className="topbar-right">
         <span className="who">
           {profile?.displayName}
-          {profile?.role === 'dm' && <span className="role-tag">DM</span>}
+          {profile?.role === 'dm' && <span className="role-tag">Game Master</span>}
         </span>
         <button className="btn ghost small" onClick={logOut}>Sign out</button>
       </div>

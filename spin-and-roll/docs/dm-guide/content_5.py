@@ -169,6 +169,7 @@ BLOCKS = [
     ]),
     ('h2', 'Version log'),
     ('table', ['Version', 'Date', 'Changes'], [
+        ['3.15', 'October 2026', 'The dashboards after sign-in match the front page (the adventurer’s hall for players, the Game Master’s tower for you). Anyone can remove a game from their own profile with ✕ and bring it back with Show hidden. Nothing is deleted, and trophies and saved characters are untouched.'],
         ['3.14', 'October 2026', 'A new front page: the sign-in screen is now a night sky over a castle, with the wheel and a d20 as the crest, a small “crafted by Zibby” under the title, and an Enter the realm button. Nothing else changes.'],
         ['3.13', 'October 2026', 'Final polish before game night: people stand on the floor at Home too, and the Home picture is smaller so it loads faster. No new features.'],
         ['3.12', 'October 2026', 'Ollivanders and the Sorting Hat ask every student a different random set of questions (54 wand questions, 30 Sorting questions, answers shuffled). The GM panel shows the line to say back for every answer. New printable Ceremony Book.'],
