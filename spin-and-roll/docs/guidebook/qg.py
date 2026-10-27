@@ -163,7 +163,7 @@ BLOCKS = [
     *quest('Wake the Sleepers', 'The emotional heart of the first half. Brings the prefect back with one vital line.',
            [('Given by', 'Longbottom, Day 3 Lunch, after the second victim.'),
             ('Objectives', 'Gather 3 Mandrake leaves. Brew the Restorative Draught. Bring it to the Hospital Wing.'),
-            ('Reward', '60 XP, 20 house points and a Wiggenweld Potion.')],
+            ('Reward', '60 XP, 20 house points and a Wiggenweld Potion each.')],
            ['Longbottom, quietly, holding a leaf: “There’s a draught. It might bring them back.”',
             'The Sinclair, at their sister’s bedside, being told that there is a chance.',
             'The matron: “If Professor Longbottom’s draught works, perhaps. Until then, keep your voices down.”'],

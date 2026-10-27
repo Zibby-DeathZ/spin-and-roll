@@ -2,6 +2,7 @@
 // A four-cornered area in % of the picture (16:9): back-left, back-right, front-right, front-left.
 // Outlined by looking at each picture in public/maps; furniture and walls are kept outside it.
 export const floors = {
+  home: [[38, 72], [76, 74], [80, 95], [36, 95]],
   'astronomy-tower': [[36, 44], [70, 44], [70, 88], [32, 88]],
   'black-lake': [[15, 70], [55, 74], [60, 92], [12, 92]],
   'charms-classroom': [[36, 46], [68, 48], [82, 92], [42, 92]],

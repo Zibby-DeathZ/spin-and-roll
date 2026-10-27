@@ -191,3 +191,8 @@ two cold braziers. The TV lists each one under "Here", so the players can plan a
 ## Random ceremony questions (v3.12)
 - Ollivanders and the Sorting Hat draw from pools in `src/campaigns/hollow-heir-quizzes.js` (24 wood, 15 core, 30 Sorting questions). `src/lib/quiz.js` draws a set per student with shuffled answers and stores it as codes like `s12:2031` on `state.quiz.qs`; `state.quizUsed` stops repeats until a pool runs out.
 - Every answer has a `reply`; the GM panel shows it in a purple box. `docs/guidebook/build_ceremony.py` prints them all to `Ceremony-Book.pdf` (needs Node, reads the quiz file directly).
+
+## Feature freeze (27 Oct 2026, v3.13)
+- No new features before game night: fixes and polish only.
+- `docs/guidebook/Test-Run-Checklist.pdf` (built by `build_testrun.py` from `test_run.py`) is the full two-phone test run.
+- Still missing art (emoji shows instead): Hale, Penrose and Okafor portraits, the Thornback Boar, all item icons, the creatures, the house crests (drawn ones show). Prompts are in the Art Prompts page.

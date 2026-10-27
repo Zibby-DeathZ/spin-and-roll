@@ -169,6 +169,8 @@ BLOCKS = [
     ]),
     ('h2', 'Version log'),
     ('table', ['Version', 'Date', 'Changes'], [
+        ['3.14', 'October 2026', 'A new front page: the sign-in screen is now a night sky over a castle, with the wheel and a d20 as the crest and an Enter the realm button. Nothing else changes.'],
+        ['3.13', 'October 2026', 'Final polish before game night: people stand on the floor at Home too, and the Home picture is smaller so it loads faster. No new features.'],
         ['3.12', 'October 2026', 'Ollivanders and the Sorting Hat ask every student a different random set of questions (54 wand questions, 30 Sorting questions, answers shuffled). The GM panel shows the line to say back for every answer. New printable Ceremony Book.'],
         ['3.11', 'October 2026', 'Everyone stands on the floor of each picture (staff at the back, students at the front, spawns on the floor). Tidy this room button. Party panel with a card per student (look at their room without changing the TV, put it on the TV, move just them). Lights out sends everyone to their common room.'],
         ['3.10', 'October 2026', '🧹 Clear the TV in the GM header unsticks any screen. Accusation votes can be cancelled or shown with no votes, Back to the map closes an open vote, and phones say when a vote fails. New Troubleshooting section.'],
