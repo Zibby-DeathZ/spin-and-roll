@@ -108,7 +108,10 @@ export default function Login() {
           <D20 size={66} />
         </div>
         <p className="gate-kicker">A tabletop of wheels, dice and stories</p>
-        <h1 className="gate-title">Spin <span>&amp;</span> Roll</h1>
+        <div className="gate-title-wrap">
+          <h1 className="gate-title">Spin <span>&amp;</span> Roll</h1>
+          <p className="gate-credit">crafted by Zibby</p>
+        </div>
         <p className="gate-tagline">Gather your party. Spin the wheel. Roll the dice.</p>
 
         <section className="gate-card">
