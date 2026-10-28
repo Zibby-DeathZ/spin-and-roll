@@ -1011,9 +1011,9 @@ select.wide { width: 100%; background: var(--ink); color: var(--bone); border: 1
   display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6% 7%; }
 .leaf.left { border-radius: 6px 0 0 6px; box-shadow: inset -18px 0 26px -12px rgb(80 50 20 / .55); }
 .leaf.right { border-radius: 0 6px 6px 0; box-shadow: inset 18px 0 26px -12px rgb(80 50 20 / .55); }
-.story-img { width: 100%; height: 100%; min-height: 0; object-fit: contain; animation: fadein 1.4s ease-out; filter: drop-shadow(0 4px 10px rgb(80 50 20 / .35)); }
+.story-img { width: 100%; height: 100%; min-height: 0; object-fit: contain; animation: fadein .6s ease-out; filter: drop-shadow(0 4px 10px rgb(80 50 20 / .35)); }
 .story-icon { font-size: min(18vh, 12vw); filter: sepia(.6) drop-shadow(0 6px 10px rgb(80 50 20 / .4)); animation: fadein 1.4s ease-out; }
-.story-text { margin: 0; font: italic 500 clamp(1.3rem, 2.4vw, 2.3rem)/1.45 'Grenze', Georgia, serif; color: #3a2614; animation: fadein 1.8s ease-out .6s both; }
+.story-text { margin: 0; font: italic 500 clamp(1.3rem, 2.4vw, 2.3rem)/1.45 'Grenze', Georgia, serif; color: #3a2614; animation: fadein .8s ease-out .15s both; }
 .dropcap { float: left; font: 700 3.4em/0.85 'Cinzel Decorative', Georgia, serif; color: #8a2a1e; margin: .05em .08em 0 0; font-style: normal; }
 .folio { position: absolute; bottom: 4%; font: 500 1rem 'Cinzel', serif; color: #8a6a3e; }
 .choose-title { margin: 0 0 3%; font: 700 clamp(1.4rem, 2.6vw, 2.4rem) 'Cinzel', Georgia, serif; color: #6e1813; }
@@ -1053,28 +1053,29 @@ select.wide { width: 100%; background: var(--ink); color: var(--bone); border: 1
 /* Painted book art (public/story/book-*). Each image only takes over once it exists, and the book takes its shape. */
 .book-stage.painted { background-size: cover; background-position: center; }
 .book-stage.painted::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 50%, transparent 30%, rgb(5 4 11 / .6) 100%); pointer-events: none; }
-.book.closed.cover-art { aspect-ratio: var(--cover-ratio, .75); width: min(60vw, calc(78vh * var(--cover-ratio, .75))); }
+.book.cover-art, .book.spread-art { --bh: min(80vh, 46vw); }
+.book.closed.cover-art { aspect-ratio: var(--cover-ratio, .75); width: calc(var(--bh) * var(--cover-ratio, .75)); }
 .cover.painted { background-size: 100% 100%; background-position: center; background-color: transparent; padding: 0; border-radius: 4px; box-shadow: 0 30px 60px rgb(0 0 0 / .7); }
 .cover.painted .cover-frame { border: 0; outline: 0; justify-content: center; }
 .cover.painted .cover-crest { display: none; }
 /* The title sits on the cover's empty plaque (the middle third of the cover). */
-.cover.painted .cover-title { max-width: 34%; padding: 0; font-size: calc(min(60vw, 78vh * var(--cover-ratio, .75)) * .052); line-height: 1.15;
+.cover.painted .cover-title { max-width: 34%; padding: 0; font-size: calc(var(--bh) * var(--cover-ratio, .75) * .052); line-height: 1.15;
   text-shadow: 0 2px 0 rgb(20 10 2 / .95), 0 0 18px rgb(241 213 142 / .45); }
 .flip-cover .cover.painted, .flip-close .cover.painted { background-size: cover; }
-.book.open.spread-art { aspect-ratio: var(--spread-ratio, 1.5); width: min(92vw, calc(84vh * var(--spread-ratio, 1.5))); }
+.book.open.spread-art { aspect-ratio: var(--spread-ratio, 1.5); width: calc(var(--bh) * var(--spread-ratio, 1.5)); }
 .book.spread-art .spread { background: var(--spread) center / 100% 100% no-repeat; padding: 0; box-shadow: none; border-radius: 0; filter: drop-shadow(0 26px 40px rgb(0 0 0 / .7)); }
 /* Inside each page's printed border (measured on the painted pages). */
 .book.spread-art .leaf { background: none; box-shadow: none; padding: 24% 10% 26%; }
 .book.spread-art .leaf.left { padding-left: 22%; padding-right: 10%; }
 .book.spread-art .leaf.right { padding-left: 10%; padding-right: 22%; }
-.book.spread-art .story-text { font-size: calc(min(92vw, 84vh * var(--spread-ratio, 1.5)) * .034); }
-.book.spread-art .choose-title { font-size: calc(min(92vw, 84vh * var(--spread-ratio, 1.5)) * .028); }
-.book.spread-art .choose-title.muted-ink { font-size: calc(min(92vw, 84vh * var(--spread-ratio, 1.5)) * .02); }
+.book.spread-art .story-text { font-size: calc(var(--bh) * var(--spread-ratio, 1.5) * .034); }
+.book.spread-art .choose-title { font-size: calc(var(--bh) * var(--spread-ratio, 1.5) * .028); }
+.book.spread-art .choose-title.muted-ink { font-size: calc(var(--bh) * var(--spread-ratio, 1.5) * .02); }
 .book.spread-art .fam-col { height: 90%; }
-.book.spread-art .fam-name { font-size: calc(min(92vw, 84vh * var(--spread-ratio, 1.5)) * .018); }
-.book.spread-art .fam-sub { font-size: calc(min(92vw, 84vh * var(--spread-ratio, 1.5)) * .011); }
-.book.spread-art .fam-portrait { width: calc(min(92vw, 84vh * var(--spread-ratio, 1.5)) * .045); height: calc(min(92vw, 84vh * var(--spread-ratio, 1.5)) * .045); font-size: 1.2rem; }
-.book.spread-art .fam-stamp { font-size: calc(min(92vw, 84vh * var(--spread-ratio, 1.5)) * .016); }
+.book.spread-art .fam-name { font-size: calc(var(--bh) * var(--spread-ratio, 1.5) * .018); }
+.book.spread-art .fam-sub { font-size: calc(var(--bh) * var(--spread-ratio, 1.5) * .011); }
+.book.spread-art .fam-portrait { width: calc(var(--bh) * var(--spread-ratio, 1.5) * .045); height: calc(var(--bh) * var(--spread-ratio, 1.5) * .045); font-size: 1.2rem; }
+.book.spread-art .fam-stamp { font-size: calc(var(--bh) * var(--spread-ratio, 1.5) * .016); }
 .book.spread-art .folio { bottom: 9%; }
 .book.spread-art .flip-leaf { top: 0; bottom: 0; width: 50%; background: var(--spread) right center / 200% 100% no-repeat; border-radius: 0; box-shadow: none; }
 .book.spread-art.cover-art .flip-cover, .book.spread-art.cover-art .flip-close { top: 0; bottom: 0; }

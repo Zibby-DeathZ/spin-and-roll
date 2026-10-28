@@ -78,7 +78,8 @@ function useStoryArt(name) {
     (async () => {
       let found = null;
       for (const ext of ['jpg', 'png', 'webp']) {
-        const url = `${BASE}story/${name}.${ext}`;
+        // Absolute, because a url() inside a CSS variable is read from the stylesheet's folder, not the page's.
+        const url = new URL(`${BASE}story/${name}.${ext}`, document.baseURI).href;
         const ratio = await loads(url);
         if (ratio) { found = { url, ratio }; break; }
       }
@@ -207,7 +208,20 @@ function IntroVideo({ onDone, onMissing }) {
 
 // ---------- The whole opening, driven by the session state ----------
 // onVideoDone: called when a custom intro video finishes, to open the book.
+// Fetches every storybook picture up front, so each page appears the moment it's turned.
+const preloaded = new Set();
+function preloadStory(intro) {
+  const names = [...intro.pages.map((_, i) => `page-${i + 1}.jpg`), 'book-cover.jpg', 'book-table.jpg', 'book-spread.webp', 'book-spread.png', 'book-spread.jpg'];
+  for (const n of names) {
+    if (preloaded.has(n)) continue;
+    preloaded.add(n);
+    const img = new Image();
+    img.src = `${BASE}story/${n}`;
+  }
+}
+
 export default function TVIntro({ intro, data, st, claims, onVideoDone, onVideoMissing }) {
+  useEffect(() => { preloadStory(intro); }, [intro]);
   const [, tick] = useState(0);
   const [video, setVideo] = useState('try'); // 'try' | 'done' | 'missing'
   useEffect(() => { const t = setInterval(() => tick((x) => x + 1), 250); return () => clearInterval(t); }, []);

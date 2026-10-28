@@ -169,6 +169,7 @@ BLOCKS = [
     ]),
     ('h2', 'Version log'),
     ('table', ['Version', 'Date', 'Changes'], [
+        ['3.18', 'October 2026', 'Storybook fixes: the painted pages now show on the live site, the closed cover and the open book are the same height, and every page picture is fetched before the book opens so each page appears straight away (faster fades too).'],
         ['3.17', 'October 2026', 'The painted storybook is in: a leather cover with the title on its plaque, open parchment pages and a candlelit desk under the book. The book takes the shape of its pictures, so square art works too.'],
         ['3.16', 'October 2026', 'The opening storybook can wear painted art: drop book-cover, book-spread and book-table (JPG or PNG) into public/story and the book, its pages and page turns use them, with the title, story pictures and words on top. Prompts are on the Art Prompts page. The Media tab lists them. Until then the drawn book shows.'],
         ['3.15', 'October 2026', 'The dashboards after sign-in match the front page (the adventurer’s hall for players, the Game Master’s tower for you). Anyone can remove a game from their own profile with ✕ and bring it back with Show hidden. Nothing is deleted, and trophies and saved characters are untouched.'],
