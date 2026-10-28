@@ -1065,18 +1065,18 @@ select.wide { width: 100%; background: var(--ink); color: var(--bone); border: 1
 .book.open.spread-art { aspect-ratio: var(--spread-ratio, 1.5); width: calc(var(--bh) * var(--spread-ratio, 1.5)); }
 .book.spread-art .spread { background: var(--spread) center / 100% 100% no-repeat; padding: 0; box-shadow: none; border-radius: 0; filter: drop-shadow(0 26px 40px rgb(0 0 0 / .7)); }
 /* Inside each page's printed border (measured on the painted pages). */
-.book.spread-art .leaf { background: none; box-shadow: none; padding: 24% 10% 26%; }
+.book.spread-art .leaf { background: none; box-shadow: none; padding: 12% 10% 13%; }
 .book.spread-art .leaf.left { padding-left: 22%; padding-right: 10%; }
 .book.spread-art .leaf.right { padding-left: 10%; padding-right: 22%; }
-.book.spread-art .story-text { font-size: calc(var(--bh) * var(--spread-ratio, 1.5) * .034); }
-.book.spread-art .choose-title { font-size: calc(var(--bh) * var(--spread-ratio, 1.5) * .028); }
-.book.spread-art .choose-title.muted-ink { font-size: calc(var(--bh) * var(--spread-ratio, 1.5) * .02); }
+.book.spread-art .story-text { font-size: calc(var(--bh) * .045); }
+.book.spread-art .choose-title { font-size: calc(var(--bh) * .038); }
+.book.spread-art .choose-title.muted-ink { font-size: calc(var(--bh) * .026); }
 .book.spread-art .fam-col { height: 90%; }
-.book.spread-art .fam-name { font-size: calc(var(--bh) * var(--spread-ratio, 1.5) * .018); }
-.book.spread-art .fam-sub { font-size: calc(var(--bh) * var(--spread-ratio, 1.5) * .011); }
-.book.spread-art .fam-portrait { width: calc(var(--bh) * var(--spread-ratio, 1.5) * .045); height: calc(var(--bh) * var(--spread-ratio, 1.5) * .045); font-size: 1.2rem; }
-.book.spread-art .fam-stamp { font-size: calc(var(--bh) * var(--spread-ratio, 1.5) * .016); }
-.book.spread-art .folio { bottom: 9%; }
+.book.spread-art .fam-name { font-size: calc(var(--bh) * .028); }
+.book.spread-art .fam-sub { font-size: calc(var(--bh) * .017); }
+.book.spread-art .fam-portrait { width: calc(var(--bh) * .065); height: calc(var(--bh) * .065); font-size: 1.3rem; }
+.book.spread-art .fam-stamp { font-size: calc(var(--bh) * .026); }
+.book.spread-art .folio { bottom: 8%; }
 .book.spread-art .flip-leaf { top: 0; bottom: 0; width: 50%; background: var(--spread) right center / 200% 100% no-repeat; border-radius: 0; box-shadow: none; }
 .book.spread-art.cover-art .flip-cover, .book.spread-art.cover-art .flip-close { top: 0; bottom: 0; }
 

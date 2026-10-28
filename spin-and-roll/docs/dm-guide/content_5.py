@@ -169,6 +169,7 @@ BLOCKS = [
     ]),
     ('h2', 'Version log'),
     ('table', ['Version', 'Date', 'Changes'], [
+        ['3.19', 'October 2026', 'Storybook: each open page is now the same square as the cover, so the open book is two covers wide at the same height. Bigger words and pictures on the wider pages.'],
         ['3.18', 'October 2026', 'Storybook fixes: the painted pages now show on the live site, the closed cover and the open book are the same height, and every page picture is fetched before the book opens so each page appears straight away (faster fades too).'],
         ['3.17', 'October 2026', 'The painted storybook is in: a leather cover with the title on its plaque, open parchment pages and a candlelit desk under the book. The book takes the shape of its pictures, so square art works too.'],
         ['3.16', 'October 2026', 'The opening storybook can wear painted art: drop book-cover, book-spread and book-table (JPG or PNG) into public/story and the book, its pages and page turns use them, with the title, story pictures and words on top. Prompts are on the Art Prompts page. The Media tab lists them. Until then the drawn book shows.'],

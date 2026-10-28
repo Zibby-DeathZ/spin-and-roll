@@ -176,7 +176,8 @@ function Storybook({ intro, data, claims, st }) {
     <div className={`book-stage ${tableArt ? 'painted' : ''}`} style={tableArt ? { backgroundImage: `url(${tableArt.url})` } : undefined}>
       <div className={`book ${page === 0 ? 'closed' : 'open'} ${st.stage === 'closing' ? 'closing' : ''} ${coverArt ? 'cover-art' : ''} ${spreadArt ? 'spread-art' : ''}`}
         style={{
-          ...(spreadArt ? { '--spread': `url(${spreadArt.url})`, '--spread-ratio': spreadArt.ratio } : {}),
+          // Each open page is the same shape as the cover, so the open book is two covers wide.
+          ...(spreadArt ? { '--spread': `url(${spreadArt.url})`, '--spread-ratio': coverArt ? 2 * coverArt.ratio : spreadArt.ratio } : {}),
           ...(coverArt ? { '--cover-ratio': coverArt.ratio } : {}),
         }}>
         {page === 0 ? <Cover intro={intro} art={coverArt} />
