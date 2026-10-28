@@ -143,6 +143,7 @@ export default function GMMedia({ data, session }) {
         Music: [['intro', 'sounds/music/intro.mp3'], ...(data.music ?? []).map((m) => [m.id, `sounds/music/${m.id}.mp3`])].map(([n, p]) => [n, p, exists(p)]),
         Narration: (data.intro?.pages ?? []).map((_, i) => [`Page ${i + 1}`, `sounds/narration/page-${i + 1}.mp3`, exists(`sounds/narration/page-${i + 1}.mp3`)]),
         'Storybook pictures': (data.intro?.pages ?? []).map((_, i) => [`Page ${i + 1}`, `story/page-${i + 1}.jpg`, exists(`story/page-${i + 1}.jpg`)]),
+        'Storybook design (optional, the drawn book shows until then)': [['Book cover', 'book-cover'], ['Open book (blank pages)', 'book-spread'], ['Table under the book', 'book-table']].map(([n, f]) => [n, `story/${f}.jpg`, anyOf(['jpg', 'png', 'webp'].map((e) => `story/${f}.${e}`))]),
         Portraits: (data.families ?? []).map((f) => [f.name, `portraits/${f.id}.jpg`, img(`portraits/${f.id}`)]),
         Maps: (data.locations ?? []).map((l) => [l.name, `maps/${l.id}.jpg`, img(`maps/${l.id}`)]),
         Puzzles: [['Scrambled Portrait', 'puzzles/portrait.jpg', exists('puzzles/portrait.jpg')]],

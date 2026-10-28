@@ -1050,6 +1050,35 @@ select.wide { width: 100%; background: var(--ink); color: var(--bone); border: 1
 @keyframes turn-leaf { from { transform: rotateY(0); } to { transform: rotateY(-180deg); } }
 @media (prefers-reduced-motion: reduce) { .flip-cover, .flip-close, .flip-leaf { display: none; } }
 
+/* Painted book art (public/story/book-*). Each image only takes over once it exists, and the book takes its shape. */
+.book-stage.painted { background-size: cover; background-position: center; }
+.book-stage.painted::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 50%, transparent 30%, rgb(5 4 11 / .6) 100%); pointer-events: none; }
+.book.closed.cover-art { aspect-ratio: var(--cover-ratio, .75); width: min(60vw, calc(78vh * var(--cover-ratio, .75))); }
+.cover.painted { background-size: 100% 100%; background-position: center; background-color: transparent; padding: 0; border-radius: 4px; box-shadow: 0 30px 60px rgb(0 0 0 / .7); }
+.cover.painted .cover-frame { border: 0; outline: 0; justify-content: center; }
+.cover.painted .cover-crest { display: none; }
+/* The title sits on the cover's empty plaque (the middle third of the cover). */
+.cover.painted .cover-title { max-width: 34%; padding: 0; font-size: calc(min(60vw, 78vh * var(--cover-ratio, .75)) * .052); line-height: 1.15;
+  text-shadow: 0 2px 0 rgb(20 10 2 / .95), 0 0 18px rgb(241 213 142 / .45); }
+.flip-cover .cover.painted, .flip-close .cover.painted { background-size: cover; }
+.book.open.spread-art { aspect-ratio: var(--spread-ratio, 1.5); width: min(92vw, calc(84vh * var(--spread-ratio, 1.5))); }
+.book.spread-art .spread { background: var(--spread) center / 100% 100% no-repeat; padding: 0; box-shadow: none; border-radius: 0; filter: drop-shadow(0 26px 40px rgb(0 0 0 / .7)); }
+/* Inside each page's printed border (measured on the painted pages). */
+.book.spread-art .leaf { background: none; box-shadow: none; padding: 24% 10% 26%; }
+.book.spread-art .leaf.left { padding-left: 22%; padding-right: 10%; }
+.book.spread-art .leaf.right { padding-left: 10%; padding-right: 22%; }
+.book.spread-art .story-text { font-size: calc(min(92vw, 84vh * var(--spread-ratio, 1.5)) * .034); }
+.book.spread-art .choose-title { font-size: calc(min(92vw, 84vh * var(--spread-ratio, 1.5)) * .028); }
+.book.spread-art .choose-title.muted-ink { font-size: calc(min(92vw, 84vh * var(--spread-ratio, 1.5)) * .02); }
+.book.spread-art .fam-col { height: 90%; }
+.book.spread-art .fam-name { font-size: calc(min(92vw, 84vh * var(--spread-ratio, 1.5)) * .018); }
+.book.spread-art .fam-sub { font-size: calc(min(92vw, 84vh * var(--spread-ratio, 1.5)) * .011); }
+.book.spread-art .fam-portrait { width: calc(min(92vw, 84vh * var(--spread-ratio, 1.5)) * .045); height: calc(min(92vw, 84vh * var(--spread-ratio, 1.5)) * .045); font-size: 1.2rem; }
+.book.spread-art .fam-stamp { font-size: calc(min(92vw, 84vh * var(--spread-ratio, 1.5)) * .016); }
+.book.spread-art .folio { bottom: 9%; }
+.book.spread-art .flip-leaf { top: 0; bottom: 0; width: 50%; background: var(--spread) right center / 200% 100% no-repeat; border-radius: 0; box-shadow: none; }
+.book.spread-art.cover-art .flip-cover, .book.spread-art.cover-art .flip-close { top: 0; bottom: 0; }
+
 /* Sound gate */
 .sound-gate { position: fixed; right: 1.5rem; bottom: 1.5rem; z-index: 60; display: flex; flex-direction: column; align-items: center; gap: .2rem;
   background: var(--gold); color: var(--ink); border: 0; border-radius: 18px; padding: 1rem 1.6rem; font: 700 1.1rem var(--body); cursor: pointer;

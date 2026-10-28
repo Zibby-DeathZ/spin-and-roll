@@ -27,7 +27,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
 sys.path.insert(0, os.path.dirname(__file__))
-VERSION = '3.15'
+VERSION = '3.17'
 VERSION_NOTE = 'Year 1 with the living castle. Matches the complete app, October 2026.'
 
 # ---------- Fonts (fall back to built-ins if the TTFs aren't on this machine) ----------

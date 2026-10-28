@@ -56,6 +56,39 @@ function TitleCard({ title }) {
 }
 
 // ---------- The book ----------
+// Optional painted book art (made in an image tool), in public/story/:
+//   book-cover.jpg  (or .png) the closed cover, 3:4, with an empty title plaque in the middle
+//   book-spread.jpg the open book, 3:2, two blank parchment pages
+//   book-table.jpg  what the book rests on, 16:9
+// Each one that exists replaces the drawn version; the words and pictures go on top.
+const probed = new Map();
+// Loads a picture and reports its shape, or null when the file isn't there.
+const loads = (src) => new Promise((res) => {
+  const img = new Image();
+  img.onload = () => res(img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : 1);
+  img.onerror = () => res(null);
+  img.src = src;
+});
+// { url, ratio } for public/story/<name>.jpg, .png or .webp, or null. The book takes the picture's own shape.
+function useStoryArt(name) {
+  const [art, setArt] = useState(probed.get(name) ?? null);
+  useEffect(() => {
+    if (probed.has(name)) { setArt(probed.get(name)); return undefined; }
+    let alive = true;
+    (async () => {
+      let found = null;
+      for (const ext of ['jpg', 'png', 'webp']) {
+        const url = `${BASE}story/${name}.${ext}`;
+        const ratio = await loads(url);
+        if (ratio) { found = { url, ratio }; break; }
+      }
+      probed.set(name, found);
+      if (alive) setArt(found);
+    })();
+    return () => { alive = false; };
+  }, [name]);
+  return art;
+}
 function StoryImage({ n, icon }) {
   const [ok, setOk] = useState(true);
   useEffect(() => setOk(true), [n]);
@@ -105,9 +138,9 @@ function ChooseSpread({ intro, data, claims }) {
   );
 }
 
-function Cover({ intro }) {
+function Cover({ intro, art }) {
   return (
-    <div className="cover">
+    <div className={`cover ${art ? 'painted' : ''}`} style={art ? { backgroundImage: `url(${art.url})` } : undefined}>
       <div className="cover-frame">
         <span className="cover-crest" aria-hidden="true">✦</span>
         <p className="cover-title">{intro.cover}</p>
@@ -121,6 +154,9 @@ function Storybook({ intro, data, claims, st }) {
   const page = st.stage === 'choose' || st.stage === 'closing' ? intro.pages.length + 1 : st.page;
   const prev = useRef(page);
   const [flip, setFlip] = useState(null); // 'open' | 'turn' | 'close'
+  const coverArt = useStoryArt('book-cover');
+  const spreadArt = useStoryArt('book-spread');
+  const tableArt = useStoryArt('book-table');
 
   useEffect(() => {
     if (st.stage === 'closing') { setFlip('close'); play('thud'); return; }
@@ -136,14 +172,18 @@ function Storybook({ intro, data, claims, st }) {
   }, [page, st.stage, intro.pages.length]);
 
   return (
-    <div className="book-stage">
-      <div className={`book ${page === 0 ? 'closed' : 'open'} ${st.stage === 'closing' ? 'closing' : ''}`}>
-        {page === 0 ? <Cover intro={intro} />
+    <div className={`book-stage ${tableArt ? 'painted' : ''}`} style={tableArt ? { backgroundImage: `url(${tableArt.url})` } : undefined}>
+      <div className={`book ${page === 0 ? 'closed' : 'open'} ${st.stage === 'closing' ? 'closing' : ''} ${coverArt ? 'cover-art' : ''} ${spreadArt ? 'spread-art' : ''}`}
+        style={{
+          ...(spreadArt ? { '--spread': `url(${spreadArt.url})`, '--spread-ratio': spreadArt.ratio } : {}),
+          ...(coverArt ? { '--cover-ratio': coverArt.ratio } : {}),
+        }}>
+        {page === 0 ? <Cover intro={intro} art={coverArt} />
           : page > intro.pages.length ? <ChooseSpread intro={intro} data={data} claims={claims} />
             : <Spread intro={intro} page={page} />}
-        {flip === 'open' && <div className="flip-cover"><Cover intro={intro} /></div>}
+        {flip === 'open' && <div className="flip-cover"><Cover intro={intro} art={coverArt} /></div>}
         {flip === 'turn' && <div className="flip-leaf" />}
-        {flip === 'close' && <div className="flip-close"><Cover intro={intro} /></div>}
+        {flip === 'close' && <div className="flip-close"><Cover intro={intro} art={coverArt} /></div>}
       </div>
     </div>
   );
