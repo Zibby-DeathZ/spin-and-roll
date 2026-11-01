@@ -79,9 +79,13 @@ export function actionsAt(data, session, locId) {
   };
 }
 
+// The person the GM has picked out on the map: the TV rings them and shows their name, so everyone
+// knows who is talking. Pass null to clear it.
+export const setSpotlight = (sid, id) => updateDoc(sessionRef(sid), { 'state.map.spotlight': id ?? deleteField() });
+
 export async function showOnTV(sid, data, locId) {
   const loc = data.locations.find((l) => l.id === locId);
-  await updateDoc(sessionRef(sid), { 'state.map.loc': locId, 'state.map.discovered': arrayUnion(locId) });
+  await updateDoc(sessionRef(sid), { 'state.map.loc': locId, 'state.map.discovered': arrayUnion(locId), 'state.map.spotlight': deleteField() });
   await logEvent(sid, { type: 'travel', payload: { name: loc.name, icon: loc.icon } });
 }
 
@@ -93,7 +97,7 @@ export async function movePlayers(sid, data, locId, uids, chars, alsoShow = true
   // Everyone stands together at the front of the floor in that picture.
   const spots = studentSpots(data, locId, uids.length);
   uids.forEach((u, i) => { upd[`state.pcPos.${u}`] = { loc: locId, ...spots[i] }; });
-  if (alsoShow) upd['state.map.loc'] = locId;
+  if (alsoShow) { upd['state.map.loc'] = locId; upd['state.map.spotlight'] = deleteField(); }
   await updateDoc(sessionRef(sid), upd);
   const names = uids.map((u) => chars[u]?.firstName ?? chars[u]?.name ?? 'Someone');
   await logEvent(sid, { type: 'moved', payload: { names, name: loc.name, icon: loc.icon } });

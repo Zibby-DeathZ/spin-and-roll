@@ -136,7 +136,7 @@ BLOCKS = [
     ('h2', 'Breaking the rules'),
     ('p', 'They will. Hogwarts has a simple system for it, and it is also your best steering tool.'),
     ('table', ['They…', 'What happens'], [
-        ['Are out after curfew', 'Spin Out after curfew for each group that moves (Wheels tab). Filch means detention.'],
+        ['Are out after curfew', 'Spin Out after curfew for each group that moves (Wheels &amp; dice tab). Filch means detention.'],
         ['Get detention', 'Detention is in the Trophy Room with Filch, polishing cups. It starts the secret quest The Old Cup. Detention is a reward in disguise.'],
         ['Fight in a corridor', '−5 points each, unless a teacher is in the room, then −10 and detention.'],
         ['Curse a teacher', '−20 points and detention. If it is Ashgrove, he forgives them warmly and it is somehow worse.'],

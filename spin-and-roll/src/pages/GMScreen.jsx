@@ -12,7 +12,7 @@ import StatusPill from '../components/StatusPill';
 import EventToasts from '../components/EventToasts';
 import { GMQuiz, HouseBoard } from '../components/Ceremony';
 import { ClockChip, GMClock } from '../components/Clock';
-import { GMSpin } from '../components/SpinWheel';
+import { GMDice, GMSpin } from '../components/SpinWheel';
 import GMTable from '../components/GMTable';
 import Portrait from '../components/Portrait';
 import GMQuests from '../components/GMQuests';
@@ -227,7 +227,7 @@ function Feed({ sid, nameOf }) {
 
 const TABS = [
   ['table', '🗺️ Table'], ['day', '🕰️ Day & class'], ['quests', '📜 Quests'], ['puzzles', '🧩 Puzzles'],
-  ['shows', '🎬 TV shows'], ['players', '🧑‍🎓 Players'], ['owls', '🦉 Owl Post'], ['imposter', '🎭 Double'], ['spells', '✨ Spells'], ['wheels', '🎡 Wheels'], ['media', '🎞️ Media'],
+  ['shows', '🎬 TV shows'], ['players', '🧑‍🎓 Players'], ['owls', '🦉 Owl Post'], ['imposter', '🎭 Double'], ['spells', '✨ Spells'], ['wheels', '🎡 Wheels & dice'], ['media', '🎞️ Media'],
 ];
 
 export default function GMScreen() {
@@ -268,7 +268,7 @@ export default function GMScreen() {
   const quizState = session.state?.quiz;
   const enc = session.state?.encounter;
   const lesson = session.state?.lesson;
-  const tabs = TABS.filter(([id]) => (id === 'day' ? data.clock : id === 'quests' ? data.quests : id === 'wheels' ? data.wheels : id === 'table' ? data.locations : id === 'puzzles' ? data.puzzles : id === 'shows' ? data.suspects : id === 'spells' ? data.spells : true));
+  const tabs = TABS.filter(([id]) => (id === 'day' ? data.clock : id === 'quests' ? data.quests : id === 'wheels' ? true : id === 'table' ? data.locations : id === 'puzzles' ? data.puzzles : id === 'shows' ? data.suspects : id === 'spells' ? data.spells : true));
   const active = tabs.some(([id]) => id === tab) ? tab : tabs[0][0];
 
   return (
@@ -345,7 +345,7 @@ export default function GMScreen() {
           {active === 'spells' && <GMSpells sid={sid} data={data} session={session} chars={chars} />}
           {active === 'shows' && <GMShows sid={sid} data={data} session={session} chars={chars} />}
           {active === 'puzzles' && <GMPuzzles sid={sid} data={data} session={session} chars={chars} />}
-          {active === 'wheels' && <GMSpin sid={sid} data={data} session={session} chars={chars} />}
+          {active === 'wheels' && <><GMSpin sid={sid} data={data} session={session} chars={chars} /><GMDice sid={sid} /></>}
           {active === 'players' && (
             <section className="gm-players">
               <TestBench sid={sid} data={data} session={session} chars={chars} />

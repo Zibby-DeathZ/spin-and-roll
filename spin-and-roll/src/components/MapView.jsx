@@ -14,7 +14,7 @@ const CROWD = 3;
 
 export default function MapView({
   loc, tokens = {}, pcs = [], encounter, selected, onSelect, onMove, big = false, small = false, caption = true,
-  doors = [], onDoor = null,
+  doors = [], onDoor = null, spotlight = null,
 }) {
   const [ext, setExt] = useState(0);
   useEffect(() => setExt(0), [loc?.id]);
@@ -26,7 +26,7 @@ export default function MapView({
   const crowded = !small && people.length > CROWD;
   // A person stays on the picture if they're mid-fight or selected; everyone else joins the strip.
   const fighting = new Set((encounter?.order ?? []).map((o) => o.id));
-  const inStrip = crowded ? people.filter(([id]) => id !== selected && !fighting.has(id)) : [];
+  const inStrip = crowded ? people.filter(([id]) => id !== selected && id !== spotlight && !fighting.has(id)) : [];
   const stripIds = new Set(inStrip.map(([id]) => id));
   const here = all.filter(([id]) => !stripIds.has(id));
   const current = encounter?.order?.[encounter.turn];
@@ -38,6 +38,9 @@ export default function MapView({
     onMove(((e.clientX - r.left) / r.width) * 100, ((e.clientY - r.top) / r.height) * 100);
   };
   const pick = (id) => (e) => { e.stopPropagation(); onSelect?.(id); };
+  // Who the GM has spotlighted, if they're in this room.
+  const spotTok = spotlight && !spotlight.startsWith('pc:') && tokens[spotlight]?.loc === loc.id ? tokens[spotlight] : null;
+  const spotPc = spotlight?.startsWith('pc:') ? pcs.find((p) => `pc:${p.uid}` === spotlight) : null;
 
   return (
     <div className={`mapview ${src ? '' : 'parchment'} ${big ? 'big' : ''} ${small ? 'small' : ''} ${onMove ? 'editable' : ''}`} onClick={click}>
@@ -76,7 +79,7 @@ export default function MapView({
         const cls = t.kind === 'chest' ? `chest ${t.opened ? 'opened' : ''}` : t.kind === 'item' ? 'item' : t.kind === 'hazard' ? `hazard ${t.used ? 'opened' : ''}` : t.npc ? 'npc' : 'mon';
         return (
           <button key={id} type="button"
-            className={`token ${cls} ${down ? 'down' : ''} ${selected === id ? 'sel' : ''} ${current?.id === id ? 'turn' : ''}`}
+            className={`token ${cls} ${down ? 'down' : ''} ${selected === id ? 'sel' : ''} ${spotlight === id ? 'spot' : ''} ${current?.id === id ? 'turn' : ''}`}
             style={{ left: `${t.x}%`, top: `${t.y}%`, ...(t.scale ? { transform: `translate(-50%, -50%) scale(${t.scale})` } : {}) }}
             onClick={pick(id)} aria-label={t.name} tabIndex={onSelect ? 0 : -1}>
             <Art path={tokenArt(t)} icon={t.icon} className={`token-icon ${t.revealed ? 'mimic-icon' : ''}`} />
@@ -91,7 +94,7 @@ export default function MapView({
         const id = `pc:${p.uid}`;
         return (
           <button key={id} type="button"
-            className={`token pc house-${(p.house ?? 'unsorted').toLowerCase()} ${p.hp <= 0 ? 'down' : ''} ${selected === id ? 'sel' : ''} ${current?.id === p.uid ? 'turn' : ''}`}
+            className={`token pc house-${(p.house ?? 'unsorted').toLowerCase()} ${p.hp <= 0 ? 'down' : ''} ${selected === id ? 'sel' : ''} ${spotlight === id ? 'spot' : ''} ${current?.id === p.uid ? 'turn' : ''}`}
             style={{ left: `${p.x}%`, top: `${p.y}%` }} onClick={pick(id)} aria-label={p.name} tabIndex={onSelect ? 0 : -1}>
             <Portrait family={p.family} name={p.name} className="token-icon" />
             {!small && <span className="token-name">{p.name}</span>}
@@ -100,6 +103,13 @@ export default function MapView({
           </button>
         );
       })}
+
+      {big && (spotTok || spotPc) && (
+        <div className="spot-banner" key={spotlight} aria-live="polite">
+          {spotTok ? <Art path={tokenArt(spotTok)} icon={spotTok.icon} className="spot-face" /> : <Portrait family={spotPc.family} name={spotPc.name} className="spot-face" />}
+          <span className="spot-name">{spotTok ? spotTok.name : spotPc.name}</span>
+        </div>
+      )}
 
       {!small && caption && (
         <div className="map-caption">

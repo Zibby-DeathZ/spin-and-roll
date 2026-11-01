@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getCampaign, getCampaignData } from '../campaigns';
 import { useProfiles, useSession } from '../lib/sessions';
-import { answerKey, clockOf, useAnswers, useCharacters } from '../lib/game';
+import { answerKey, clockOf, spinWheelOf, useAnswers, useCharacters } from '../lib/game';
 import { ClockChip } from '../components/Clock';
 import { TVSpin } from '../components/SpinWheel';
 import MapView from '../components/MapView';
@@ -50,7 +50,7 @@ export default function TVScreen() {
   const q = session.state?.quiz;
   const quiz = q && resolveQuiz(data.quizzes?.[q.id], q);
   const spin = session.state?.spin;
-  const showSpin = spin && !spin.hidden && data.wheels?.[spin.wheelId];
+  const showSpin = spin && !spin.hidden && spinWheelOf(data, spin);
   const loc = data.locations?.find((l) => l.id === session.state?.map?.loc);
   const enc = session.state?.encounter;
 
@@ -96,7 +96,7 @@ export function TVLive({ session, chars, profiles, data, title, answers, lessonR
   const q = session.state?.quiz;
   const quiz = q && resolveQuiz(data.quizzes?.[q.id], q);
   const spin = session.state?.spin;
-  const showSpin = spin && !spin.hidden && data.wheels?.[spin.wheelId];
+  const showSpin = spin && !spin.hidden && spinWheelOf(data, spin);
   const loc = data.locations?.find((l) => l.id === session.state?.map?.loc);
   const enc = session.state?.encounter;
   const acts = loc ? actionsAt(data, session, loc.id) : null;
@@ -117,7 +117,7 @@ export function TVLive({ session, chars, profiles, data, title, answers, lessonR
   else if (session.state?.imposter) stage = <div className="tv2-center"><TVImposter session={session} chars={chars} /></div>;
   else if (session.state?.show) stage = <div className="tv2-center"><TVShow data={data} session={session} /></div>;
   else if (quiz) stage = <div className="tv2-center"><TVQuiz quiz={quiz} answer={answers[answerKey(q.id, q.uid)]} name={nameOf(q.uid)} /></div>;
-  else if (showSpin) stage = <div className="tv2-center"><TVSpin data={data} spin={spin} name={spin.uid ? nameOf(spin.uid) : null} /></div>;
+  else if (showSpin) stage = <div className="tv2-center"><TVSpin data={data} spin={spin} name={spin.uid ? nameOf(spin.uid) : spin.who ?? null} /></div>;
   else if (session.state?.puzzle && data.puzzles?.find((p) => p.id === session.state.puzzle.id)) {
     stage = <div className="tv2-center"><TVPuzzle p={data.puzzles.find((p) => p.id === session.state.puzzle.id)} st={session.state.puzzle} /></div>;
   } else if (session.state?.lesson) {
@@ -131,7 +131,7 @@ export function TVLive({ session, chars, profiles, data, title, answers, lessonR
       <div className="tv2-play">
         <div className="tv2-map">
           <MapView loc={loc} tokens={session.state?.tokens} pcs={pcsAt(session, chars, loc.id)} encounter={enc} big caption={false}
-            doors={enc ? [] : doorsAt(data, session, loc.id)} />
+            doors={enc ? [] : doorsAt(data, session, loc.id)} spotlight={session.state?.map?.spotlight ?? null} />
           {enc && (
             <ol className="tv-turns">
               <li className="tv-round">Round {enc.round}</li>

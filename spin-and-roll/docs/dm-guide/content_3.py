@@ -166,7 +166,9 @@ BLOCKS = [
     ('tip', 'House points are the easiest way to reward players for the things you want more of. Give them out often and say why out loud.'),
 
     ('h2', 'Wheels'),
-    ('gm', 'Wheels tab: choose a wheel and who is spinning, press <b>Spin</b>. It spins on the TV and its result applies to that student when it lands. <b>Re-spin (Felix)</b> is for Felix Felicis.'),
+    ('gm', '<b>🎡 Wheels &amp; dice</b> tab: pick a wheel card (open “What can it land on?” to see every result), choose who spins (a student, the whole table, or type an NPC’s name), then <b>📺 Spin on the TV</b>, or <b>🤫 Spin quietly</b> to see it only on your screen. A campaign wheel’s result applies to that student when it lands. <b>Re-spin (Felix)</b> is for Felix Felicis.'),
+    ('gm', '<b>Custom wheel:</b> on the same tab, press <b>✏️ Custom wheel</b>, give it a name and type 2 to 16 options, one per line (“Yes | The portrait opens its eyes” puts “Yes” on the wheel and the rest underneath). <b>💾 Save to my wheels</b> keeps it for every game. Custom wheels only show words: they never change HP, points or items.'),
+    ('gm', '<b>Dice:</b> under the wheels, choose a die (d4 to d100), how many, a bonus and, for a single d20, advantage or disadvantage. Type what it is for (“Filch spots them”) and press <b>🎲 Roll</b>. With <b>📺 Show on the TV</b> ticked the result pops up big on the TV; untick it for a secret roll. Your last eight rolls stay listed.'),
     ('table', ['Wheel', 'Use it when'], [
         ['Bertie Bott’s Beans', 'Someone eats the beans (it spins by itself)'],
         ['Potion brewing', 'Brewing outside class, or as drama during Potions'],
@@ -210,7 +212,8 @@ BLOCKS = [
     ('h2', 'Doors and crowds on the map'),
     ('list', [
         '<b>Door pins:</b> every way out of a place has a glowing pin on its picture, drawn where the doorway is (the portrait hole, the spiral stair, the far arch), labelled with where it leads. Where the picture shows no door, the pin sits at the bottom edge: the way you came in. A secret place’s door only appears once the party has found it. Door pins hide on the TV during a fight.',
-        '<b>Going through:</b> on the Table tab, tap a door pin to take every student standing here through it (it asks first). If nobody is here, it just shows that place on the TV.',
+        '<b>Going through:</b> on the Table tab, tap a door pin’s round dot to take every student standing here through it (it asks first). If nobody is here, it just shows that place on the TV. People always stand on top of door pins, so a pin never stops you selecting someone; if someone stands right on a door, move them first.',
+        '<b>Who is talking:</b> when you tap a person on the Table tab map (a student, staff, a ghost or a monster), the TV rings them in gold and shows their name across the top, so everyone knows who is speaking. Tap them again, or press <b>Deselect</b>, to clear it. Untick <b>📢 Show who I pick on the TV</b> under the map to select people quietly. Changing place clears it.',
         '<b>Crowds:</b> when more than three people (staff, prefects, ghosts) are in one place, they move off the picture into a row along the top, like a high table. Monsters, chests and items stay where they are. Tap someone in the row to select them as usual; anyone in a fight stays on the picture.',
     ]),
 

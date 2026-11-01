@@ -1996,9 +1996,11 @@ button.status-chip.removable:hover { background: rgba(200, 60, 80, 0.3); }
 /* ===================== Door pins and the crowd strip (location maps) ===================== */
 /* Sizes follow the map's own width (cqw), so pins sit on the picture the same way on a phone, the GM screen or the TV. */
 .mapview { container-type: inline-size; }
-.door-pin { --dot: clamp(18px, 2.1cqw, 36px); position: absolute; z-index: 4; transform: translate(-50%, -50%); display: flex; align-items: center; gap: .35cqw;
+.door-pin { --dot: clamp(18px, 2.1cqw, 36px); position: absolute; z-index: 2; transform: translate(-50%, -50%); display: flex; align-items: center; gap: .35cqw;
   padding: 0; border: 0; background: none; color: #fff4dc; pointer-events: none; }
-.door-pin.clickable { pointer-events: auto; cursor: pointer; }
+/* Only the round dot is a button: the label never blocks a person standing near a door. People stand above the pins. */
+.door-pin.clickable { pointer-events: none; }
+.door-pin.clickable .door-dot { pointer-events: auto; cursor: pointer; }
 .door-dot { display: grid; place-items: center; flex: none; width: var(--dot); height: var(--dot); border-radius: 50%; font-size: calc(var(--dot) * .5);
   color: #2a1a06; background: radial-gradient(circle at 35% 30%, #fff1b8, #e3b04b 60%, #a87a1f);
   box-shadow: 0 0 0 2px rgb(23 20 42 / .7), 0 0 14px 3px rgb(255 205 110 / .55); animation: door-glow 2.6s ease-in-out infinite; }
@@ -2288,3 +2290,75 @@ button.status-chip.removable:hover { background: rgba(200, 60, 80, 0.3); }
 .hidden-games .history { margin-top: .6rem; }
 @media (max-width: 560px) { .seal { width: 76px; } .seal strong { font-size: 1.4rem; } .dash-hero { padding-top: .6rem; } }
 @media (prefers-reduced-motion: reduce) { .night-sky span { animation: none; } }
+
+/* ===================== Tokens above door pins, and the TV spotlight ===================== */
+.mapview .token { z-index: 3; }
+.mapview .token.sel, .mapview .token.turn { z-index: 5; }
+.mapview .token.spot { z-index: 6; }
+.token.spot .token-icon { animation: spot-pulse 1.8s ease-in-out infinite; }
+.mapview.big .token.spot { transform: translate(-50%, -50%) scale(1.25); transition: transform .3s; }
+@keyframes spot-pulse {
+  0%, 100% { box-shadow: 0 0 0 3px #fff1b8, 0 0 16px 6px rgb(255 205 110 / .65); }
+  50% { box-shadow: 0 0 0 4px #fff1b8, 0 0 30px 12px rgb(255 205 110 / .9); }
+}
+.token.spot .token-name { background: #e3b04b; color: #1d1404; }
+.spot-banner {
+  position: absolute; left: 50%; top: 4%; z-index: 7; transform: translateX(-50%);
+  display: flex; align-items: center; gap: .8cqw; padding: .5cqw 2cqw .5cqw .6cqw; border-radius: 999px;
+  background: linear-gradient(180deg, rgb(43 36 80 / .95), rgb(18 14 34 / .95)); border: 2px solid rgb(227 176 75 / .8);
+  box-shadow: 0 8px 30px rgb(0 0 0 / .6), 0 0 24px rgb(227 176 75 / .3); animation: spot-in .35s ease-out;
+}
+.spot-face { width: 4.4cqw; height: 4.4cqw; border-radius: 50%; overflow: hidden; display: grid; place-items: center; font-size: 2.4cqw;
+  border: 2px solid #e3b04b; background: #17142a; }
+.spot-face img { width: 100%; height: 100%; object-fit: cover; }
+.spot-name { font: 700 2.1cqw 'Cinzel', var(--display); color: #f6d98a; letter-spacing: .03em; white-space: nowrap; }
+@keyframes spot-in { from { opacity: 0; transform: translate(-50%, -12px); } to { opacity: 1; transform: translateX(-50%); } }
+.spot-toggle { display: inline-flex; align-items: center; gap: .3rem; cursor: pointer; }
+@media (prefers-reduced-motion: reduce) { .token.spot .token-icon, .spot-banner { animation: none; } }
+
+/* ===================== GM: wheels and dice ===================== */
+.wd { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 1rem 1.1rem; margin-bottom: 1rem; }
+.wd-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .6rem; margin-bottom: .7rem; }
+.wd-head h2, .wd-dice h2 { margin: 0; }
+.wd-modes { display: flex; gap: .4rem; }
+.wd-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: .5rem; margin-bottom: .6rem; }
+.wd-card { display: flex; flex-direction: column; align-items: flex-start; gap: .1rem; padding: .6rem .7rem; border-radius: 10px; cursor: pointer; text-align: left;
+  background: var(--ink); border: 1.5px solid var(--line); color: var(--bone); }
+.wd-card.on { border-color: var(--gold); box-shadow: 0 0 0 2px rgb(227 176 75 / .25); }
+.wd-card-icon { font-size: 1.4rem; }
+.wd-card-name { font-weight: 700; font-size: .92rem; }
+.wd-card-n { font-size: .75rem; color: var(--muted); }
+.wd-peek { margin: 0 0 .7rem; font-size: .9rem; }
+.wd-peek summary { cursor: pointer; color: var(--muted); }
+.wd-peek ol { margin: .4rem 0 0; padding-left: 1.3rem; }
+.wd-peek li { margin: .15rem 0; }
+.wd-custom textarea { width: 100%; min-height: 8rem; resize: vertical; padding: .6rem .7rem; border-radius: 10px; font: 400 .95rem/1.45 var(--body);
+  background: var(--ink); color: var(--bone); border: 1.5px solid var(--line); }
+.wd-custom-foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .5rem; margin: .4rem 0 .6rem; }
+.wd-saved { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; margin-bottom: .6rem; }
+.wd-chip { display: inline-flex; align-items: center; gap: .3rem; padding: .15rem .3rem .15rem .6rem; border: 1px solid var(--line); border-radius: 999px; font-size: .85rem; }
+.wd-chip-x { background: none; border: 0; color: var(--muted); cursor: pointer; font-size: .8rem; }
+.wd-who { margin-top: .4rem; }
+.wd-live { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; margin-top: .8rem; padding: .8rem; border-radius: 12px; background: var(--ink); }
+.wd-live .spin-result { display: none; }
+.wd-live-side { flex: 1; min-width: 200px; }
+.wd-live-side p { margin: 0 0 .4rem; }
+.wd-result { font: 700 1.15rem var(--display); color: var(--gold); }
+.wd-quiet { color: var(--muted); font-size: .85rem; }
+.wd-dice-row { display: flex; flex-wrap: wrap; gap: .4rem; margin: .7rem 0; }
+.wd-die { min-width: 3.2rem; min-height: 2.6rem; border-radius: 10px; cursor: pointer; font: 700 1rem var(--display);
+  background: var(--ink); color: var(--bone); border: 1.5px solid var(--line); clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%); }
+.wd-die.on { background: var(--gold); color: var(--ink); border-color: var(--gold); }
+.wd-num { display: inline-flex; align-items: center; gap: .35rem; font-size: .88rem; color: var(--muted); }
+.wd-num input { width: 4.2rem; }
+.wd-log { list-style: none; margin: .7rem 0 0; padding: 0; display: grid; gap: .3rem; }
+.wd-log li { display: grid; grid-template-columns: 3rem 1fr auto; align-items: center; gap: .6rem; padding: .35rem .6rem; border-radius: 8px; background: var(--ink); opacity: .75; }
+.wd-log li.newest { opacity: 1; box-shadow: inset 3px 0 0 var(--gold); }
+.wd-log strong { font: 700 1.4rem var(--display); text-align: center; }
+.wd-log strong.crit { color: var(--teal); } .wd-log strong.fumble { color: var(--ember); }
+
+.wd input[type='text'], .wd input:not([type]), .wd input[type='number'], .wd select {
+  min-height: 38px; padding: 0 .7rem; border-radius: 10px; border: 1.5px solid var(--line); background: var(--ink); color: var(--bone); font: 400 .95rem var(--body); }
+.wd input:focus, .wd select:focus, .wd textarea:focus { outline: none; border-color: var(--gold); }
+.wd .gm-give input:not([type='checkbox']) { flex: 1; min-width: 10rem; }
+.wd .wd-num input { flex: none; min-width: 0; width: 4.4rem; }

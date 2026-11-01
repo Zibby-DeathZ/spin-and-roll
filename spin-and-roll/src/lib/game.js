@@ -444,12 +444,19 @@ export const taughtKey = (info) => info?.key?.replace(' ', '_');
 
 export const SPIN_MS = 5200; // how long the TV wheel spins before landing
 
-export async function startSpin(sid, data, wheelId, uid = null) {
-  const wheel = data.wheels?.[wheelId];
-  if (!wheel) return;
+// The wheel a spin is using: one of the campaign's, or a custom one the GM typed (stored on the spin itself).
+export const spinWheelOf = (data, spin) => (spin ? spin.custom ?? data.wheels?.[spin.wheelId] ?? null : null);
+
+// opts: { custom: {name, icon, segments:[{label, text}]}, hidden: spin only on the GM screen, who: a name to show (an NPC) }
+export async function startSpin(sid, data, wheelId, uid = null, opts = {}) {
+  const wheel = opts.custom ?? data.wheels?.[wheelId];
+  if (!wheel?.segments?.length) return;
   const idx = Math.floor(Math.random() * wheel.segments.length);
   await updateDoc(doc(db, 'sessions', sid), {
-    'state.spin': { wheelId, uid, idx, id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, at: Date.now(), applied: false },
+    'state.spin': {
+      wheelId: opts.custom ? 'custom' : wheelId, uid, idx, id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, at: Date.now(), applied: false,
+      ...(opts.custom ? { custom: opts.custom } : {}), ...(opts.hidden ? { hidden: true } : {}), ...(opts.who ? { who: opts.who } : {}),
+    },
   });
 }
 
@@ -466,11 +473,12 @@ export async function applySpin(sid, data, spin) {
     claimed = true;
   });
   if (!claimed) return;
-  const wheel = data.wheels[spin.wheelId];
-  const seg = wheel.segments[spin.idx];
-  await logEvent(sid, { type: 'wheel', targetUid: spin.uid, payload: { wheel: wheel.name, icon: wheel.icon, text: seg.text } });
+  const wheel = spinWheelOf(data, spin);
+  const seg = wheel?.segments?.[spin.idx];
+  if (!seg) return;
+  if (!spin.hidden) await logEvent(sid, { type: 'wheel', targetUid: spin.uid, payload: { wheel: wheel.name, icon: wheel.icon, text: seg.text, who: spin.who ?? null } });
   const fx = seg.effect ?? {};
-  if (!spin.uid) return;
+  if (!spin.uid || spin.custom) return; // custom wheels are words only: no effects
   for (const f of ['hp', 'mana', 'xp', 'gold']) if (fx[f]) await adjust(sid, spin.uid, f, fx[f]);
   if (fx.detention) await sendToDetention(sid, data, spin.uid);
   if (fx.expel) {
@@ -915,7 +923,13 @@ export function describe(e, nameOf) {
     case 'lesson_passed': return { icon: '🎓', text: `${target} mastered ${e.payload.lesson}!`, tone: 'teal', big: true };
     case 'lesson_failed': return { icon: '😬', text: `${target} couldn’t get ${e.payload.lesson} right today`, tone: 'ember' };
     case 'spell_learned': return { icon: e.payload.icon, text: `${target} knows ${e.payload.name}${e.payload.form ? ` (a ${e.payload.form})` : ''}!`, tone: 'violet', big: true };
-    case 'wheel': return { icon: e.payload.icon, text: `${e.targetUid ? `${target}: ` : ''}${e.payload.text}`, tone: 'gold' };
+    case 'wheel': return { icon: e.payload.icon, text: `${e.targetUid ? `${target}: ` : e.payload.who ? `${e.payload.who}: ` : ''}${e.payload.text}`, tone: 'gold' };
+    case 'gm_roll': {
+      const p = e.payload;
+      const detail = `${p.die}${p.rolls.length > 1 ? ` (${p.rolls.join(p.mode && p.mode !== 'normal' ? ' / ' : ' + ')})` : ` ${p.rolls[0]}`}${p.mod ? ` ${p.mod > 0 ? '+' : '−'} ${Math.abs(p.mod)}` : ''}`;
+      const crit = p.die === 'd20' && p.nat === 20 ? ' Natural 20!' : p.die === 'd20' && p.nat === 1 ? ' Natural 1!' : '';
+      return { icon: '🎲', text: `${p.label ? `${p.label}: ` : ''}${p.total}${crit} (${detail})`, tone: p.nat === 20 ? 'gold' : p.nat === 1 ? 'ember' : 'violet', big: true };
+    }
     case 'time_turner': return { icon: '⌛', text: 'The Time-Turner spins… It’s Day 1 again. Then it cracks.', tone: 'violet', big: true };
     case 'class_held': return { icon: '🎓', text: `${e.payload.names.join(', ')} learned ${e.payload.lesson} in ${e.payload.cls}`, tone: 'teal' };
     case 'spell_cast': return e.failed ? null

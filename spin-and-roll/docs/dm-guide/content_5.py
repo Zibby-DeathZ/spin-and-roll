@@ -169,6 +169,7 @@ BLOCKS = [
     ]),
     ('h2', 'Version log'),
     ('table', ['Version', 'Date', 'Changes'], [
+        ['3.20', 'November 2026', 'From the test run: picking a person on the map spotlights them on the TV with their name, so everyone knows who is talking. People now stand on top of door pins, so pins never block selecting someone. New Wheels &amp; dice tab: wheel cards with every result listed, spin for an NPC, spin quietly, custom wheels you can save, and a GM dice roller that can show on the TV.'],
         ['3.19', 'October 2026', 'Storybook: each open page is now the same square as the cover, so the open book is two covers wide at the same height. Bigger words and pictures on the wider pages.'],
         ['3.18', 'October 2026', 'Storybook fixes: the painted pages now show on the live site, the closed cover and the open book are the same height, and every page picture is fetched before the book opens so each page appears straight away (faster fades too).'],
         ['3.17', 'October 2026', 'The painted storybook is in: a leather cover with the title on its plaque, open parchment pages and a candlelit desk under the book. The book takes the shape of its pictures, so square art works too.'],

@@ -9,7 +9,7 @@ import {
   addToken, endFight, monsterAttack, moveToken, nextTurn, placeToken, removeToken, setTokenHp, startFight,
 } from '../lib/combat';
 import { doubleToken, springMimic, trunkToken } from '../lib/mimic';
-import { chestToken, doorsAt, tidyRoom, hazardToken, itemToken, locOf, movePlayers, pcsAt, placeStaff, showOnTV, triggerHazard } from '../lib/world';
+import { chestToken, doorsAt, tidyRoom, hazardToken, itemToken, locOf, movePlayers, pcsAt, placeStaff, setSpotlight, showOnTV, triggerHazard } from '../lib/world';
 
 const KINDS = [['monsters', '👹 Monsters'], ['people', '🧑 People'], ['chests', '🧰 Chests'], ['items', '✨ Items'], ['hazards', '🔥 Hazards'], ['mimics', '👄 Mimics']];
 
@@ -37,6 +37,9 @@ export default function GMTable({ sid, data, session, chars, view = null, setVie
   const [who, setWho] = useState(null);
   const [kind, setKind] = useState('monsters');
   const [sel, setSel] = useState(null);
+  // Spotlight: picking a person (a student, staff, a monster) on the map rings them on the TV and shows their name.
+  const [spotOn, setSpotOn] = useState(() => { try { return localStorage.getItem('gm-spotlight') !== 'off'; } catch { return true; } });
+  const spotlight = session.state?.map?.spotlight ?? null;
   const [target, setTarget] = useState('');
   const [copyWho, setCopyWho] = useState('flitwick');
   const movers = who ?? players;
@@ -49,6 +52,19 @@ export default function GMTable({ sid, data, session, chars, view = null, setVie
   const current = enc?.order?.[enc.turn];
   const placeName = (id) => data.locations.find((l) => l.id === id)?.name ?? 'not placed';
   const name = (u) => chars[u]?.firstName ?? chars[u]?.name;
+
+  const isPerson = (id) => id && (id.startsWith('pc:') || (tokens[id] && !['chest', 'item', 'hazard'].includes(tokens[id].kind)));
+  const choose = (id) => {
+    setSel(id);
+    if (!spotOn || peeking) return;
+    if (id && isPerson(id)) { if (id !== spotlight) setSpotlight(sid, id); } else if (spotlight) setSpotlight(sid, null);
+  };
+  const toggleSpot = () => {
+    const next = !spotOn;
+    setSpotOn(next);
+    try { localStorage.setItem('gm-spotlight', next ? 'on' : 'off'); } catch { /* private mode */ }
+    if (!next && spotlight) setSpotlight(sid, null);
+  };
 
   const place = async (type, id) => {
     let newId;
@@ -82,7 +98,7 @@ export default function GMTable({ sid, data, session, chars, view = null, setVie
           </p>
         )}
         <MapView loc={loc} tokens={tokens} pcs={pcsAt(session, chars, viewId)} encounter={enc} selected={sel}
-          onSelect={(id) => setSel(sel === id ? null : id)} onMove={(x, y) => sel && moveToken(sid, sel, x, y)}
+          onSelect={(id) => choose(sel === id ? null : id)} onMove={(x, y) => sel && moveToken(sid, sel, x, y)} spotlight={peeking ? null : spotlight}
           doors={doorsAt(data, session, viewId)}
           onDoor={(d) => {
             if (!here.length) { if (peeking) setView(d.id); else showOnTV(sid, data, d.id); return; }
@@ -90,7 +106,9 @@ export default function GMTable({ sid, data, session, chars, view = null, setVie
           }} />
         <p className="muted small">
           {sel ? 'Tap anywhere on the map to move the selected token.' : 'Tap a token or character to select it. Tap a glowing door to take everyone here through it.'}{' '}
-          <button className="linkish small" onClick={() => { setSel(null); tidyRoom(sid, data, session, viewId); }}>🧍 Tidy this room</button>
+          <button className="linkish small" onClick={() => { setSel(null); tidyRoom(sid, data, session, viewId); }}>🧍 Tidy this room</button>{' · '}
+          <label className="spot-toggle"><input type="checkbox" checked={spotOn} onChange={toggleSpot} /> 📢 Show who I pick on the TV</label>
+          {spotlight && <>{' · '}<button className="linkish small" onClick={() => setSpotlight(sid, null)}>Clear the TV spotlight</button></>}
         </p>
 
         {(t || selPc) && (
@@ -159,7 +177,7 @@ export default function GMTable({ sid, data, session, chars, view = null, setVie
               </details>
             )}
             {t && <button className="btn small ghost" onClick={() => { removeToken(sid, sel); setSel(null); }}>Remove</button>}
-            <button className="btn small ghost" onClick={() => setSel(null)}>Deselect</button>
+            <button className="btn small ghost" onClick={() => choose(null)}>Deselect</button>
           </div>
         )}
       </div>

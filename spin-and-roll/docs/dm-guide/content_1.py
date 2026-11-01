@@ -131,7 +131,7 @@ BLOCKS = [
     ('read', 'A bell tinkles somewhere deep in the shop. The place smells of dust and old wood. Thousands of narrow boxes are piled to the ceiling. Then an old man with wide, pale eyes is simply there, as if he has been standing behind the counter all along. “Ah,” he says softly. “I wondered when I would be seeing you.”'),
     ('p', 'Do one student at a time while the others watch. This is the moment the physical wands come out.'),
     ('gm', 'Players tab: on a student’s card press <b>🪄 Wand questions</b>. Their phone and the TV show five questions, drawn at random so every student hears different ones (three about the wood, two about the core). Read each question aloud in Ollivander’s voice. After each answer, the purple box on the GM panel shows what he says back; the Ceremony Book has every line on paper. When they finish, the panel suggests the wood and core. Press <b>Give this wand</b>.'),
-    ('tip', 'For comedy, before the real wand, hand them a wrong one and spin the <b>Wand misfire</b> wheel for them (Wheels tab). Then: “No, no. Not that one.”'),
+    ('tip', 'For comedy, before the real wand, hand them a wrong one and spin the <b>Wand misfire</b> wheel for them (Wheels &amp; dice tab). Then: “No, no. Not that one.”'),
     ('read', '“Curious,” Ollivander murmurs, as the wand warms in your hand and a ribbon of light curls from its tip. “Very curious. The wand chooses the wizard, you see. It is not always clear why. But I think we can expect great things from you. Or terrible ones. Often it is the same thing.”'),
     ('table', ['Wood', 'Bonus', 'Physical wand to hand over'], [
         ['Holly', '+1 WIS', 'The holly wand'], ['Yew', '+1 CHA', 'The yew wand'], ['Vine', '+1 INT', 'The vine wand'],
