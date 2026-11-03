@@ -41,6 +41,7 @@ import Info from '../components/Info';
 import ClueReader from '../components/ClueReader';
 import RuneNotebook, { readerFor } from '../components/RuneNotebook';
 import { knownRunes, usePencil } from '../lib/runes';
+import { SecretGiftCard } from '../components/SecretGift';
 
 function AbilityCard({ sid, c, ability, dawn }) {
   const [used, setUsed] = useState(false);
@@ -160,6 +161,7 @@ function Sheet({ sid, c, currency, data, points, clk, scenes = null, loc, discov
         </section>
       )}
       {fam?.ability && <AbilityCard sid={sid} c={c} ability={fam.ability} dawn={clk.dawn} />}
+      <SecretGiftCard c={c} dawn={clk.dawn} />
       <HouseCard sid={sid} c={c} dawn={clk.dawn} hod={hod} />
       <OwlArchive owls={owls} />
       {fam && (
@@ -188,7 +190,7 @@ const KINDS = [
   ['clue', 'Clues and keepsakes', 'Nothing to use: tap Read to look at them, show them to the others, or trade them.'],
 ];
 // Old saved items may not have a kind yet: anything with an effect or a wheel is a consumable.
-const kindOf = (data, i) => data?.items?.[i.id]?.kind ?? (i.effect || i.wheel ? 'consumable' : 'clue');
+const kindOf = (data, i) => data?.items?.[i.id]?.kind ?? i.kind ?? (i.effect || i.wheel ? 'consumable' : 'clue');
 
 function itemInfo(def, i, kind) {
   const fx = def.effect ?? i.effect;

@@ -224,6 +224,54 @@ export const hollowHeir = {
     },
   ],
 
+  // Secret gifts: the one thing about each student nobody at Hogwarts knows. The players made these up
+  // after the first night; the GM gives them from the Players tab and can edit the words first.
+  // Only that player sees theirs, on their Sheet. Nothing shows on the TV.
+  gifts: {
+    'spider-speech': {
+      family: 'blackwood', name: 'Spider-Speech', icon: '🕷️',
+      always: 'You understand spiders, and they understand you. They live in every corner of the castle, and they notice everything.',
+      daily: 'Ask the spiders in a room what they saw there since yesterday. The DM answers in a few short, whispery words.',
+      drawback: 'Spiders want paying: give up a food item from your Bag, or they ignore you until tomorrow. And they will not go anywhere near the covered painting.',
+    },
+    'fashionably-late': {
+      family: 'sinclair', name: 'Fashionably Late', icon: '⏰',
+      always: 'You are late for everything. But the castle seems to bend around it: you always turn up at exactly the moment things get interesting.',
+      daily: 'Burst into a scene or a fight that has already started, wherever the others are. In a fight you join at the start of the next round, and your first spell gets +2 to hit.',
+      drawback: 'At every morning class the DM rolls a d20 for you. On 1 to 6 you are late: lose 5 house points, and the teacher remembers your name for the wrong reasons.',
+    },
+    'green-thumb': {
+      family: 'fenwick', name: 'Green Thumb', icon: '🌿',
+      always: 'Plants like you. You know any plant on sight (what it does, and whether it bites), you roll with advantage in Herbology, and you can learn Herbology spells nobody else is taught.',
+      daily: 'Ask a plant for help: a vine lowers itself for you to climb, a hedge parts, a Mandrake stays quiet, or the grass tells you who walked past.',
+      drawback: 'Plants feel what you feel. When you are angry or frightened, the plants around you go wild. And Devil’s Snare always grabs you first.',
+    },
+    'rat-speech': {
+      family: 'thornbury', name: 'Rat-Speech', icon: '🐀',
+      always: 'You can talk to rats. They know every crack, pipe and pantry in the castle.',
+      daily: 'Send a rat to listen in a room or follow someone for one block. At the start of the next block, the DM tells you what it heard.',
+      drawback: 'Rats are cowards and gossips: on a d20 of 1 to 5, it also tells someone else what you asked. And the caretaker’s cat can smell rat on you, so after curfew you roll with disadvantage to stay hidden.',
+    },
+    'mirror-self': {
+      family: 'quill', name: 'Mirror Self', icon: '🪞',
+      always: 'You can make a magical illusion of yourself. It looks, moves and smiles like you, but it cannot speak or touch anything.',
+      daily: 'For one scene, send your illusion somewhere you are not: as a decoy, an alibi, or to walk into danger first. In a fight, the first attack that would hit you hits the illusion instead, and it pops.',
+      drawback: 'While it is up you cannot cast spells. If it is hit or touched it bursts, and you feel it: 1d4 damage. And something else in this castle copies people. It has noticed you.',
+    },
+    'battered-suitcase': {
+      family: 'penrose', name: 'The Battered Suitcase', icon: '🧳',
+      always: 'You carry an old suitcase with the initials N.S. worn into the handle. Inside is a whole world of magical creatures, and they let you in.',
+      daily: 'Let one creature out to help for a scene: a Niffler sniffs out something shiny or hidden, a Bowtruckle picks a small lock, or an Occamy squeezes into any gap to fetch something.',
+      drawback: 'Things get out. Each morning the DM rolls a d20: on 1 to 4, something escaped in the night and is causing chaos somewhere in the castle. Catch it before a teacher does, or the case is confiscated. Professor Scamander would very much like to know where you got it.',
+    },
+    'invisibility-cloak': {
+      family: 'okafor', name: 'The Invisibility Cloak', icon: '🧥',
+      always: 'You own a real Invisibility Cloak, silvery and light as water. Under it, nobody can see you.',
+      daily: 'Its old magic tires: wear it for one scene a day. Unseen, you can slip past anyone, and in a fight your first attack has advantage (after that, they know where you are).',
+      drawback: 'It hides you, not your sound, your smell or your footprints: the Marauder’s Map still shows you, creatures smell you, ghosts walk straight through you, and Quill’s Sight sees a shimmer. Two can hide under it only if both pass a DEX roll. If a teacher catches you in it, it is confiscated for a week.',
+    },
+  },
+
   // Ollivander: the DM picks wood + core after the wand questions.
   wandPrice: 7,
   wandWoods: [
@@ -373,6 +421,11 @@ export const hollowHeir = {
     confundo: { group: 'extra', name: 'Confundo', icon: '😵', mana: 4, hit: 'cha', attack: true, desc: 'On a hit, the target attacks the wrong person next turn (GM decides).' },
     immobulus: { group: 'extra', name: 'Immobulus', icon: '⏸️', mana: 4, hit: 'wis', attack: true, applies: [{ status: 'stun', turns: 1 }], desc: 'On a hit, freezes a creature in place for a round.' },
     'petrificus-totalus': { group: 'extra', name: 'Petrificus Totalus', icon: '🧊', mana: 5, hit: 'int', attack: true, applies: [{ status: 'stun', turns: 1 }], desc: 'Full body-bind. On a hit, the target skips its next turn.' },
+    // Herbology magic (teach from the GM Spells tab; made for the Fenwick's Green Thumb)
+    herbivicus: { group: 'herbology', name: 'Herbivicus', icon: '🌱', mana: 2, check: 'wis', desc: 'Makes a plant grow and bloom in moments: a vine to climb, a hedge to hide behind, roots to bridge a gap. Bigger plants need a higher roll.' },
+    'herba-sana': { group: 'herbology', name: 'Herba Sana', icon: '🍃', mana: 3, dice: { count: 1, die: 6 }, effectLabel: 'HP healed (GM applies)', desc: 'Coaxes a healing herb out of any soil. Whoever eats it heals.' },
+    'radix-vincula': { group: 'herbology', name: 'Radix Vincula', icon: '🌳', mana: 4, minLevel: 2, hit: 'wis', attack: true, applies: [{ status: 'stun', turns: 1 }], desc: 'Roots burst out of the ground and grab the target. On a hit, it loses its next turn.' },
+    'lumos-solem': { group: 'herbology', name: 'Lumos Solem', icon: '☀️', mana: 4, minLevel: 3, hit: 'wis', attack: true, dice: { count: 2, die: 8 }, damage: true, onlyKind: 'devils-snare', desc: 'A blaze of sunlight from the wand tip. Devil’s Snare shrivels; it is harmless to everything else.' },
     // Advanced magic
     bombarda: { group: 'advanced', name: 'Bombarda', icon: '💣', mana: 7, hit: 'int', attack: true, dice: { count: 2, die: 8 }, damage: true, desc: 'Explosive. Loud. Very loud.' },
     'expecto-patronum': {

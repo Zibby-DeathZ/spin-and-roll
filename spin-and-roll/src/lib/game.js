@@ -181,7 +181,8 @@ export const createCharacter = (sid, uid, data, name) =>
 export const setField = (sid, uid, field, value) => updateDoc(charRef(sid, uid), { [field]: value });
 
 // Changes hp / mana / xp / gold safely, and tells the TV about it.
-export async function adjust(sid, uid, field, delta) {
+// opts.quiet: change it without announcing it on the TV (an owl's parcel is a secret).
+export async function adjust(sid, uid, field, delta, opts = {}) {
   let before, after;
   await runTransaction(db, async (tx) => {
     const snap = await tx.get(charRef(sid, uid));
@@ -197,7 +198,7 @@ export async function adjust(sid, uid, field, delta) {
     after = clamp(before + delta, 0, max);
     tx.update(charRef(sid, uid), { [field]: after });
   });
-  if (after === before) return;
+  if (after === before || opts.quiet) return;
   await logEvent(sid, { type: field, targetUid: uid, payload: { delta: after - before, value: after } });
   if (field === 'xp' && levelFor(after) > levelFor(before)) {
     await logEvent(sid, { type: 'level_up', targetUid: uid, payload: { level: levelFor(after) } });
@@ -207,11 +208,12 @@ export async function adjust(sid, uid, field, delta) {
 export const setStat = (sid, uid, key, value) =>
   updateDoc(charRef(sid, uid), { [`stats.${key}`]: clamp(value, 1, 20) });
 
-export async function giveItem(sid, uid, item, qty = 1) {
+export async function giveItem(sid, uid, item, qty = 1, opts = {}) {
   await runTransaction(db, async (tx) => {
     const snap = await tx.get(charRef(sid, uid));
     tx.update(charRef(sid, uid), { inventory: addItems(snap.data().inventory, item, qty) });
   });
+  if (opts.quiet) return;
   await logEvent(sid, { type: 'item_given', targetUid: uid, payload: { name: item.name, icon: item.icon, qty } });
 }
 

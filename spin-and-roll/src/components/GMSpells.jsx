@@ -4,7 +4,7 @@ import { forgetSpell, levelFor, teachSpell } from '../lib/game';
 import { lockReason } from '../lib/spellbook';
 import { diceLabel } from '../lib/dice';
 
-const GROUPS = [['class', 'Taught in class'], ['extra', 'Other charms and jinxes'], ['advanced', 'Advanced magic'], ['dark', 'Dark arts, blood magic and later years']];
+const GROUPS = [['class', 'Taught in class'], ['extra', 'Other charms and jinxes'], ['herbology', 'Herbology magic (for the Green Thumb)'], ['advanced', 'Advanced magic'], ['dark', 'Dark arts, blood magic and later years']];
 const STATS = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
 
 function rollText(sp) {

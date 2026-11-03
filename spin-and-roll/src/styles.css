@@ -2362,3 +2362,57 @@ button.status-chip.removable:hover { background: rgba(200, 60, 80, 0.3); }
 .wd input:focus, .wd select:focus, .wd textarea:focus { outline: none; border-color: var(--gold); }
 .wd .gm-give input:not([type='checkbox']) { flex: 1; min-width: 10rem; }
 .wd .wd-num input { flex: none; min-width: 0; width: 4.4rem; }
+
+/* ===================== GM session notes ===================== */
+.notes-night { display: inline-flex; align-items: center; gap: .4rem; }
+.notes-night strong { font: 700 1.2rem var(--display); min-width: 1.4rem; text-align: center; color: var(--gold); }
+.notes-kinds { display: flex; flex-wrap: wrap; gap: .4rem; margin: .7rem 0 .5rem; }
+.notes-who { margin: 0 0 .5rem; }
+.notes-text { width: 100%; resize: vertical; min-height: 4.5rem; padding: .6rem .7rem; border-radius: 10px; font: 400 .98rem/1.45 var(--body);
+  background: var(--ink); color: var(--bone); border: 1.5px solid var(--line); }
+.notes-text:focus { outline: none; border-color: var(--gold); }
+.notes-add { display: flex; justify-content: space-between; align-items: center; gap: .5rem; margin: .4rem 0 1rem; }
+.notes-filter { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin-bottom: .7rem; padding-top: .8rem; border-top: 1px solid var(--line); }
+.notes-filter select { min-height: 36px; border-radius: 10px; background: var(--ink); color: var(--bone); border: 1.5px solid var(--line); padding: 0 .6rem; }
+.notes-export { margin-left: auto; display: inline-flex; gap: .4rem; }
+.notes-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .45rem; }
+.note { display: grid; grid-template-columns: auto 1fr auto; gap: .7rem; align-items: start; padding: .6rem .7rem; border-radius: 10px;
+  background: var(--ink); border-left: 4px solid var(--line); }
+.note-request { border-left-color: var(--teal); } .note-reward { border-left-color: var(--gold); } .note-diary { border-left-color: var(--violet); }
+.note-idea { border-left-color: var(--ember); }
+.note.done { opacity: .5; } .note.done .note-text { text-decoration: line-through; }
+.note-check input { width: 1.15rem; height: 1.15rem; margin-top: .2rem; accent-color: var(--gold); }
+.note-meta { margin: 0 0 .2rem; display: flex; flex-wrap: wrap; gap: .5rem; align-items: baseline; font-size: .85rem; }
+.note-text { margin: 0; white-space: pre-wrap; }
+.note-tools { display: flex; gap: .35rem; align-items: center; }
+
+/* ===================== Owl parcels ===================== */
+.owl-parcel { margin: .6rem 0; padding: .6rem .8rem; border-radius: 10px; background: var(--ink); border: 1px dashed rgb(227 176 75 / .5); }
+.owl-parcel summary { cursor: pointer; font-weight: 600; }
+.owl-parcel input, .owl-parcel select { min-height: 36px; border-radius: 9px; background: var(--panel); color: var(--bone); border: 1.5px solid var(--line); padding: 0 .6rem; font: 400 .92rem var(--body); }
+.owl-parcel .gm-give input:not([type='checkbox']):not([type='number']) { flex: 1; min-width: 8rem; }
+.owl-parcel .owl-qty, .owl-parcel .wd-num input { width: 4.4rem; flex: none; }
+.owl-parcel .owl-icon { flex: none; width: 4rem; }
+.owl-custom-opts { align-items: center; flex-wrap: wrap; }
+.owl-answering { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; padding: .5rem .7rem; margin: .5rem 0; border-radius: 10px;
+  background: rgb(79 179 169 / .12); border: 1px solid rgb(79 179 169 / .5); font-size: .9rem; }
+.owl-answering > span { flex: 1; min-width: 200px; }
+.owl-parcel-line { color: var(--gold); font-size: .88rem; }
+.owl-gift { margin: .6rem 0 1rem; padding: .7rem .9rem; border-radius: 12px; border: 1.5px dashed #b89a5e; background: rgb(184 154 94 / .12); }
+.owl-gift-title { margin: 0 0 .2rem; font: 700 .78rem var(--body); letter-spacing: .12em; text-transform: uppercase; color: #8a6a3e; }
+.owl-gift p { margin: 0 0 .2rem; }
+
+/* ---------- Secret gifts ---------- */
+.gift-gm { margin: 6px 0; }
+.gift-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; padding: 6px 10px; border: 1px dashed rgba(167, 139, 250, .45); border-radius: 10px; background: rgba(167, 139, 250, .07); }
+.gift-name { font-weight: 600; margin-right: auto; }
+.gift-used { display: inline-flex; align-items: center; gap: 6px; font-size: .85rem; }
+.gift-form { display: grid; gap: 8px; margin-top: 8px; padding: 10px; border-radius: 10px; background: rgba(0, 0, 0, .18); }
+.gift-form label { display: grid; gap: 4px; font-size: .85rem; color: var(--muted, #b9b3d0); }
+.gift-form textarea, .gift-form input, .gift-form select { width: 100%; box-sizing: border-box; margin: 0; font: inherit; color: inherit; background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .14); border-radius: 8px; padding: 6px 8px; }
+.gift-form textarea { resize: vertical; }
+.gift-title { display: grid; grid-template-columns: 70px 1fr; gap: 8px; }
+.gift-form .btn { justify-self: start; }
+.gift-card { border-color: rgba(167, 139, 250, .55); background: linear-gradient(160deg, rgba(167, 139, 250, .12), rgba(0, 0, 0, 0) 60%); }
+.gift-kicker { margin: 0 0 2px; font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: #c4b5fd; }
+.gift-how { margin-bottom: 0; }

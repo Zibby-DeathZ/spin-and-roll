@@ -151,7 +151,7 @@ BLOCKS = [
     ('read', 'The train pulls out of the station and the city falls away into green hills. You have a compartment to yourselves. Somewhere down the corridor, a trolley is rattling closer, and a voice is calling, “Anything from the trolley, dears?”'),
     ('p', 'Let them explore. The TV shows what they can do here: buy from the trolley, explore the carriages, peek at the covered painting.'),
     ('list', [
-        '<b>The trolley:</b> anyone with Galleons can buy a Chocolate Frog or Bertie Bott’s Beans. Use Players tab, <b>Give item</b>, and take the gold with the −5 button. Eating the beans spins the bean wheel on the TV by itself.',
+        '<b>The trolley:</b> anyone with Galleons can buy a Chocolate Frog or Bertie Bott’s Beans. Use Players tab, <b>Give item</b>, and take the gold with the −1 or −5 buttons. Eating the beans spins the bean wheel on the TV by itself.',
         '<b>Prefect Sinclair</b> checks on her younger sibling and introduces herself to everyone. She is brisk, kind and clearly tired. If the Sinclair player talks to her privately, she admits she has been having bad dreams about paintings.',
         '<b>Cassius Thorne</b> passes the compartment and makes a point of greeting the Marlowe by surname, loudly.',
     ]),

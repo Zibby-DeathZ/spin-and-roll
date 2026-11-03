@@ -1,0 +1,357 @@
+{
+ "runes": {
+  "T": "ᚠ",
+  "W": "ᚢ",
+  "E": "ᚦ",
+  "Z": "ᚨ",
+  "Y": "ᚱ",
+  "K": "ᚲ",
+  "V": "ᚷ",
+  "B": "ᚹ",
+  "P": "ᚺ",
+  "J": "ᚾ",
+  "G": "ᛁ",
+  "F": "ᛃ",
+  "M": "ᛇ",
+  "U": "ᛈ",
+  "C": "ᛉ",
+  "L": "ᛊ",
+  "D": "ᛏ",
+  "R": "ᛒ",
+  "H": "ᛖ",
+  "S": "ᛗ",
+  "N": "ᛚ",
+  "I": "ᛜ",
+  "O": "ᛞ",
+  "A": "ᛟ",
+  "Q": "ᚬ",
+  "X": "ᚭ"
+ },
+ "gifts": {
+  "spider-speech": {
+   "family": "blackwood",
+   "name": "Spider-Speech",
+   "icon": "🕷️",
+   "always": "You understand spiders, and they understand you. They live in every corner of the castle, and they notice everything.",
+   "daily": "Ask the spiders in a room what they saw there since yesterday. The DM answers in a few short, whispery words.",
+   "drawback": "Spiders want paying: give up a food item from your Bag, or they ignore you until tomorrow. And they will not go anywhere near the covered painting."
+  },
+  "fashionably-late": {
+   "family": "sinclair",
+   "name": "Fashionably Late",
+   "icon": "⏰",
+   "always": "You are late for everything. But the castle seems to bend around it: you always turn up at exactly the moment things get interesting.",
+   "daily": "Burst into a scene or a fight that has already started, wherever the others are. In a fight you join at the start of the next round, and your first spell gets +2 to hit.",
+   "drawback": "At every morning class the DM rolls a d20 for you. On 1 to 6 you are late: lose 5 house points, and the teacher remembers your name for the wrong reasons."
+  },
+  "green-thumb": {
+   "family": "fenwick",
+   "name": "Green Thumb",
+   "icon": "🌿",
+   "always": "Plants like you. You know any plant on sight (what it does, and whether it bites), you roll with advantage in Herbology, and you can learn Herbology spells nobody else is taught.",
+   "daily": "Ask a plant for help: a vine lowers itself for you to climb, a hedge parts, a Mandrake stays quiet, or the grass tells you who walked past.",
+   "drawback": "Plants feel what you feel. When you are angry or frightened, the plants around you go wild. And Devil’s Snare always grabs you first."
+  },
+  "rat-speech": {
+   "family": "thornbury",
+   "name": "Rat-Speech",
+   "icon": "🐀",
+   "always": "You can talk to rats. They know every crack, pipe and pantry in the castle.",
+   "daily": "Send a rat to listen in a room or follow someone for one block. At the start of the next block, the DM tells you what it heard.",
+   "drawback": "Rats are cowards and gossips: on a d20 of 1 to 5, it also tells someone else what you asked. And the caretaker’s cat can smell rat on you, so after curfew you roll with disadvantage to stay hidden."
+  },
+  "mirror-self": {
+   "family": "quill",
+   "name": "Mirror Self",
+   "icon": "🪞",
+   "always": "You can make a magical illusion of yourself. It looks, moves and smiles like you, but it cannot speak or touch anything.",
+   "daily": "For one scene, send your illusion somewhere you are not: as a decoy, an alibi, or to walk into danger first. In a fight, the first attack that would hit you hits the illusion instead, and it pops.",
+   "drawback": "While it is up you cannot cast spells. If it is hit or touched it bursts, and you feel it: 1d4 damage. And something else in this castle copies people. It has noticed you."
+  },
+  "battered-suitcase": {
+   "family": "penrose",
+   "name": "The Battered Suitcase",
+   "icon": "🧳",
+   "always": "You carry an old suitcase with the initials N.S. worn into the handle. Inside is a whole world of magical creatures, and they let you in.",
+   "daily": "Let one creature out to help for a scene: a Niffler sniffs out something shiny or hidden, a Bowtruckle picks a small lock, or an Occamy squeezes into any gap to fetch something.",
+   "drawback": "Things get out. Each morning the DM rolls a d20: on 1 to 4, something escaped in the night and is causing chaos somewhere in the castle. Catch it before a teacher does, or the case is confiscated. Professor Scamander would very much like to know where you got it."
+  },
+  "invisibility-cloak": {
+   "family": "okafor",
+   "name": "The Invisibility Cloak",
+   "icon": "🧥",
+   "always": "You own a real Invisibility Cloak, silvery and light as water. Under it, nobody can see you.",
+   "daily": "Its old magic tires: wear it for one scene a day. Unseen, you can slip past anyone, and in a fight your first attack has advantage (after that, they know where you are).",
+   "drawback": "It hides you, not your sound, your smell or your footprints: the Marauder’s Map still shows you, creatures smell you, ghosts walk straight through you, and Quill’s Sight sees a shimmer. Two can hide under it only if both pass a DEX roll. If a teacher catches you in it, it is confiscated for a week."
+  }
+ },
+ "families": {
+  "blackwood": {
+   "name": "Blackwood",
+   "secret": "Your grandmother’s diary mentions “the painted man” and a debt the Blackwoods never paid. Centuries ago, a Blackwood sealed a dark wizard inside a painting."
+  },
+  "sinclair": {
+   "name": "Sinclair",
+   "secret": "Your sister wrote home that the castle “feels wrong this year” and asked you to keep an eye out. You’re the only one she told."
+  },
+  "fenwick": {
+   "name": "Fenwick",
+   "secret": "Your great-uncle copied the Marauder’s Map before he was expelled, but it was torn in half during a duel. Someone at Hogwarts has the other half, and they’ve been watching you."
+  },
+  "thornbury": {
+   "name": "Thornbury",
+   "secret": "Last year your family’s prize hippogriff, Bramble, vanished near the Forbidden Forest. Nobody believed you when you said you heard her calling."
+  },
+  "quill": {
+   "name": "Quill",
+   "secret": "On the train, you’ll be the only one who sees the covered painting’s eyes follow you. It happens again every time you pass one of its kind."
+  },
+  "marlowe": {
+   "name": "Marlowe",
+   "secret": "Your vault holds only a few coins and an old iron key with a serpent on it. An ancestor served a dark wizard, and only a Parseltongue can open the door that key belongs to."
+  },
+  "hale": {
+   "name": "Hale",
+   "secret": "Your great-grandmother kept a casebook. One page describes a Hogwarts student brought in long ago, alive but empty, “as if someone had painted over her”. She kept whispering one word: Vale. The case was closed by order of the Headmaster."
+  },
+  "penrose": {
+   "name": "Penrose",
+   "secret": "Your great-great-grandmother once sat for a famous portrait painter. She came home unable to change her face ever again. The painting was never delivered, and nobody knows where it went."
+  },
+  "okafor": {
+   "name": "Okafor",
+   "secret": "Last month Gringotts sent your mum to inspect a painting before it was shipped to Hogwarts. She refused to unwrap it and wrote one word in her report: Occupied. It was sent anyway."
+  }
+ },
+ "items": {
+  "rune-tablet-1": {
+   "name": "Rune tablet (beasts and sky)",
+   "icon": "🪨",
+   "note": "Pictures, each with a word in runes underneath",
+   "kind": "clue",
+   "read": {
+    "style": "tablet",
+    "heading": "A cracked slate from the Ancient Runes shelf",
+    "words": [
+     {
+      "pic": "🦉",
+      "word": "OWL"
+     },
+     {
+      "pic": "🌙",
+      "word": "MOON"
+     },
+     {
+      "pic": "⭐",
+      "word": "STAR"
+     }
+    ],
+    "footer": "Each rune is always the same letter. Pencil what you work out into your rune notebook."
+   }
+  },
+  "rune-tablet-2": {
+   "name": "Rune tablet (garden)",
+   "icon": "🪨",
+   "note": "Pictures, each with a word in runes underneath",
+   "kind": "clue",
+   "read": {
+    "style": "tablet",
+    "heading": "A mossy slate wedged under a seed tray",
+    "words": [
+     {
+      "pic": "🍎",
+      "word": "APPLE"
+     },
+     {
+      "pic": "🌲",
+      "word": "PINE"
+     },
+     {
+      "pic": "🐸",
+      "word": "TOAD"
+     }
+    ],
+    "footer": "Each rune is always the same letter. Pencil what you work out into your rune notebook."
+   }
+  },
+  "rune-tablet-3": {
+   "name": "Rune tablet (hearth)",
+   "icon": "🪨",
+   "note": "Pictures, each with a word in runes underneath",
+   "kind": "clue",
+   "read": {
+    "style": "tablet",
+    "heading": "A soot-black slate from beside a fireplace",
+    "words": [
+     {
+      "pic": "🔥",
+      "word": "FIRE"
+     },
+     {
+      "pic": "🗝️",
+      "word": "KEY"
+     },
+     {
+      "pic": "🐟",
+      "word": "FISH"
+     }
+    ],
+    "footer": "Each rune is always the same letter. Pencil what you work out into your rune notebook."
+   }
+  },
+  "diary-page": {
+   "name": "Page of Vale’s diary",
+   "icon": "📓",
+   "note": "Written in runes. Collect all three.",
+   "kind": "clue",
+   "read": {
+    "style": "runes",
+    "heading": "Pages of a diary, in a spiky hand",
+    "pages": [
+     "ONLY THE ONE WHO STANDS ALONE",
+     "MAY LEARN THE CURSE",
+     "THAT CANNOT BE BLOCKED"
+    ],
+    "footer": "Each rune is always the same letter. With all three pages, show the DM: the whole diary goes up on the TV."
+   }
+  },
+  "map-half": {
+   "name": "Half of the Marauder’s Map",
+   "icon": "📜",
+   "note": "Torn down the middle. It wakes only for the right words",
+   "opensMap": true,
+   "kind": "key",
+   "keep": true,
+   "read": {
+    "style": "runes",
+    "heading": "Scratched along the torn edge",
+    "pages": [
+     "I SOLEMNLY SWEAR THAT I AM UP TO NO GOOD"
+    ],
+    "footer": "Tiny runes in faded ink. Ask the DM to put them on the TV so you can work them out together."
+   }
+  },
+  "ring-clue-serpent": {
+   "name": "Scratched note (first ring)",
+   "icon": "🗒️",
+   "note": "“The first ring remembers what sleeps beneath the castle.”",
+   "kind": "clue",
+   "read": {
+    "style": "note",
+    "text": "“The first ring remembers what sleeps beneath the castle.”"
+   }
+  },
+  "ring-clue-moon": {
+   "name": "Star chart (second ring)",
+   "icon": "🗺️",
+   "note": "“The second ring follows the lamp of the night.”",
+   "kind": "clue",
+   "read": {
+    "style": "note",
+    "text": "“The second ring follows the lamp of the night.”"
+   }
+  },
+  "ring-clue-owl": {
+   "name": "Feathered card (last ring)",
+   "icon": "🪶",
+   "note": "“The last ring belongs to the one who carries every letter.”",
+   "kind": "clue",
+   "read": {
+    "style": "note",
+    "text": "“The last ring belongs to the one who carries every letter.”"
+   }
+  }
+ },
+ "lock": {
+  "id": "turning-lock",
+  "type": "rings",
+  "icon": "🌀",
+  "title": "The Turning Lock",
+  "intro": "Three stone rings, each carved with symbols. Turn them until the right three symbols sit beneath the arrow.",
+  "rings": [
+   [
+    "🌙",
+    "🦉",
+    "🐍",
+    "⭐",
+    "🗝️",
+    "🦁"
+   ],
+   [
+    "⭐",
+    "🦡",
+    "☀️",
+    "🌙",
+    "🐍",
+    "🦅"
+   ],
+   [
+    "🗝️",
+    "🐍",
+    "🦡",
+    "🌙",
+    "🦉",
+    "☀️"
+   ]
+  ],
+  "answer": [
+   "🐍",
+   "🌙",
+   "🦉"
+  ],
+  "solution": "Serpent, Moon, Owl. Clues: “what sleeps beneath the castle” (the serpent in the Undercroft), “the lamp of the night” (the moon), “the one who carries every letter” (an owl)."
+ },
+ "bottles": {
+  "id": "seven-bottles",
+  "type": "bottles",
+  "icon": "⚗️",
+  "title": "The Seven Bottles",
+  "intro": "Seven bottles stand in a row. One lets you walk on through the fire. One leads safely back. Two bring a deep sleep. Three are poison. Only one of you may drink to go forward.",
+  "bottles": [
+   {
+    "shape": "tall",
+    "colour": "green",
+    "kind": "poison"
+   },
+   {
+    "shape": "small",
+    "colour": "red",
+    "kind": "sleep"
+   },
+   {
+    "shape": "round",
+    "colour": "blue",
+    "kind": "poison"
+   },
+   {
+    "shape": "small",
+    "colour": "gold",
+    "kind": "forward"
+   },
+   {
+    "shape": "tall",
+    "colour": "purple",
+    "kind": "poison"
+   },
+   {
+    "shape": "round",
+    "colour": "green",
+    "kind": "sleep"
+   },
+   {
+    "shape": "tiny",
+    "colour": "clear",
+    "kind": "back"
+   }
+  ],
+  "clues": [
+   "No poison stands beside the way back.",
+   "No two poisons stand side by side.",
+   "Every tall bottle is poison.",
+   "The way back stands beside a sleeping draught.",
+   "The way forward is neither red nor clear.",
+   "The way forward stands somewhere to the left of the way back."
+  ],
+  "solution": "Bottle 4, the small gold one. Poison: 1, 3, 5. Sleep: 2, 6. Back: 7. (Checked: these six clues allow only this answer, and every clue is needed.)"
+ }
+}

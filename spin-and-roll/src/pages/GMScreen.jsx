@@ -22,6 +22,10 @@ import { GMPuzzles } from '../components/Puzzles';
 import { GMShows } from '../components/Shows';
 import GMSpells from '../components/GMSpells';
 import { GMOwlPost } from '../components/OwlPost';
+import GMNotes from '../components/GMNotes';
+import { GMSecretGift } from '../components/SecretGift';
+import { setNote } from '../lib/notes';
+import { useAuth } from '../auth/AuthProvider';
 import GMMedia from '../components/GMMedia';
 import { GMImposter } from '../components/Imposter';
 import { useImposterEngine } from '../lib/imposter';
@@ -92,7 +96,7 @@ function Ollivander({ sid, c, data }) {
   );
 }
 
-function CharacterControls({ sid, c, data, playerName, quizBusy, forbiddenLearner }) {
+function CharacterControls({ sid, c, data, playerName, quizBusy, forbiddenLearner, dawn }) {
   const [open, setOpen] = useState(false);
   const [itemId, setItemId] = useState(Object.keys(data.items)[0] ?? '');
   const give = () => {
@@ -125,7 +129,7 @@ function CharacterControls({ sid, c, data, playerName, quizBusy, forbiddenLearne
       <div className="gm-row"><span className="gm-label">XP {c.xp}</span><Buttons sid={sid} uid={c.uid} field="xp" steps={[10, 25, 50]} /></div>
       <Corruption c={c} data={data} sid={sid} />
       <StatusEditor sid={sid} data={data} who={{ kind: 'pc', id: c.uid }} map={c.status} />
-      <div className="gm-row"><span className="gm-label">{data.currency.icon} {c.gold}</span><Buttons sid={sid} uid={c.uid} field="gold" steps={[-5, 5, 10, 50]} /></div>
+      <div className="gm-row"><span className="gm-label">{data.currency.icon} {c.gold}</span><Buttons sid={sid} uid={c.uid} field="gold" steps={[-5, -1, 1, 5, 10, 50]} /></div>
 
       {data.quizzes && (
         <div className="actions ceremony-btns">
@@ -165,6 +169,8 @@ function CharacterControls({ sid, c, data, playerName, quizBusy, forbiddenLearne
           {Object.values(c.equipment).map((e) => `${e.icon} ${e.name}`).join('   ')}
         </p>
       )}
+
+      {data.gifts && <GMSecretGift sid={sid} c={c} data={data} dawn={dawn} />}
 
       <div className="gm-give">
         <select value={itemId} onChange={(e) => setItemId(e.target.value)} aria-label="Item to give">
@@ -227,7 +233,7 @@ function Feed({ sid, nameOf }) {
 
 const TABS = [
   ['table', '🗺️ Table'], ['day', '🕰️ Day & class'], ['quests', '📜 Quests'], ['puzzles', '🧩 Puzzles'],
-  ['shows', '🎬 TV shows'], ['players', '🧑‍🎓 Players'], ['owls', '🦉 Owl Post'], ['imposter', '🎭 Double'], ['spells', '✨ Spells'], ['wheels', '🎡 Wheels & dice'], ['media', '🎞️ Media'],
+  ['shows', '🎬 TV shows'], ['players', '🧑‍🎓 Players'], ['owls', '🦉 Owl Post'], ['notes', '📓 Notes'], ['imposter', '🎭 Double'], ['spells', '✨ Spells'], ['wheels', '🎡 Wheels & dice'], ['media', '🎞️ Media'],
 ];
 
 export default function GMScreen() {
@@ -258,6 +264,8 @@ export default function GMScreen() {
   const [side, setSide] = useState('party');
   const [view, setView] = useState(null); // a place the GM is looking at on the Table tab (null = the TV's)
   const [pointsOpen, setPointsOpen] = useState(false);
+  const [owlPreset, setOwlPreset] = useState(null); // answering a note with an owl
+  const { user } = useAuth();
   const nameOf = useCallback(
     (u) => chars?.[u]?.name ?? profiles[u]?.displayName ?? 'Someone', [chars, profiles]);
 
@@ -340,7 +348,10 @@ export default function GMScreen() {
           {active === 'day' && <GMClock sid={sid} data={data} session={session} clk={clockOf(session)} chars={chars} lessonResults={lessonResults} />}
           {active === 'quests' && <GMQuests sid={sid} data={data} session={session} chars={chars} />}
           {active === 'media' && <GMMedia data={data} session={session} />}
-          {active === 'owls' && <GMOwlPost sid={sid} session={session} chars={chars} />}
+          {active === 'owls' && <GMOwlPost sid={sid} session={session} chars={chars} data={data} preset={owlPreset}
+            onSent={(note) => note?.id && user && setNote(user.uid, sid, note.id, { done: true })} />}
+          {active === 'notes' && <GMNotes sid={sid} data={data} session={session} chars={chars}
+            onOwl={(uid, note) => { setOwlPreset({ uid, note, at: Date.now() }); setTab('owls'); }} />}
           {active === 'imposter' && <GMImposter sid={sid} session={session} chars={chars} />}
           {active === 'spells' && <GMSpells sid={sid} data={data} session={session} chars={chars} />}
           {active === 'shows' && <GMShows sid={sid} data={data} session={session} chars={chars} />}
@@ -350,7 +361,7 @@ export default function GMScreen() {
             <section className="gm-players">
               <TestBench sid={sid} data={data} session={session} chars={chars} />
               {session.playerUids.map((u) => chars[u]
-                ? <CharacterControls key={u} sid={sid} c={chars[u]} data={data} playerName={profiles[u]?.displayName} quizBusy={!!quizState} forbiddenLearner={session.state?.forbiddenLearner} />
+                ? <CharacterControls key={u} sid={sid} c={chars[u]} data={data} playerName={profiles[u]?.displayName} quizBusy={!!quizState} forbiddenLearner={session.state?.forbiddenLearner} dawn={clockOf(session).dawn} />
                 : <NewCharacter key={u} sid={sid} uid={u} profile={profiles[u]} data={data} />)}
               {!session.playerUids.length && <p className="muted">Players appear here once they join with the code.</p>}
               {data.series && Object.keys(chars).length > 0 && (
