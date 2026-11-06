@@ -2509,3 +2509,11 @@ button.status-chip.removable:hover { background: rgba(200, 60, 80, 0.3); }
 .maze-lit-line { margin: 0; color: #8a8478; font-style: italic; text-align: center; }
 .maze-key .mk-watcher circle { fill: #3a0d0d; stroke: #ff6b6b; stroke-width: .8; }
 .maze-key .mk-watcher text { font-size: 4.5px; text-anchor: middle; }
+
+/* Mirror maze: walking a test student from the GM screen */
+.maze-testers { margin-top: 1rem; padding-top: .8rem; border-top: 1px solid rgba(255, 255, 255, .1); display: grid; gap: .6rem; }
+.maze-testers h3 { margin: 0; }
+.maze-sim { width: min(100%, 380px); }
+.maze-sim .dark-phone { position: relative; inset: auto; z-index: auto; min-height: 520px; border-radius: 26px; border: 6px solid #22202a; box-shadow: 0 10px 40px rgba(0, 0, 0, .45); padding: 1.4rem 1rem; }
+.maze-sim .lumos-glow { border-radius: 20px; }
+.test-maze { margin-top: .8rem; padding-top: .6rem; border-top: 1px dashed rgba(255, 255, 255, .15); }

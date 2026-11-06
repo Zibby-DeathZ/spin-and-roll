@@ -132,7 +132,9 @@ function savePos(k, v) {
   try { window.localStorage.setItem(k, JSON.stringify(v)); } catch { /* private mode: the GM screen has it */ }
 }
 
-export function DarkMazePhone({ sid, uid, p, st, house }) {
+// `gm`: a maze test student walked from the GM screen. It writes straight to the puzzle (the GM may),
+// instead of sending events for the GM screen to carry out.
+export function DarkMazePhone({ sid, uid, p, st, house, gm = false }) {
   const maze = p.maze;
   const mapIdx = mapFor(maze, st, uid, house);
   const has = mapIdx != null;
@@ -147,7 +149,12 @@ export function DarkMazePhone({ sid, uid, p, st, house }) {
   const safeUntil = useRef(0); // a few seconds' grace after being caught or thrown back
 
   // Where am I? This phone's memory first, then the GM screen's copy, then my map's YOU.
-  const here = me?.k === k ? me : has ? (() => {
+  // A GM-walked test student just follows the puzzle (the GM writes it directly, so it is always up to date,
+  // and the "all to the centre" buttons move it). A real phone trusts its own memory first.
+  const here = gm && has ? (() => {
+    const sp = st.pos?.[uid];
+    return { k, pos: sp ? [sp[0], sp[1]] : startOf(maze, mapIdx), centre: !!st.centre?.[uid], out: !!st.out?.[uid] };
+  })() : me?.k === k ? me : has ? (() => {
     const saved = loadPos(k);
     const server = st.pos?.[uid];
     const pos = saved?.pos ?? (server ? [server[0], server[1]] : startOf(maze, mapIdx));
@@ -156,10 +163,25 @@ export function DarkMazePhone({ sid, uid, p, st, house }) {
   const atPedestal = !!here && st.riddle && inCentre(maze, here.pos);
   const lit = !!st.lumos;
 
-  const send = (state, kind) => logEvent(sid, {
-    type: 'maze_move', actorUid: uid, processed: false,
-    payload: { pos: state.pos, centre: state.centre, out: state.out, kind },
-  }).catch(console.error);
+  const [blocked, setBlocked] = useState(false);
+  const failed = (err) => {
+    console.error(err);
+    // The game's database rules don't let this phone send its moves yet (see the DM Guide).
+    if (err?.code === 'permission-denied') setBlocked(true);
+  };
+  const send = (state, kind) => {
+    const payload = { pos: state.pos, centre: state.centre, out: state.out, kind };
+    if (gm) {
+      setPuzzle(sid, {
+        [`pos.${uid}`]: [state.pos[0], state.pos[1]], [`centre.${uid}`]: !!state.centre, [`out.${uid}`]: !!state.out,
+        ...(kind === 'caught' ? { watcher: null } : {}),
+      }).catch(console.error);
+      // Still tell the TV, so the toasts and sounds play.
+      if (kind !== 'step' && kind !== 'bump') logEvent(sid, { type: 'maze_move', actorUid: uid, processed: true, payload }).catch(console.error);
+      return;
+    }
+    logEvent(sid, { type: 'maze_move', actorUid: uid, processed: false, payload }).catch(failed);
+  };
   const commit = (state, kind, line) => {
     if (kind === 'caught' || kind === 'thrown') safeUntil.current = Date.now() + 8000;
     setMe(state);
@@ -173,7 +195,12 @@ export function DarkMazePhone({ sid, uid, p, st, house }) {
   const ear = useHiddenEar(atPedestal && !lit, () => {
     if (spoke.current) return;
     spoke.current = true;
-    logEvent(sid, { type: 'lumos', actorUid: uid, processed: false, payload: { on: true, maze: true } }).catch(console.error);
+    if (gm) {
+      setPuzzle(sid, { lumos: true, lightbox: true }).catch(console.error);
+      logEvent(sid, { type: 'lumos', actorUid: uid, processed: true, payload: { on: true, maze: true } }).catch(console.error);
+      return;
+    }
+    logEvent(sid, { type: 'lumos', actorUid: uid, processed: false, payload: { on: true, maze: true } }).catch(failed);
   });
 
   const go = (dir) => {
@@ -229,6 +256,7 @@ export function DarkMazePhone({ sid, uid, p, st, house }) {
   // Arrow keys work too (handy on a laptop).
   useEffect(() => {
     const onKey = (e) => {
+      if (/^(INPUT|SELECT|TEXTAREA)$/.test(e.target?.tagName ?? '')) return; // not while typing on the GM screen
       const dir = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' }[e.key];
       if (dir) { e.preventDefault(); go(dir); }
     };
@@ -292,6 +320,7 @@ export function DarkMazePhone({ sid, uid, p, st, house }) {
             <button key={dir} className={`maze-btn maze-${dir}`} onClick={() => go(dir)} aria-label={label}>{glyph}</button>
           ))}
         </div>
+        {blocked && <p className="dark-phone-err">This phone can’t reach the game. Tell the DM: the database rules need updating (DM Guide, Mirror in the Dark).</p>}
         {lit && torch === 'off' && <button className="btn small" onClick={lightTorch}>🔦 Brighter: use the torch too</button>}
         {lit && torch === 'none' && <p className="small">This phone won’t let the page use its torch. Turn the screen brightness right up.</p>}
       </div>
@@ -438,6 +467,46 @@ export function DarkMazeGM({ sid, p, st, chars, players, onSet }) {
       <p className="muted small"><b>The riddle:</b> {p.riddle.join(' ')} <b>Answer:</b> darkness, so they say <i>Lumos</i>. The phones at the pedestal are listening, but nothing tells them so.</p>
       <MazeKey maze={maze} people={people} watcher={st.watcher} />
       <p className="muted small">Gold: the only way out. ✕: the bricked-up EXITs. Letters: where each house starts. 👁: the watcher. Initials: the players.</p>
+      <MazeTesters sid={sid} p={p} st={st} chars={chars} players={players} />
     </div>
+  );
+}
+
+// Walk the maze test students yourself (add them from the 🧪 Test student panel on the Players tab).
+function MazeTesters({ sid, p, st, chars, players }) {
+  const testers = players.filter((u) => u.startsWith('maze-test-') && chars[u]);
+  const [who, setWho] = useState(testers[0] ?? '');
+  if (!testers.length) return null;
+  const cur = testers.includes(who) ? who : testers[0];
+  const toCentre = () => setPuzzle(sid, Object.fromEntries(testers.flatMap((u, i) => {
+    const cell = p.maze.centre[(i * 2) % p.maze.centre.length];
+    return [[`pos.${u}`, [cell[0], cell[1]]], [`centre.${u}`, true], [`out.${u}`, false]];
+  })));
+  const toStart = () => setPuzzle(sid, Object.fromEntries(testers.flatMap((u) => {
+    const idx = mapFor(p.maze, st, u, chars[u].house);
+    const s0 = p.maze.starts[idx];
+    return [[`pos.${u}`, [s0[0], s0[1]]], [`centre.${u}`, false], [`out.${u}`, false]];
+  })));
+  const allOut = () => setPuzzle(sid, Object.fromEntries(testers.flatMap((u) => [[`pos.${u}`, [p.maze.exit[0], p.maze.exit[1]]], [`out.${u}`, true]])));
+  return (
+    <section className="maze-testers">
+      <h3>🧪 Walk a test student</h3>
+      <p className="muted small">Pick one and walk it with the arrows below (or your keyboard’s arrow keys). Each test student remembers where it was. At the pedestal, your laptop listens too: try saying “Lumos”.</p>
+      <div className="dark-gm-row">
+        {testers.map((u) => (
+          <button key={u} className={`btn small ${u === cur ? 'gold' : 'ghost'}`} onClick={() => setWho(u)}>
+            {HOUSE_ICON[chars[u].house] ?? '🧪'} {chars[u].firstName ?? chars[u].name}
+          </button>
+        ))}
+      </div>
+      <div className="actions">
+        <button className="btn small" onClick={toCentre}>◎ All test students to the centre</button>
+        <button className="btn small ghost" onClick={toStart}>↩ All back to their start</button>
+        <button className="btn small ghost" onClick={allOut}>★ All test students out</button>
+      </div>
+      <div className="maze-sim">
+        <DarkMazePhone key={cur} sid={sid} uid={cur} p={p} st={st} house={chars[cur].house} gm />
+      </div>
+    </section>
   );
 }

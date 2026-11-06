@@ -411,6 +411,11 @@ BLOCKS = [
         '<b>Lumos:</b> phones at the pedestal listen quietly (they are not told). Whoever says <i>Lumos</i> lights the TV and every phone. The TV stays plain white: they hold the four maps, stacked, against it.',
         'When everyone who went in is out, it solves itself.',
     ]),
+    ('h3', 'Before you play it: two things'),
+    ('list', [
+        '<b>Update the database rules once.</b> The phones send their maze steps and their “Lumos” to the game, and the rules must allow it. In the Firebase console: <b>Firestore Database → Rules</b>, paste everything from <i>firestore.rules</i> (in the project folder), press <b>Publish</b>. If you skip this, the phones show <i>“This phone can’t reach the game”</i> and nobody moves on your screen.',
+        '<b>Test it with the maze test students.</b> Players tab, <b>🧪 Test student</b> panel, <b>Add 4 maze test students</b>: one per house, Test Lion, Test Badger, Test Eagle and Test Snake. Put the puzzle on the TV and, under the maze key, <b>Walk a test student</b>: pick one, walk it with the arrows (or the keyboard), or use <b>All test students to the centre</b> to light the pedestal straight away. At the pedestal your laptop listens too, so you can say “Lumos” yourself. Real phones can join in at the same time. <b>Remove the maze test students</b> before game night (they never reach anyone’s profile).',
+    ]),
     ('tip', 'Four sheets of ordinary paper show clearly against a bright TV. Test the stack against a white screen before the night: you should see the whole circles, a great eye round the centre, and HE SEES YOU beneath the maze.'),
     ('h2', 'Levels'),
     ('p', 'Each year has its own level range: <b>Year 1 is levels 1 to 5</b>, Year 2 is 5 to 10, and so on to Year 7. XP stops at the top of the year’s range. Every new level gives <b>+4 max HP and +2 max mana</b> automatically. Give a stat point by hand if you like (Players tab, Edit stats and limits).'),

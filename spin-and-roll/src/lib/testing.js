@@ -71,3 +71,37 @@ export async function testKit(sid, data, session, uid, kit) {
   }
   return clockOf(session).dawn;
 }
+
+// ---------- Maze test students ----------
+// Four pretend students, one per house, with no account behind them. The GM walks them from the
+// Mirror in the Dark panel on the GM screen, to try the maze (the pedestal needs every house).
+// They are marked test: true, never saved to a profile, and get no trophy. Remove them before game night.
+export const MAZE_TEST_PREFIX = 'maze-test-';
+export const isMazeTester = (uid) => uid.startsWith(MAZE_TEST_PREFIX);
+const TESTERS = [
+  ['Gryffindor', 'Lion'], ['Hufflepuff', 'Badger'], ['Ravenclaw', 'Eagle'], ['Slytherin', 'Snake'],
+];
+
+export async function addMazeTesters(sid, data) {
+  const fams = data.families ?? [];
+  const uids = [];
+  for (const [i, [house, animal]] of TESTERS.entries()) {
+    const uid = `${MAZE_TEST_PREFIX}${house.toLowerCase()}`;
+    const fam = fams[(i * 2) % Math.max(fams.length, 1)];
+    const c = fam ? buildCharacter(data, fam, `Test ${animal}`) : { ...structuredClone(data.defaults), name: `Test ${animal}` };
+    await setDoc(charRef(sid, uid), { ...c, firstName: `Test ${animal}`, name: `Test ${animal}`, test: true, mazeTest: true, house, vaultOpened: true });
+    uids.push(uid);
+  }
+  await updateDoc(sessionRef(sid), { playerUids: arrayUnion(...uids) });
+}
+
+export async function removeMazeTesters(sid, session) {
+  const uids = (session.playerUids ?? []).filter(isMazeTester);
+  for (const uid of uids) await deleteDoc(charRef(sid, uid));
+  if (uids.length) {
+    await updateDoc(sessionRef(sid), {
+      playerUids: arrayRemove(...uids),
+      ...Object.fromEntries(uids.map((u) => [`state.pcPos.${u}`, deleteField()])),
+    });
+  }
+}

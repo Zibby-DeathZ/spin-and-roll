@@ -45,13 +45,15 @@ export const startSession = (sid, withIntro = false) =>
     ...(withIntro ? { 'state.intro': { stage: 'opening', page: 0, at: Date.now() } } : {}),
   });
 
+const isMazeTester = (uid) => uid.startsWith('maze-test-');
+
 // Closes the game and writes the result + trophy onto every player's account.
 export async function endSession(session, result) {
   const campaign = getCampaign(session.campaignId);
   const batch = writeBatch(db);
   batch.update(doc(db, 'sessions', session.id), { status: result, endedAt: serverTimestamp() });
   for (const uid of session.playerUids) {
-    if (uid === session.dmUid) continue; // the GM's own test student gets no history or trophy
+    if (uid === session.dmUid || isMazeTester(uid)) continue; // test students get no history or trophy
     batch.set(doc(db, 'users', uid, 'history', session.id), {
       campaignId: session.campaignId,
       campaignTitle: campaign?.title ?? session.campaignId,

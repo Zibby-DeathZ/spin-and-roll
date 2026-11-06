@@ -1,7 +1,7 @@
 // GM: a test student on your own account, plus one-tap kits, so you can try everything as a player.
 import { useState } from 'react';
 import { useAuth } from '../auth/AuthProvider';
-import { addTestStudent, removeTestStudent, testKit } from '../lib/testing';
+import { addMazeTesters, addTestStudent, isMazeTester, removeMazeTesters, removeTestStudent, testKit } from '../lib/testing';
 
 const KITS = [
   ['level', '⭐ Top level for this year'],
@@ -57,6 +57,19 @@ export default function TestBench({ sid, data, session, chars }) {
           </button>
         </>
       )}
+      <div className="test-maze">
+        <p className="small"><b>🪞 Maze test students:</b> four pretend students, one per house, that you walk yourself from the Mirror in the Dark panel (Puzzles tab).</p>
+        {(session.playerUids ?? []).some(isMazeTester) ? (
+          <button className="btn small ghost" disabled={busy}
+            onClick={() => confirm('Remove the four maze test students?') && go(() => removeMazeTesters(sid, session))}>
+            Remove the maze test students
+          </button>
+        ) : (
+          <button className="btn small" disabled={busy} onClick={() => go(() => addMazeTesters(sid, data))}>
+            Add 4 maze test students (one per house)
+          </button>
+        )}
+      </div>
     </details>
   );
 }
