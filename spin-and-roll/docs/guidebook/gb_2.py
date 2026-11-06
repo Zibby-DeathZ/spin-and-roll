@@ -183,6 +183,17 @@ BLOCKS = [
           ('They ask to enter the Restricted Section', 'Only with a teacher’s signed note. Forging one is a DEX 15. Vance would sign for a good reason; Ashgrove signs anything, cheerfully.')],
          []),
 
+    *npc('Professor Greaves', 'Divination. Tall, thin, very still. Reads the cards for a price. A showman who half believes his own act.',
+         'The Library, in a velvet-curtained alcove at the back of the stacks, behind a single candle.',
+         'Speak slowly and low. Never blink first. Call every student “child”. Touch the cards as if they might bite. When the news is bad, go quiet rather than sorry.',
+         'Twenty Galleons, and an audience. He loves the moment just before the last card turns.',
+         'He has seen all three cards reversed only a handful of times in thirty years, and he remembers every name. He does not like the covered painting, and will not say why.',
+         [('They ask for a reading', '“Twenty Galleons. On the table. And one of you per house, per day; the cards tire of a crowd.” Then run it (Part 4, Day 1 Free time, <b>Professor Greaves and his cards</b>).'),
+          ('They want their money back', '“You paid to look, not to like what you saw.”'),
+          ('They ask about Vale or the painting', 'He covers the deck with his hand. “Some faces should stay under their cloth.” Nothing more, unless a reading turns up the Moon or the High Priestess.'),
+          ('They try to peek at or stack the deck', 'He catches their wrist without looking up. “The cards know.” The reading is refused for that house today.')],
+         [('Professor Greaves', '“Sit. No, not there. There, where the candle can see you. Now cut the deck. Left hand. Your <i>left</i>.”')]),
+
     *npc('The matron', 'Brisk, warm, exhausted. Runs the Hospital Wing.',
          'The Hospital Wing, always.',
          'Tuck in blankets while you talk. Never stop moving. Call everyone “dear”.',

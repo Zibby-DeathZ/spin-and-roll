@@ -29,6 +29,9 @@ BLOCKS = [
     ('tip', 'If the table goes quiet, use a nudge: a ghost drifts past with gossip, Cassius picks a fight, or spin <b>Hogwarts surprises</b>.'),
 
     ('h2', 'Day 1: Welcome to Hogwarts'),
+    ('h3', 'Read this at breakfast'),
+    ('read', 'Your first morning at Hogwarts. The castle is enormous, and it is already whispering to you. The older students say three things to every first-year. Do not be late for Charms. Do not touch anything in Professor Grimsby’s dungeon. And do not go into the Library after lunch unless you want to find out what you are made of. They say the Library keeps more secrets than any room in the castle. There is a tall old mirror at the end of the stacks that nobody will stand in front of for long. And in the back alcove, behind a curtain of dusty velvet, Professor Greaves of Divination will read your future in the cards, if you can pay, and if you are brave enough to hear it.'),
+    ('gm', 'Points them to: the Library in Free time (the Mirror in the Dark) and Professor Greaves (first tarot reading). Grimsby’s dungeon sets up Stolen Ingredients.'),
     day_table([
         ['Morning class', '<b>Charms</b> with Professor Flitwick. Teaches <b>Lumos</b>. Minigame: Wand Motion.', 'Charms classroom'],
         ['Lunch', 'Prefect Sinclair finds the group and offers <b>Keep an Eye Out</b>.', 'Great Hall'],
@@ -42,6 +45,9 @@ BLOCKS = [
     ('p', 'If the Quill is awake, they wake with a jolt from a dream of a painted eye. Nobody else feels a thing.'),
 
     ('h2', 'Day 2: The first victim'),
+    ('h3', 'Read this at breakfast'),
+    ('read', 'Morning. The greenhouses are steaming in the cold, and somewhere inside them, something is screaming in a very small voice. Everyone is talking about Professor Ashgrove: the friendliest teacher in the castle, with a classroom full of paintings that seem to lean in when you pass. And tonight, after dinner, Professor Flitwick is pinning a notice to the Great Hall doors. A Dueling Club. Only the bravest need sign up. Keep your wits about you today. The portraits have gone strangely quiet near Ravenclaw Tower.'),
+    ('gm', 'Points them to: the Greenhouses, Ashgrove’s Defence classroom (his paintings), the Dueling Club sign-up in the Great Hall, and plants the Ravenclaw Tower cliffhanger.'),
     day_table([
         ['Morning class', '<b>Herbology</b> with Professor Longbottom. Teaches Mandrake care (1 Mandrake leaf). Minigame: Mandrake Repotting.', 'Greenhouses'],
         ['Lunch', 'Ashgrove chats warmly with students and shows off his portraits. Everyone loves him.', 'Defence classroom'],
@@ -61,6 +67,9 @@ BLOCKS = [
     ('wait', 'Look at the Sinclair player. “What do you do?” Then stop. That is the end of session one.'),
 
     ('h2', 'Day 3: Shadows in the library'),
+    ('h3', 'Read this at breakfast'),
+    ('read', 'Nobody slept well. Prefect Sinclair lies grey and still in the Hospital Wing, and the whole castle is whispering. If you want answers, the Library is where answers live: the librarian hears everything, and the Restricted Section is closer than they let you think. Professor Scamander has lost something too. Ask her about Bramble down at the Gamekeeper’s hut. And the cards, they say, have been restless. Professor Greaves is still waiting in his alcove for anyone who dares.'),
+    ('gm', 'Points them to: the Library (second victim at lunch, diary page in Free time, tarot again), the Gamekeeper’s hut for Where is Bramble?'),
     ('tip', 'Start session two with a recap. Ask the players to tell you what has happened so far, in their own words. Fill in only what they forget.'),
     day_table([
         ['Morning class', '<b>Transfiguration</b> with Professor Vance. Teaches <b>Avifors</b>. Minigame: Matching Pairs.', 'Transfiguration classroom'],
@@ -74,6 +83,9 @@ BLOCKS = [
     ('read', 'Professor Scamander keeps a battered old suitcase by her feet at all times. Something inside it occasionally thumps. “Creatures are not dangerous,” she says. “People who do not understand them are dangerous. Today we learn to understand.”'),
 
     ('h2', 'Day 4: The missing page'),
+    ('h3', 'Read this at breakfast'),
+    ('read', 'A cold, bright morning. In the courtyard at lunch, Cassius Thorne is showing something off to his friends: half of an old piece of parchment, torn straight down the middle. Some of you may recognise that tear. Somewhere in the Restricted Section there is a page about a painter, and by tonight, someone else will want it too. If you want to read it, do not wait until dark. And watch the faces of your friends. Not everyone at Hogwarts is who they seem.'),
+    ('gm', 'Points them to: the Courtyard at lunch (The Other Half for the Fenwick), the Restricted Section in Free time (the Vale page before it vanishes), and seeds the Painted Double tonight.'),
     day_table([
         ['Morning class', '<b>Potions</b> with Grimsby. Teaches <b>Wiggenweld Potion</b> (2). Minigame: Stir Timing, harder.', 'Dungeons'],
         ['Lunch', 'Cassius is seen in the courtyard with half of an old map. The Fenwick should get <b>The Other Half</b>.', 'Courtyard'],
@@ -86,6 +98,9 @@ BLOCKS = [
     ('read', 'The page is old and brittle. Most of it is about a painter named Corvin Vale, who lived three hundred years ago and painted portraits so lifelike that people said his subjects sometimes left their frames. In his last years, he became obsessed with one idea: that a painting never grows old. The final line has been underlined so hard that the quill tore through the paper. “I will finish myself.”'),
 
     ('h2', 'Day 5: Suspicion'),
+    ('h3', 'Read this at breakfast'),
+    ('read', 'Rain against the windows. Professor Grimsby has been seen carrying armfuls of strange ingredients into his office, and he has locked the door. Professor Flitwick is teaching a spell this morning that opens locked things, and anyone with sense will be there. Up on the seventh floor, near the Grand Staircase, the older students talk about a door that is only there when you truly need it. Walk past it three times, they say, and think very hard.'),
+    ('gm', 'Points them to: Charms (Alohomora), Grimsby’s office (the red herring), and the Room of Requirement by the Grand Staircase for The Turning Lock.'),
     day_table([
         ['Morning class', '<b>Charms</b> with Flitwick. Teaches <b>Alohomora</b>. Minigame: Wand Motion, harder. Students who skip this will struggle with the Time-Turner and chests.', 'Charms classroom'],
         ['Lunch', 'Grimsby is seen carrying armfuls of ingredients to his office. Suspicious?', 'Dungeons'],
@@ -99,6 +114,9 @@ BLOCKS = [
     ('tip', 'This is the moment the players will want to accuse Grimsby. Let them. Their accusation is wrong, and finding that out is half the fun. Call an accusation vote and keep it a <b>hunch</b>: he is stamped <b>Accused</b>. Mark him <b>Cleared</b> when the truth comes out. This is the end of session two.'),
 
     ('h2', 'Day 6: Hogsmeade'),
+    ('h3', 'Read this at breakfast'),
+    ('read', 'No classes today. Hogsmeade! The village is white with snow and every window glows. In the Three Broomsticks the landlady knows every rumour worth knowing, and the old folk say the Shrieking Shack on the hill is not as empty as it looks. Get back to the castle before dark. Professor Ashgrove has asked to see a few students in his classroom this evening. He sounded very kind about it.'),
+    ('gm', 'Points them to: the Three Broomsticks (Vale rumours), the Shrieking Shack (diary page), and Ashgrove’s classroom in Free time (his eyes).'),
     day_table([
         ['Morning class', 'No classes. Hogsmeade visit. Open the shops if you like.', 'Hogsmeade'],
         ['Lunch', 'The Three Broomsticks: rumours about a painter, and a ghost who saw “a figure step out of a frame”.', 'Three Broomsticks'],
@@ -112,6 +130,9 @@ BLOCKS = [
     ('gm', 'Pin <b>Ashgrove’s eyes looked like brushstrokes</b> and, if they look closely at his sleeve, <b>Flecks of wet paint on Ashgrove’s sleeve</b>. If the players put it together tonight, let them confront him. If not, it all comes out on Day 7.'),
 
     ('h2', 'Day 7: The seventh night'),
+    ('h3', 'Read this at breakfast'),
+    ('read', 'The seventh morning. You can feel it in the stone: a hum, deep under the castle, like something breathing. Professor Vance is teaching a fire spell this morning, and anyone who means to fight should be there. After lunch the castle will close its doors. Whatever you still need, a potion, a rest, a last word with Professor Greaves and his cards, find it before then. Tonight, something below the dungeons is waiting to be finished.'),
+    ('gm', 'Points them to: Transfiguration (Incendio), last preparations and a final tarot reading, then the Undercroft.'),
     day_table([
         ['Morning class', '<b>Transfiguration</b> with Vance. Teaches <b>Incendio</b>. This is the spell that burns Paint Wraiths and Vale’s canvas.', 'Transfiguration classroom'],
         ['Lunch', 'Ashgrove does not appear at lunch. His classroom is locked. His paintings are gone.', 'Great Hall'],

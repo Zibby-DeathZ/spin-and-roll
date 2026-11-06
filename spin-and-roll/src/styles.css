@@ -2517,3 +2517,59 @@ button.status-chip.removable:hover { background: rgba(200, 60, 80, 0.3); }
 .maze-sim .dark-phone { position: relative; inset: auto; z-index: auto; min-height: 520px; border-radius: 26px; border: 6px solid #22202a; box-shadow: 0 10px 40px rgba(0, 0, 0, .45); padding: 1.4rem 1rem; }
 .maze-sim .lumos-glow { border-radius: 20px; }
 .test-maze { margin-top: .8rem; padding-top: .6rem; border-top: 1px dashed rgba(255, 255, 255, .15); }
+
+/* ---------- Tarot: Professor Greaves in the Library ---------- */
+.gm-tarot { display: grid; gap: .8rem; max-width: 900px; }
+.tarot-houses { display: flex; flex-wrap: wrap; gap: .4rem; }
+.tarot-house { font-size: .8rem; padding: .2rem .6rem; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); }
+.tarot-house.done { border-color: var(--violet); color: var(--bone); background: rgba(142, 124, 195, .15); }
+.tarot-who select { display: block; margin-top: .25rem; min-width: 260px; }
+.tarot-picks { display: grid; gap: .5rem; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+.tarot-pick { display: grid; gap: .3rem; padding: .6rem; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
+.tarot-pos { font-family: var(--display); color: var(--gold); font-size: 1.1rem; }
+.tarot-rev { font-size: .85rem; display: flex; gap: .35rem; align-items: center; }
+.tarot-preview { padding: .8rem 1rem; border: 1px solid var(--line); border-left: 4px solid var(--violet); border-radius: 8px; background: rgba(0, 0, 0, .25); }
+.tarot-preview.kind-blessed { border-left-color: var(--gold); }
+.tarot-preview.kind-cursed { border-left-color: var(--ember); }
+.tarot-preview.kind-none { border-left-color: var(--muted); }
+.tarot-preview h3 { font-size: 1rem; color: var(--muted); margin-top: .4rem; }
+.tarot-line { font-family: Georgia, serif; font-size: 1.02rem; margin: .35rem 0; }
+.tarot-line .tag { margin-right: .4rem; }
+.tarot-line.verdict { font-style: italic; color: var(--gold); }
+.fortune-card { border-top: 3px solid var(--violet); padding: .5rem .7rem; border-radius: 6px; background: linear-gradient(160deg, rgba(142, 124, 195, .16), transparent 60%), var(--panel); margin-top: .4rem; }
+.fortune-card p { margin: .2rem 0; }
+.fortune-card.curse { border-top-color: var(--ember); background: linear-gradient(160deg, rgba(208, 84, 63, .2), transparent 60%), var(--panel); }
+.fortune-card.used { opacity: .5; }
+.fortune-row.curse .gift-name { color: #f08a78; }
+.tarot-today h3 { font-size: 1rem; }
+
+.tarot-show { text-align: center; max-width: 1100px; margin: 0 auto; padding: 1rem; }
+.tarot-kicker { font-family: var(--display); font-size: 1.6rem; color: var(--violet); letter-spacing: .04em; animation: fadein 1s both; }
+.tarot-spread { display: flex; justify-content: center; gap: 3vw; margin: 1.5rem 0; }
+.tarot-slot { display: grid; justify-items: center; gap: .4rem; animation: tarot-deal 1.1s both cubic-bezier(.2, .8, .3, 1); }
+.tarot-slot-pos { font-family: var(--display); color: var(--gold); font-size: 1.3rem; text-transform: uppercase; letter-spacing: .15em; }
+.tarot-slot-rev { font-size: .9rem; color: #f08a78; letter-spacing: .2em; text-transform: uppercase; }
+.tarot-card {
+  width: 13vw; min-width: 120px; aspect-ratio: 7 / 12; display: grid; grid-template-rows: auto 1fr auto; align-items: center;
+  padding: .6rem .5rem; border-radius: 10px; color: var(--bone);
+  border: 2px solid #8a7a52; outline: 1px solid #8a7a52; outline-offset: -8px;
+  background: radial-gradient(circle at 50% 40%, #2c2433, #110d16 75%);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, .7), inset 0 0 30px rgba(0, 0, 0, .8);
+}
+.tarot-card.major { border-color: var(--gold); outline-color: var(--gold); }
+.tarot-card.rev { transform: rotate(180deg); }
+.tc-num { font-family: var(--display); font-size: 1.3rem; color: var(--gold); }
+.tc-icon { font-size: 4vw; filter: grayscale(.4) drop-shadow(0 0 12px rgba(227, 176, 75, .35)); }
+.tc-name { font-family: var(--display); font-size: 1.1rem; line-height: 1.1; }
+.tarot-words { max-width: 900px; margin: 0 auto; }
+.tarot-words p { font-family: Georgia, serif; font-size: 1.35rem; line-height: 1.45; margin: .6rem 0; animation: fadein 1.2s both; }
+.tarot-banner { margin-top: 1.2rem; padding: 1rem 1.4rem; border-radius: 12px; border: 2px solid var(--violet); background: rgba(0, 0, 0, .45); animation: award-in 1s both; }
+.tarot-banner h2 { font-size: 2.4rem; }
+.tarot-banner p { font-size: 1.25rem; margin: .3rem 0; }
+.tarot-banner.kind-blessed { border-color: var(--gold); box-shadow: 0 0 40px rgba(227, 176, 75, .35); }
+.tarot-banner.kind-cursed { border-color: var(--ember); box-shadow: 0 0 50px rgba(208, 84, 63, .45); }
+.tarot-banner.kind-cursed h2 { color: #f08a78; }
+.tarot-banner.kind-none { border-color: var(--line); }
+.tarot-banner.kind-none h2 { color: var(--muted); }
+@keyframes tarot-deal { from { opacity: 0; transform: translateY(-30px) rotate(-6deg) scale(.8); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .tarot-slot, .tarot-words p, .tarot-banner, .tarot-kicker { animation-duration: .01s; animation-delay: 0s !important; } }

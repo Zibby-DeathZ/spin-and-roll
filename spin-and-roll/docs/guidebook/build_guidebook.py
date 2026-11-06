@@ -22,7 +22,7 @@ from reportlab.platypus import CondPageBreak  # noqa: E402
 from reportlab.platypus import Spacer, Table, TableStyle, KeepTogether, PageBreak, NextPageTemplate  # noqa: E402
 from reportlab.platypus.tableofcontents import TableOfContents  # noqa: E402
 
-VERSION = '1.0'
+VERSION = '1.1'
 VIOLET = colors.HexColor('#5b3f8c')
 VIOLET_BG = colors.HexColor('#efe9f8')
 SAY = ParagraphStyle('say', fontName=G.SERIF_I, fontSize=11, leading=15.2, textColor=G.INK)

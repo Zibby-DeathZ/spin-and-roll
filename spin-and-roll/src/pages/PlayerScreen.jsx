@@ -43,6 +43,7 @@ import RuneNotebook, { readerFor } from '../components/RuneNotebook';
 import { knownRunes, usePencil } from '../lib/runes';
 import { SecretGiftCard } from '../components/SecretGift';
 import { RelicCards } from '../components/Relics';
+import { FortuneCards } from '../components/Tarot';
 import { DarkMazePhone } from '../components/DarkMaze';
 
 function AbilityCard({ sid, c, ability, dawn }) {
@@ -165,6 +166,7 @@ function Sheet({ sid, c, currency, data, points, clk, scenes = null, loc, discov
       {fam?.ability && <AbilityCard sid={sid} c={c} ability={fam.ability} dawn={clk.dawn} />}
       <SecretGiftCard c={c} dawn={clk.dawn} />
       <RelicCards c={c} dawn={clk.dawn} />
+      <FortuneCards c={c} />
       <HouseCard sid={sid} c={c} dawn={clk.dawn} hod={hod} />
       <OwlArchive owls={owls} />
       {fam && (

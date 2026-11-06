@@ -6,6 +6,7 @@ import { doors } from './hollow-heir-doors.js';
 import { floors } from './hollow-heir-floors.js';
 import mirrorMaze from './mirror-maze.json' with { type: 'json' };
 import { addMissing, importSpellbook } from '../lib/spellbook.js';
+import * as tarot from './hollow-heir-tarot.js';
 
 // The Hogwarts series spellbook: dark arts, blood magic and later-year spells, with Corruption and status effects.
 // Most unlock in later years; the GM Spells tab shows them locked until then.
@@ -563,6 +564,7 @@ export const hollowHeir = {
     longbottom: { name: 'Professor Longbottom', icon: '🌱', npc: true },
     scamander: { name: 'Professor Scamander', icon: '🐾', npc: true },
     flitwick: { name: 'Professor Flitwick', icon: '✨', npc: true },
+    greaves: { name: 'Professor Greaves', icon: '🔮', npc: true },
     vance: { name: 'Professor Vance', icon: '🔄', npc: true },
     hooch: { name: 'Madam Hooch', icon: '🧹', npc: true },
     filch: { name: 'Filch', icon: '🔦', npc: true },
@@ -580,7 +582,7 @@ export const hollowHeir = {
   staff: {
     flitwick: 'charms-classroom', grimsby: 'dungeons', longbottom: 'greenhouses', ashgrove: 'defence-classroom',
     vance: 'transfiguration-classroom', scamander: 'hagrids-hut', hooch: 'quidditch-pitch',
-    filch: 'entrance-hall', peeves: 'grand-staircase',
+    filch: 'entrance-hall', peeves: 'grand-staircase', greaves: 'library',
   },
 
   // Places on the map. Drop an image at public/maps/<id>.jpg and it shows automatically.
@@ -599,7 +601,7 @@ export const hollowHeir = {
     { id: 'hufflepuff-common', area: 'Common rooms', name: 'Hufflepuff common room', icon: '🦡', desc: 'A cosy round basement room full of plants, copper pots and honey-coloured wood, near the kitchens.', actions: ['Tap the barrels in the right rhythm', 'Rest by the fire', 'Hear the latest gossip'] },
     { id: 'slytherin-common', area: 'Common rooms', name: 'Slytherin common room', icon: '🐍', desc: 'A long low dungeon under the lake, lit green by the water outside the windows.', actions: ['Give the password to the bare stone wall', 'Watch the lake through the windows', 'Hear the latest gossip'] },
     { id: 'kitchens', area: 'Castle', name: 'The Kitchens', icon: '🍲', exits: ['hufflepuff-common'], desc: 'Behind a painting of a fruit bowl: tickle the pear. House-elves everywhere.', actions: ['Tickle the pear to get in', 'Ask the house-elves for food', 'Ask the house-elves what they’ve heard'] },
-    { id: 'library', area: 'Castle', name: 'The Library', icon: '📚', desc: 'Silent shelves and a librarian who hears everything.', exits: ['restricted-section'], actions: ['Search the shelves (INT)', 'Ask the librarian', 'Look into the tall mirror at the end of the stacks'] },
+    { id: 'library', area: 'Castle', name: 'The Library', icon: '📚', desc: 'Silent shelves and a librarian who hears everything.', exits: ['restricted-section'], actions: ['Search the shelves (INT)', 'Ask the librarian', 'Look into the tall mirror at the end of the stacks', 'Have your cards read by Professor Greaves (20 Galleons)'] },
     { id: 'restricted-section', area: 'Castle', name: 'Restricted Section', icon: '⛓️', desc: 'Chained books that whisper when you pass.', secret: true, actions: ['Read a chained book (WIS)', 'Look for the page about Vale'] },
     { id: 'dungeons', area: 'Castle', name: 'The Dungeons', icon: '⚗️', desc: 'Cold stone, green light, and the Potions classroom.', exits: ['undercroft', 'slytherin-common'], actions: ['Check the store cupboard', 'Brew something'] },
     { id: 'charms-classroom', area: 'Castle', name: 'Charms classroom', icon: '✨', desc: 'Tiered desks and a tall stack of books for the professor to stand on.', actions: ['Practise a charm', 'Ask Flitwick a question'] },
@@ -1080,6 +1082,9 @@ export const hollowHeir = {
   ],
 
   items,
+
+  // Professor Greaves reads the cards in the Library. See hollow-heir-tarot.js.
+  tarot: { ...tarot },
 };
 
 // Spellbook spells join the list without replacing this year's versions (like the secret Killing Curse).

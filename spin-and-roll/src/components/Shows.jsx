@@ -3,6 +3,7 @@ import { computeAwards, houseCup, pinClue, setShow, setSuspectMark, standingsOf 
 import { GMAccuse } from './Accuse';
 import { endAccusation } from '../lib/accuse';
 import AwardsCeremony from './AwardsCeremony';
+import { TarotShow } from './Tarot';
 
 const HOUSES = ['Gryffindor', 'Hufflepuff', 'Ravenclaw', 'Slytherin'];
 
@@ -67,6 +68,7 @@ export function TVShow({ data, session }) {
   if (show?.type === 'suspects') return <SuspectBoard data={data} board={session.state?.board} />;
   if (show?.type === 'awards') return <AwardsShow show={show} />;
   if (show?.type === 'housecup') return <HouseCupShow show={show} />;
+  if (show?.type === 'tarot' && data.tarot) return <TarotShow data={data} show={show} />;
   return null;
 }
 
@@ -83,7 +85,7 @@ export function GMShows({ sid, data, session, chars }) {
   return (
     <section className="gm-shows">
       <div className="show-bar">
-        <span className="muted small">On the TV now: <strong>{session.state?.accuse ? 'Accusation vote' : show ? (show.kind === 'day' ? 'End-of-day ceremony' : { suspects: 'Suspect board', awards: 'Awards', housecup: 'House Cup' }[show.type]) : 'the map'}</strong></span>
+        <span className="muted small">On the TV now: <strong>{session.state?.accuse ? 'Accusation vote' : show ? (show.kind === 'day' ? 'End-of-day ceremony' : { suspects: 'Suspect board', awards: 'Awards', housecup: 'House Cup', tarot: 'A tarot reading' }[show.type]) : 'the map'}</strong></span>
         <span className="actions">
           <button className="btn small" disabled={show?.type === 'suspects'} onClick={() => setShow(sid, { type: 'suspects' })}>🕵️ Suspect board</button>
           <button className="btn small" disabled={busy} onClick={() => go(async () => setShow(sid, { type: 'awards', awards: await computeAwards(sid, chars), at: Date.now() }))}>🎖️ Tonight’s awards</button>

@@ -25,6 +25,7 @@ import { GMOwlPost } from '../components/OwlPost';
 import GMNotes from '../components/GMNotes';
 import { GMSecretGift } from '../components/SecretGift';
 import { GMRelics } from '../components/Relics';
+import { GMFortunes, GMTarot } from '../components/Tarot';
 import { useMazeEngine } from '../components/DarkMaze';
 import { setNote } from '../lib/notes';
 import { useAuth } from '../auth/AuthProvider';
@@ -174,6 +175,7 @@ function CharacterControls({ sid, c, data, playerName, quizBusy, forbiddenLearne
 
       {data.gifts && <GMSecretGift sid={sid} c={c} data={data} dawn={dawn} />}
       {data.relics && <GMRelics sid={sid} c={c} data={data} dawn={dawn} holders={relicHolders} />}
+      <GMFortunes sid={sid} c={c} />
 
       <div className="gm-give">
         <select value={itemId} onChange={(e) => setItemId(e.target.value)} aria-label="Item to give">
@@ -236,7 +238,7 @@ function Feed({ sid, nameOf }) {
 
 const TABS = [
   ['table', '🗺️ Table'], ['day', '🕰️ Day & class'], ['quests', '📜 Quests'], ['puzzles', '🧩 Puzzles'],
-  ['shows', '🎬 TV shows'], ['players', '🧑‍🎓 Players'], ['owls', '🦉 Owl Post'], ['notes', '📓 Notes'], ['imposter', '🎭 Double'], ['spells', '✨ Spells'], ['wheels', '🎡 Wheels & dice'], ['media', '🎞️ Media'],
+  ['shows', '🎬 TV shows'], ['players', '🧑‍🎓 Players'], ['owls', '🦉 Owl Post'], ['notes', '📓 Notes'], ['tarot', '🔮 Tarot'], ['imposter', '🎭 Double'], ['spells', '✨ Spells'], ['wheels', '🎡 Wheels & dice'], ['media', '🎞️ Media'],
 ];
 
 export default function GMScreen() {
@@ -280,7 +282,7 @@ export default function GMScreen() {
   const quizState = session.state?.quiz;
   const enc = session.state?.encounter;
   const lesson = session.state?.lesson;
-  const tabs = TABS.filter(([id]) => (id === 'day' ? data.clock : id === 'quests' ? data.quests : id === 'wheels' ? true : id === 'table' ? data.locations : id === 'puzzles' ? data.puzzles : id === 'shows' ? data.suspects : id === 'spells' ? data.spells : true));
+  const tabs = TABS.filter(([id]) => (id === 'day' ? data.clock : id === 'quests' ? data.quests : id === 'wheels' ? true : id === 'table' ? data.locations : id === 'puzzles' ? data.puzzles : id === 'shows' ? data.suspects : id === 'spells' ? data.spells : id === 'tarot' ? data.tarot : true));
   const active = tabs.some(([id]) => id === tab) ? tab : tabs[0][0];
 
   return (
@@ -356,6 +358,7 @@ export default function GMScreen() {
             onSent={(note) => note?.id && user && setNote(user.uid, sid, note.id, { done: true })} />}
           {active === 'notes' && <GMNotes sid={sid} data={data} session={session} chars={chars}
             onOwl={(uid, note) => { setOwlPreset({ uid, note, at: Date.now() }); setTab('owls'); }} />}
+          {active === 'tarot' && <GMTarot sid={sid} data={data} session={session} chars={chars} />}
           {active === 'imposter' && <GMImposter sid={sid} session={session} chars={chars} />}
           {active === 'spells' && <GMSpells sid={sid} data={data} session={session} chars={chars} />}
           {active === 'shows' && <GMShows sid={sid} data={data} session={session} chars={chars} />}
