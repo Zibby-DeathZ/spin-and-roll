@@ -24,6 +24,8 @@ import GMSpells from '../components/GMSpells';
 import { GMOwlPost } from '../components/OwlPost';
 import GMNotes from '../components/GMNotes';
 import { GMSecretGift } from '../components/SecretGift';
+import { GMRelics } from '../components/Relics';
+import { useMazeEngine } from '../components/DarkMaze';
 import { setNote } from '../lib/notes';
 import { useAuth } from '../auth/AuthProvider';
 import GMMedia from '../components/GMMedia';
@@ -96,7 +98,7 @@ function Ollivander({ sid, c, data }) {
   );
 }
 
-function CharacterControls({ sid, c, data, playerName, quizBusy, forbiddenLearner, dawn }) {
+function CharacterControls({ sid, c, data, playerName, quizBusy, forbiddenLearner, dawn, relicHolders }) {
   const [open, setOpen] = useState(false);
   const [itemId, setItemId] = useState(Object.keys(data.items)[0] ?? '');
   const give = () => {
@@ -171,6 +173,7 @@ function CharacterControls({ sid, c, data, playerName, quizBusy, forbiddenLearne
       )}
 
       {data.gifts && <GMSecretGift sid={sid} c={c} data={data} dawn={dawn} />}
+      {data.relics && <GMRelics sid={sid} c={c} data={data} dawn={dawn} holders={relicHolders} />}
 
       <div className="gm-give">
         <select value={itemId} onChange={(e) => setItemId(e.target.value)} aria-label="Item to give">
@@ -250,6 +253,7 @@ export default function GMScreen() {
   useAccuseEngine(sid, session); // and in an accusation vote
   useDuelEngine(sid, data, session); // settles boss spells once the students have reacted
   useMaraudersEngine(sid, session); // the Marauder’s Map ink fades after its time
+  useMazeEngine(sid, data, session, chars); // the Mirror in the Dark: the watcher and the pedestal
   // If a game was started without its opening (for example from an old, un-refreshed dashboard tab),
   // start it now, as long as nobody has chosen a family yet.
   const autoIntro = useRef(false);
@@ -361,7 +365,8 @@ export default function GMScreen() {
             <section className="gm-players">
               <TestBench sid={sid} data={data} session={session} chars={chars} />
               {session.playerUids.map((u) => chars[u]
-                ? <CharacterControls key={u} sid={sid} c={chars[u]} data={data} playerName={profiles[u]?.displayName} quizBusy={!!quizState} forbiddenLearner={session.state?.forbiddenLearner} dawn={clockOf(session).dawn} />
+                ? <CharacterControls key={u} sid={sid} c={chars[u]} data={data} playerName={profiles[u]?.displayName} quizBusy={!!quizState} forbiddenLearner={session.state?.forbiddenLearner} dawn={clockOf(session).dawn}
+                  relicHolders={Object.fromEntries(Object.values(chars).flatMap((x) => Object.keys(x.relics ?? {}).map((id) => [id, x.firstName ?? x.name])))} />
                 : <NewCharacter key={u} sid={sid} uid={u} profile={profiles[u]} data={data} />)}
               {!session.playerUids.length && <p className="muted">Players appear here once they join with the code.</p>}
               {data.series && Object.keys(chars).length > 0 && (

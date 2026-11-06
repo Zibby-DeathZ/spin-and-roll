@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { DarkMazeGM, DarkMazeTV } from './DarkMaze';
 import Art, { useArtUrl } from './Art';
 import { clearRunes, forgetRune, knownRunes, learnRunes, lettersOfClue } from '../lib/runes';
 import {
@@ -357,7 +358,8 @@ function Stairs({ p, st, gm, onAct }) {
 }
 
 // ---------- TV ----------
-export function TVPuzzle({ p, st }) {
+export function TVPuzzle({ p, st, names = {} }) {
+  if (p.type === 'darkmaze') return <DarkMazeTV p={p} st={st} names={names} />;
   return (
     <div className={`tv-puzzle ${st.solved ? 'solved' : ''}`}>
       <h2>{p.icon} {p.title}</h2>
@@ -448,9 +450,12 @@ function ActivePuzzle({ sid, p, st, chars, players }) {
         {p.type === 'constellation' && (sel != null ? `Star ${sel} selected. Tap the star to join it to (tap a line’s two stars again to remove it).` : 'Tap one star, then another, to draw a line between them.')}
         {p.type === 'stairs' && 'Tap a piece to turn it a quarter clockwise. The path glows when it connects.'}
         {p.type === 'slider' && 'Tap a piece next to the gap to slide it in.'}
+        {p.type === 'darkmaze' && 'The TV and phones are dark. Everything below runs by itself; it solves itself when everyone is out.'}
         {p.type === 'runefloor' && 'Tap the tile the walker steps on. A wrong step springs the trap and sends them back to the start (apply damage yourself).'}
       </p>
-      <PuzzleView p={p} st={st} gm onAct={act} sel={sel} />
+      {p.type === 'darkmaze'
+        ? <DarkMazeGM sid={sid} p={p} st={st} chars={chars} players={players} onSet={(patch) => setPuzzle(sid, patch)} />
+        : <PuzzleView p={p} st={st} gm onAct={act} sel={sel} />}
       {p.type === 'chess' && sel && st.board[sel] && (
         <div className="gm-give">
           <span className="small">Who is this piece?</span>

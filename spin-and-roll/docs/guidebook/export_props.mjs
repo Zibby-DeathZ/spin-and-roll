@@ -10,6 +10,7 @@ const out = {
   gifts: h.gifts,
   families: Object.fromEntries(h.families.map((f) => [f.id, { name: f.name, secret: f.secret }])),
   items: Object.fromEntries(['rune-tablet-1', 'rune-tablet-2', 'rune-tablet-3', 'diary-page', 'map-half', 'ring-clue-serpent', 'ring-clue-moon', 'ring-clue-owl'].map((k) => [k, h.items[k]])),
+  relics: h.relics,
   lock: puzzle('turning-lock'),
   bottles: puzzle('seven-bottles'),
 };

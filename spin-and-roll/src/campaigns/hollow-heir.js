@@ -4,6 +4,7 @@ import darkSpells from './spellbooks/dark-spells.json' with { type: 'json' };
 import { marauders } from './hollow-heir-map.js';
 import { doors } from './hollow-heir-doors.js';
 import { floors } from './hollow-heir-floors.js';
+import mirrorMaze from './mirror-maze.json' with { type: 'json' };
 import { addMissing, importSpellbook } from '../lib/spellbook.js';
 
 // The Hogwarts series spellbook: dark arts, blood magic and later-year spells, with Corruption and status effects.
@@ -272,6 +273,91 @@ export const hollowHeir = {
     },
   },
 
+  // Relics: legendary and mythic magical objects, one of each in the whole world. The GM gives them as rewards
+  // from the Players tab (and can change the words first). `found` is a suggestion for where each turns up.
+  relics: {
+    'sword-of-gryffindor': {
+      rarity: 'Mythic', name: 'The Sword of Gryffindor', icon: '🗡️',
+      lore: 'A silver blade set with rubies. It can’t be owned, only earned: it comes to a true Gryffindor in their darkest moment, pulled from the old Sorting Hat.',
+      always: 'While you hold it you can’t be frightened, and your spells deal +2 damage to anything Vale has made.',
+      daily: 'Strike with the blade itself: d20 + STR to hit, 3d8 damage. Anything painted, Vale included, takes double.',
+      drawback: 'It stays for one fight only. When the danger has passed, it is simply gone, until it is needed again.',
+      found: 'Day 7 in the Undercroft, when a student does something truly brave: they pull it from the Sorting Hat.',
+    },
+    'phoenix-tear': {
+      rarity: 'Mythic', name: 'A Phoenix Tear', icon: '💧',
+      lore: 'A single tear in a crystal vial, given freely by a phoenix to someone who stayed loyal when it would have been easier to run.',
+      always: 'The vial is warm to the touch. Paint Wraiths and other dark things hesitate: they attack you with disadvantage.',
+      daily: 'Once ever: one drop heals anyone to full HP and lifts every curse and status on them, or wakes one drained student completely.',
+      drawback: 'There is only one drop. Once it is used, it is gone for ever.',
+      found: 'The Hospital Wing, after a student risks themselves to protect someone else.',
+    },
+    'vales-first-brush': {
+      rarity: 'Mythic', name: 'Vale’s First Brush', icon: '🖌️',
+      lore: 'The brush Corvin Vale painted his first living portrait with. Three hundred years on, the bristles are still wet.',
+      always: 'You feel paint the way others feel weather: you always know when something painted is close.',
+      daily: 'Paint a doorway on any wall and it is a real door for one scene. Or paint over a wound: heal 2d6.',
+      drawback: 'Every use adds 1 Corruption, and Vale feels it. He starts talking to you. He is very persuasive.',
+      found: 'The Undercroft, or offered by the covered painting as part of The Painter’s Bargain.',
+    },
+    'blackwood-seal': {
+      rarity: 'Legendary', name: 'The Blackwood Seal Ring', icon: '💍',
+      lore: 'The ring a Blackwood pressed into hot wax three hundred years ago, to seal Corvin Vale inside his own canvas.',
+      always: 'Painted magic can’t take hold of you: the Painted Double can’t copy you, and Vale can’t drain you.',
+      daily: 'Press the ring to a door, a frame or a painting: it is sealed shut for the rest of the day. Nothing comes out, nothing goes in.',
+      drawback: 'Vale knows this ring. Paint Wraiths always go for you first, and from Day 5 the painting whispers to you at night.',
+      found: 'Given by a Blackwood portrait (best of all to the Blackwood), or hidden behind the oldest shield in the Trophy Room.',
+    },
+    'dark-room-lantern': {
+      rarity: 'Legendary', name: 'The Lantern of the Dark Room', icon: '🏮',
+      lore: 'A small iron lantern waiting at the way out of the mirror maze. Its flame is cold and blue, and it has never gone out.',
+      always: 'You are never in the dark: no spell, wind or water can put your light out.',
+      daily: 'Hold it up to a wall, a page or a painting: invisible writing, hidden doors and secret marks show in its light.',
+      drawback: 'In its light, anything painted can see you too. While it is lit, you can’t hide from Vale’s servants.',
+      found: 'The way out of the Mirror in the Dark.',
+    },
+    'moonlit-compass': {
+      rarity: 'Legendary', name: 'The Moonlit Compass', icon: '🧭',
+      lore: 'A brass compass with no north, south, east or west. Its needle is a sliver of moonlight.',
+      always: 'You can never truly be lost: you always know the way back to your common room.',
+      daily: 'Ask it what you need most. The needle points: the DM tells you which way, and roughly how far.',
+      drawback: 'It points to what you need, not what you want. Sometimes that is a person you would rather avoid.',
+      found: 'The Astronomy Tower at night, or the ancient chest in the Room of Requirement.',
+    },
+    'old-boot': {
+      rarity: 'Legendary', name: 'The Old Boot', icon: '🥾',
+      lore: 'A mouldy, laceless boot. It is secretly a Portkey, charmed long ago and never collected.',
+      always: '',
+      daily: 'Once: everyone touching it is whisked to one place the holder names, anywhere in the castle or the grounds. Count to three and grab on.',
+      drawback: 'The landing is rough: everyone takes 1d4 and is dizzy for a round. Afterwards, it is just a boot.',
+      found: 'Under the floorboards of the Shrieking Shack.',
+    },
+    'twin-cabinet-key': {
+      rarity: 'Legendary', name: 'The Twin Cabinet Key', icon: '🗝️',
+      lore: 'A tarnished key that fits any wardrobe or cupboard in the castle, and opens it onto its twin, deep in the Room of Requirement.',
+      always: '',
+      daily: 'Step into any cupboard or wardrobe and come out in the Room of Requirement, or the other way round. Up to three can go together.',
+      drawback: 'Something else knows the way too. Each time, the DM rolls a d20: on a 1, something has followed you through.',
+      found: 'The Room of Requirement.',
+    },
+    'goblin-dagger': {
+      rarity: 'Legendary', name: 'The Goblin-Silver Dagger', icon: '🔪',
+      lore: 'Goblin-made silver, older than Hogwarts. It takes in only what makes it stronger.',
+      always: 'It never dulls and never tarnishes, and it cuts through any rope, vine or magical binding (Devil’s Snare included).',
+      daily: 'Strike with it for 2d6. Against painted things it drinks the paint: after it hits one, its next hit deals +1d6.',
+      drawback: 'Goblins believe what they make still belongs to them. A polite, unmistakable letter from Gringotts will ask for it back.',
+      found: 'The cursed chest in the Shrieking Shack, or by owl from Okafor’s mum: “Keep this safe, and don’t tell the goblins.”',
+    },
+    'silver-memory': {
+      rarity: 'Legendary', name: 'The Silver Memory', icon: '⚗️',
+      lore: 'A stoppered vial of silver mist: someone’s memory, saved three hundred years ago.',
+      always: '',
+      daily: 'Once: pour it out and the whole table sees the memory. The DM tells the scene: a night in the castle when Corvin Vale still walked its halls.',
+      drawback: 'Memories pull. Whoever pours it is lost in it for the rest of the scene, and wakes cold and shaking (−3 HP).',
+      found: 'The Restricted Section, or a gift from the Headmaster after the second drained student.',
+    },
+  },
+
   // Ollivander: the DM picks wood + core after the wand questions.
   wandPrice: 7,
   wandWoods: [
@@ -513,7 +599,7 @@ export const hollowHeir = {
     { id: 'hufflepuff-common', area: 'Common rooms', name: 'Hufflepuff common room', icon: '🦡', desc: 'A cosy round basement room full of plants, copper pots and honey-coloured wood, near the kitchens.', actions: ['Tap the barrels in the right rhythm', 'Rest by the fire', 'Hear the latest gossip'] },
     { id: 'slytherin-common', area: 'Common rooms', name: 'Slytherin common room', icon: '🐍', desc: 'A long low dungeon under the lake, lit green by the water outside the windows.', actions: ['Give the password to the bare stone wall', 'Watch the lake through the windows', 'Hear the latest gossip'] },
     { id: 'kitchens', area: 'Castle', name: 'The Kitchens', icon: '🍲', exits: ['hufflepuff-common'], desc: 'Behind a painting of a fruit bowl: tickle the pear. House-elves everywhere.', actions: ['Tickle the pear to get in', 'Ask the house-elves for food', 'Ask the house-elves what they’ve heard'] },
-    { id: 'library', area: 'Castle', name: 'The Library', icon: '📚', desc: 'Silent shelves and a librarian who hears everything.', exits: ['restricted-section'], actions: ['Search the shelves (INT)', 'Ask the librarian'] },
+    { id: 'library', area: 'Castle', name: 'The Library', icon: '📚', desc: 'Silent shelves and a librarian who hears everything.', exits: ['restricted-section'], actions: ['Search the shelves (INT)', 'Ask the librarian', 'Look into the tall mirror at the end of the stacks'] },
     { id: 'restricted-section', area: 'Castle', name: 'Restricted Section', icon: '⛓️', desc: 'Chained books that whisper when you pass.', secret: true, actions: ['Read a chained book (WIS)', 'Look for the page about Vale'] },
     { id: 'dungeons', area: 'Castle', name: 'The Dungeons', icon: '⚗️', desc: 'Cold stone, green light, and the Potions classroom.', exits: ['undercroft', 'slytherin-common'], actions: ['Check the store cupboard', 'Brew something'] },
     { id: 'charms-classroom', area: 'Castle', name: 'Charms classroom', icon: '✨', desc: 'Tiered desks and a tall stack of books for the professor to stand on.', actions: ['Practise a charm', 'Ask Flitwick a question'] },
@@ -580,6 +666,7 @@ export const hollowHeir = {
 
   // Story beats, visible only on the GM screen, at the moment they happen.
   beats: {
+    '1-Free time': 'The tall mirror at the end of the Library stacks ripples when a student walks past. Puzzles tab: The Mirror in the Dark. Hand each house its map.',
     '1-Curfew': 'A covered painting is hung in the Undercroft corridor. A Quill feels its eyes.',
     '2-Curfew': 'The Sinclair prefect is found drained outside the Ravenclaw tower. Cliffhanger for day one of play.',
     '3-Lunch': 'A second student is drained near the library. Portraits in that corridor are strangely silent.',
@@ -905,6 +992,12 @@ export const hollowHeir = {
       size: 5,
       start: [1,1,0,0,0, 0,0,0,1,0, 0,0,0,0,0, 0,0,0,0,0, 0,1,1,1,0],
       solution: [[0,0],[0,1],[0,4],[2,2],[3,0],[3,4]],
+    },
+    {
+      id: 'mirror-maze', type: 'darkmaze', icon: '🪞', title: 'The Mirror in the Dark', maze: mirrorMaze,
+      intro: 'The tall mirror at the end of the Library swallows you whole. Pitch black. Cold stone underfoot. Somewhere in the dark, something is breathing.',
+      riddle: ['Four roads end here, and so does the light.', 'The more of me there is, the less you see.', 'This morning you learned the word that ends me.'],
+      solution: 'Hand each house its map (Props Book, T9); phones start on their house’s YOU. Every map is right from YOU to the centre. When every house stands in the centre, the pedestal lights with a riddle (answer: darkness). Whoever says “Lumos” there lights the TV and every phone. Hold the four maps, stacked and lined up by the crosshairs, against the bright TV: the walls add up, the bricked EXITs close, the whole circles lead OUT, and a great eye appears with HE SEES YOU.',
     },
     {
       id: 'turning-lock', type: 'rings', icon: '🌀', title: 'The Turning Lock',

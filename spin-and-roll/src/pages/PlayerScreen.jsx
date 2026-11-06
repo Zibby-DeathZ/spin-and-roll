@@ -42,6 +42,8 @@ import ClueReader from '../components/ClueReader';
 import RuneNotebook, { readerFor } from '../components/RuneNotebook';
 import { knownRunes, usePencil } from '../lib/runes';
 import { SecretGiftCard } from '../components/SecretGift';
+import { RelicCards } from '../components/Relics';
+import { DarkMazePhone } from '../components/DarkMaze';
 
 function AbilityCard({ sid, c, ability, dawn }) {
   const [used, setUsed] = useState(false);
@@ -162,6 +164,7 @@ function Sheet({ sid, c, currency, data, points, clk, scenes = null, loc, discov
       )}
       {fam?.ability && <AbilityCard sid={sid} c={c} ability={fam.ability} dawn={clk.dawn} />}
       <SecretGiftCard c={c} dawn={clk.dawn} />
+      <RelicCards c={c} dawn={clk.dawn} />
       <HouseCard sid={sid} c={c} dawn={clk.dawn} hod={hod} />
       <OwlArchive owls={owls} />
       {fam && (
@@ -419,6 +422,13 @@ export default function PlayerScreen() {
         </p>
       </main>
     );
+  }
+
+  // The Mirror in the Dark: every phone goes black until its owner says "Lumos".
+  const pz = session.state?.puzzle;
+  const pzDef = pz && data.puzzles?.find((p) => p.id === pz.id);
+  if (pz && !pz.solved && pzDef?.type === 'darkmaze') {
+    return <DarkMazePhone sid={sid} uid={user.uid} p={pzDef} st={pz} house={me?.house} />;
   }
 
   const q = session.state?.quiz;

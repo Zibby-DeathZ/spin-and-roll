@@ -265,9 +265,9 @@ export function TVMarauders({ data, session, chars }) {
 }
 
 // ---------- Phone ----------
-const SR = typeof window !== 'undefined' ? window.SpeechRecognition || window.webkitSpeechRecognition : null;
+export const SR = typeof window !== 'undefined' ? window.SpeechRecognition || window.webkitSpeechRecognition : null;
 
-function useListener(onHeard) {
+export function useListener(onHeard) {
   const [state, setState] = useState('idle'); // idle | listening | error
   const [interim, setInterim] = useState('');
   const [err, setErr] = useState('');

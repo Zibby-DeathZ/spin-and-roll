@@ -844,6 +844,54 @@ async function applyAbility(sid, eid) {
   });
 }
 
+// The Mirror in the Dark: a phone said "Lumos" (or "Nox"). Marks it lit on the puzzle so the TV can show it.
+async function applyLumos(sid, eid) {
+  const eRef = doc(db, 'sessions', sid, 'events', eid);
+  await runTransaction(db, async (tx) => {
+    const e = (await tx.get(eRef)).data();
+    if (!e || e.processed) return;
+    const sSnap = await tx.get(doc(db, 'sessions', sid));
+    const pz = sSnap.data()?.state?.puzzle;
+    // The Mirror in the Dark: "Lumos" at the lit pedestal floods the whole maze with light.
+    if (pz && !pz.solved && e.payload?.maze) {
+      if (pz.riddle && !pz.lumos) tx.update(sSnap.ref, { 'state.puzzle.lumos': true, 'state.puzzle.lightbox': true });
+      else { tx.update(eRef, { processed: true, failed: true }); return; }
+    } else if (pz && !pz.solved && e.actorUid) tx.update(sSnap.ref, { [`state.puzzle.lit.${e.actorUid}`]: !!e.payload?.on });
+    tx.update(eRef, { processed: true });
+  });
+}
+
+// The Mirror in the Dark: a phone walked. Keeps the GM screen's copy of where everyone is, and the mirror's
+// cold costs 1d4 HP when it throws someone back to their start.
+async function applyMazeMove(sid, eid) {
+  const eRef = doc(db, 'sessions', sid, 'events', eid);
+  await runTransaction(db, async (tx) => {
+    const e = (await tx.get(eRef)).data();
+    if (!e || e.processed) return;
+    const sSnap = await tx.get(doc(db, 'sessions', sid));
+    const cSnap = await tx.get(charRef(sid, e.actorUid));
+    const pz = sSnap.data()?.state?.puzzle;
+    const p = e.payload ?? {};
+    let dmg = 0;
+    if (pz && !pz.solved && Array.isArray(p.pos)) {
+      const u = e.actorUid;
+      tx.update(sSnap.ref, {
+        [`state.puzzle.pos.${u}`]: [p.pos[0], p.pos[1]],
+        [`state.puzzle.centre.${u}`]: !!p.centre,
+        [`state.puzzle.out.${u}`]: !!p.out,
+      });
+      const c = cSnap.data();
+      if ((p.kind === 'thrown' || p.kind === 'caught') && c) {
+        dmg = 1 + Math.floor(Math.random() * 4);
+        tx.update(cSnap.ref, { hp: clamp(c.hp - dmg, 0, c.maxHp) });
+      }
+      // Having caught someone, the watcher melts back into the far dark.
+      if (p.kind === 'caught') tx.update(sSnap.ref, { 'state.puzzle.watcher': null });
+    }
+    tx.update(eRef, { processed: true, payload: { ...p, dmg } });
+  });
+}
+
 const HANDLERS = {
   purchase: (sid, id, data) => applyPurchase(sid, id, data),
   spell_cast: (sid, id, data) => applyCast(sid, id, data),
@@ -854,7 +902,11 @@ const HANDLERS = {
   pickup: (sid, id, data) => applyPickup(sid, id, data),
   // A roll only needs the GM screen when Gryffindor's Nerve re-rolled it (handled below).
   roll: (sid, id) => updateDoc(doc(db, 'sessions', sid, 'events', id), { processed: true }),
+  lumos: (sid, id) => applyLumos(sid, id),
+  maze_move: (sid, id) => applyMazeMove(sid, id),
 };
+export const __lumosForTest = applyLumos; // for the offline checks
+export const __mazeForTest = applyMazeMove; // for the offline checks
 
 export function useGameEngine(sid, data) {
   useEffect(() => {
@@ -1034,6 +1086,18 @@ export function describe(e, nameOf) {
       return e.payload.delta > 0
         ? { icon: '⏳', text: `${e.payload.delta} points to ${e.payload.house}! ${target}${why}`, tone: `house-${e.payload.house.toLowerCase()}`, big: true }
         : { icon: '⏳', text: `${-e.payload.delta} points from ${e.payload.house}. ${target}${why}`, tone: 'ember', big: true };
+    }
+    case 'lumos':
+      if (e.payload?.maze) return e.failed ? null : { icon: '✨', text: e.actorUid ? `${actor}: “Lumos!” Light floods the maze` : 'Lumos! Light floods the maze', tone: 'gold', big: true };
+      return e.payload?.on ? { icon: '✨', text: `${actor}: Lumos!`, tone: 'violet' } : null;
+    case 'maze_riddle': return { icon: '🕯️', text: 'The four houses stand together. A stone pedestal begins to glow', tone: 'violet', big: true };
+    case 'maze_move': {
+      const k = e.payload?.kind;
+      if (k === 'centre') return { icon: '◎', text: `${actor} found the centre of the maze`, tone: 'violet' };
+      if (k === 'out') return { icon: '★', text: `${actor} found the way out!`, tone: 'gold', big: true };
+      if (k === 'thrown') return { icon: '🪞', text: `The mirror throws ${actor} back to the start${e.payload?.dmg ? ` (−${e.payload.dmg} HP)` : ''}`, tone: 'ember' };
+      if (k === 'caught') return { icon: '👁️', text: `Something in the dark caught ${actor}${e.payload?.dmg ? ` (−${e.payload.dmg} HP)` : ''}`, tone: 'ember', big: true };
+      return null;
     }
     case 'puzzle_start': return { icon: e.payload.icon, text: `A puzzle! ${e.payload.title}. Look at the TV`, tone: 'violet', big: true };
     case 'puzzle_solved': return { icon: '✨', text: `Solved: ${e.payload.title}!`, tone: 'teal', big: true };

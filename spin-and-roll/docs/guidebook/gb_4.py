@@ -103,6 +103,9 @@ BLOCKS = [
         ('They find the Kitchens', 'Tickle the pear. Pip feeds them. The Small chest is by the ovens.'),
         ('They go to the Forest', 'Out of bounds. The centaur is there, speaking to the sky. Spin the Forest wheel.'),
     ]),
+    ('h3', 'The mirror in the Library'),
+    ('p', 'Whenever the party is in the Library during Free time (or you steer them there: a rumour that the tall mirror at the end of the stacks shows you your future), run <b>The Mirror in the Dark</b>. It is the big moment of Day 1: every house has to work together, and it uses the Lumos they learned that morning (without telling them so). Everything you need is in the Props Book chapter of the same name and in the DM Guide.'),
+    ('read', 'At the far end of the Library, past the last shelf, stands a mirror taller than a door. Your reflections look back at you, but a moment late. As you lean closer, the glass ripples like water.'),
     ('tip', 'Day 1 Free time is the best moment to show them how big the world is. If they only do the quest, describe what they pass on the way: an owl with a parcel too heavy for it, a ghost crying in a corridor, a portrait of a knight challenging them to a duel.'),
 
     ('h2', 'Day 1, Curfew'),

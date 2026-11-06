@@ -91,6 +91,7 @@ export function initialState(p) {
     case 'stairs': return { rots: p.tiles.map((t) => t[1]) };
     case 'slider': return { tiles: [...p.start] };
     case 'runefloor': return { path: [], trapped: null };
+    case 'darkmaze': return { lit: {}, lightbox: false, maps: {}, pos: {}, centre: {}, out: {}, run: Date.now(), riddle: false, lumos: false, watcher: null, watcherOn: true };
     default: return {};
   }
 }
@@ -110,6 +111,11 @@ export function isSolved(p, st) {
     case 'stairs': return stairsConnected(p, st.rots);
     case 'slider': return st.tiles.every((t, i) => t === (i === 8 ? 0 : i + 1));
     case 'runefloor': return st.path.length > 0 && Math.floor(st.path[st.path.length - 1] / p.grid[0].length) === 0;
+    case 'darkmaze': {
+      // Solved when everyone who stepped into the maze has walked out.
+      const walkers = Object.keys(st.pos ?? {});
+      return walkers.length > 0 && walkers.every((u) => st.out?.[u]);
+    }
     default: return false; // chess: the GM judges
   }
 }

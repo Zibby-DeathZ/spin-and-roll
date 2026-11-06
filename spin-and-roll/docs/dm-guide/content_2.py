@@ -33,7 +33,7 @@ BLOCKS = [
         ['Morning class', '<b>Charms</b> with Professor Flitwick. Teaches <b>Lumos</b>. Minigame: Wand Motion.', 'Charms classroom'],
         ['Lunch', 'Prefect Sinclair finds the group and offers <b>Keep an Eye Out</b>.', 'Great Hall'],
         ['Afternoon class', '<b>Potions</b> with Professor Grimsby. Teaches <b>Pepperup Potion</b> (2). Minigame: Stir Timing.', 'Dungeons'],
-        ['Free time', 'Grimsby storms past furious: his store cupboard was raided. Offer <b>Stolen Ingredients</b>.', 'Dungeons'],
+        ['Free time', 'Grimsby storms past furious: his store cupboard was raided. Offer <b>Stolen Ingredients</b>. <b>Beat:</b> the tall mirror in the Library: <b>The Mirror in the Dark</b>.', 'Dungeons, Library'],
         ['Curfew', '<b>Beat:</b> a covered painting is hung in a corridor near the Undercroft.', 'Anywhere'],
     ]),
     ('read', 'Professor Grimsby does not look up when you come in. “Sit. Open your books. If anyone’s cauldron explodes, they clean it up themselves.” He is thin and grey and smells faintly of sulphur. Nobody likes him. You can tell he likes it that way.'),

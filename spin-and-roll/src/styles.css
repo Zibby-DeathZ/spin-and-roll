@@ -2416,3 +2416,96 @@ button.status-chip.removable:hover { background: rgba(200, 60, 80, 0.3); }
 .gift-card { border-color: rgba(167, 139, 250, .55); background: linear-gradient(160deg, rgba(167, 139, 250, .12), rgba(0, 0, 0, 0) 60%); }
 .gift-kicker { margin: 0 0 2px; font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: #c4b5fd; }
 .gift-how { margin-bottom: 0; }
+
+/* ---------- The Mirror in the Dark ---------- */
+.dark-tv { position: fixed; inset: 0; z-index: 60; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.2rem; transition: background 1.2s; }
+.dark-tv.some-light { background: radial-gradient(circle at 50% 55%, #3a3220 0%, #0b0a08 55%, #000 100%); }
+.dark-tv-title { font-family: 'Cinzel', serif; font-size: 2.2rem; letter-spacing: .12em; color: #2c2a33; margin: 0; }
+.dark-tv.some-light .dark-tv-title { color: #8d7a4c; }
+.dark-tv-sub { color: #24222a; font-style: italic; font-size: 1.3rem; margin: 0; }
+.dark-tv-lights { display: flex; gap: 2.4rem; flex-wrap: wrap; justify-content: center; }
+.dark-tv-light { display: flex; flex-direction: column; align-items: center; gap: .6rem; color: #f3e7c4; font-size: 1.1rem; }
+.dark-tv-light i { width: 56px; height: 56px; border-radius: 50%; background: radial-gradient(circle, #fffbe8 0%, #ffe9a8 35%, rgba(255, 220, 140, 0) 70%); box-shadow: 0 0 60px 30px rgba(255, 230, 160, .35); animation: lumos-flicker 2.4s ease-in-out infinite; }
+@keyframes lumos-flicker { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .82; transform: scale(.94); } }
+.dark-tv-lightbox { background: #fff; }
+.dark-tv-lightbox .dark-tv-hint { position: absolute; bottom: 2rem; color: #c9c9c9; font-size: 1rem; }
+.dark-tv-out { background: radial-gradient(circle at 50% 40%, #d9d4c4 0%, #4b4a52 45%, #0b0a10 100%); }
+.dark-tv-out .dark-tv-title { color: #1b1a22; }
+.dark-tv-out .dark-tv-sub { color: #f1ecdf; }
+
+.dark-phone { position: fixed; inset: 0; z-index: 80; background: #000; color: #57535f; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; padding: 2rem 1.4rem; text-align: center; }
+.dark-phone-title { font-family: 'Cinzel', serif; font-size: 1.5rem; color: #6f6a78; margin: 0; }
+.dark-phone-sub { font-style: italic; margin: 0 0 1rem; line-height: 1.5; }
+.dark-mic { display: flex; flex-direction: column; align-items: center; gap: .5rem; width: min(260px, 80vw); padding: 1.4rem 1rem; border-radius: 22px; border: 1px solid #3a3644; background: #0e0d12; color: #d8cfa8; font: inherit; font-size: 1.05rem; cursor: pointer; }
+.dark-mic span { font-size: 2rem; }
+.dark-mic:disabled { border-color: #8d7a4c; box-shadow: 0 0 30px rgba(220, 190, 110, .25); }
+.dark-phone-err { color: #b58f86; font-size: .9rem; margin: 0; }
+.dark-phone-tap { color: #4d4955; margin-top: 1rem; }
+.dark-phone.lit { background: #fff; color: #888; justify-content: flex-end; }
+.lumos-glow { position: absolute; inset: 0; background: radial-gradient(circle at 50% 45%, #ffffff 0%, #fffdf6 55%, #fff6dc 100%); pointer-events: none; }
+.lumos-tools { position: relative; display: flex; flex-direction: column; align-items: center; gap: .5rem; opacity: .55; }
+.lumos-tools .btn { background: #f4f1e8; color: #555; border-color: #ddd; }
+
+.dark-gm { display: grid; gap: .7rem; }
+.dark-gm-row { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; }
+.maze-key { width: min(100%, 520px); background: #f7f3e8; border-radius: 10px; }
+.maze-key .mk-floor { fill: #f7f3e8; }
+.maze-key .mk-centre { fill: #e9e1f5; }
+.maze-key .mk-walls line { stroke: #1d1a2e; stroke-width: 1.3; stroke-linecap: round; }
+.maze-key .mk-path { fill: none; stroke: #d2a338; stroke-width: 3.4; stroke-linejoin: round; stroke-linecap: round; opacity: .85; }
+.maze-key .mk-start { fill: #fff; stroke: #5b3f8c; stroke-width: .8; }
+.maze-key .mk-num { font: 700 3.6px sans-serif; text-anchor: middle; fill: #5b3f8c; }
+.maze-key .mk-false { font: 700 6px sans-serif; text-anchor: middle; fill: #a8392a; }
+.maze-key .mk-out { font: 700 4.2px sans-serif; text-anchor: middle; fill: #8a6410; }
+
+/* ---------- Relics ---------- */
+.relics-gm { display: grid; gap: 6px; margin: 6px 0; }
+.relic-row.rarity-mythic { border-color: rgba(227, 176, 75, .7); background: rgba(227, 176, 75, .08); }
+.relic-rarity { font-size: .7rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #c4b5fd; margin-left: 4px; }
+.rarity-mythic .relic-rarity { color: #e3b04b; }
+.relic-title { grid-template-columns: 70px 1fr 120px; }
+.relic-card { border-top-color: #9b8ad8; background: linear-gradient(160deg, rgba(155, 138, 216, .14), rgba(0, 0, 0, 0) 60%), var(--panel); }
+.relic-card.rarity-mythic { border-top-color: #e3b04b; background: linear-gradient(160deg, rgba(227, 176, 75, .16), rgba(0, 0, 0, 0) 60%), var(--panel); }
+.relic-kicker { margin: 0 0 2px; font-size: .75rem; letter-spacing: .1em; text-transform: uppercase; color: #c4b5fd; }
+.rarity-mythic .relic-kicker { color: #e3b04b; }
+.relic-card.rarity-mythic h2 { color: #f0cf7d; }
+.relic-lore { font-style: italic; opacity: .85; }
+
+/* Mirror maze: walking */
+.maze-status { text-align: center; max-width: 340px; }
+.maze-map { margin: 0; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; color: #6d6878; }
+.maze-said { margin: .3rem 0 0; min-height: 2.6em; color: #b3aac4; font-style: italic; }
+.maze-pad { display: grid; grid-template-columns: repeat(3, 72px); grid-template-rows: repeat(3, 64px); gap: 6px; margin: .4rem 0; }
+.maze-btn { border-radius: 16px; border: 1px solid #34303f; background: #0f0e14; color: #cfc6a6; font-size: 1.6rem; cursor: pointer; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+.maze-btn:active { background: #1f1c29; transform: scale(.96); }
+.maze-up { grid-column: 2; grid-row: 1; }
+.maze-left { grid-column: 1; grid-row: 2; }
+.maze-right { grid-column: 3; grid-row: 2; }
+.maze-down { grid-column: 2; grid-row: 3; }
+.dark-phone { overflow-y: auto; }
+.dark-phone.lit .maze-btn { background: #f2efe6; border-color: #ddd8ca; color: #8a8478; }
+.dark-phone.lit .maze-said, .dark-phone.lit .maze-map { color: #8a8478; }
+.dark-phone.lit .lumos-tools { opacity: .8; }
+.dark-phone.out { background: radial-gradient(circle at 50% 40%, #e8e2cf 0%, #5a5866 55%, #121019 100%); }
+.dark-phone.out .dark-phone-title { color: #1b1a22; }
+.dark-phone.out .dark-phone-sub { color: #f4efe2; }
+.dark-tv-progress { display: flex; gap: 2rem; color: #6e6656; font-size: 1.1rem; margin: 0; }
+.maze-assign { display: grid; gap: 4px; }
+.maze-assign-row { display: grid; grid-template-columns: 110px 230px 1fr; gap: 8px; align-items: center; }
+.maze-assign-name { font-weight: 600; }
+.maze-assign select { font: inherit; color: inherit; background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .16); border-radius: 8px; padding: 4px 6px; }
+.maze-key .mk-person circle { fill: #2a8a7f; stroke: #fff; stroke-width: .6; }
+.maze-key .mk-person text { font: 700 3.2px sans-serif; text-anchor: middle; fill: #fff; }
+
+/* Mirror maze: the pedestal and the watcher */
+.maze-stage { display: flex; flex-direction: column; align-items: center; gap: .6rem; position: relative; width: 100%; }
+.pedestal { position: relative; display: flex; flex-direction: column; align-items: center; }
+.pedestal-glow { width: 220px; height: 120px; border-radius: 50%; background: radial-gradient(ellipse, rgba(255, 214, 140, .55) 0%, rgba(255, 190, 100, .12) 45%, rgba(0, 0, 0, 0) 70%); animation: lumos-flicker 3s ease-in-out infinite; }
+.pedestal-riddle { display: flex; flex-direction: column; gap: .5rem; text-align: center; font-family: 'Cinzel', serif; color: #c9a85e; font-size: 1.9rem; letter-spacing: .04em; margin: 0; animation: riddle-in 4s ease-out both; }
+@keyframes riddle-in { from { opacity: 0; filter: blur(6px); } to { opacity: 1; filter: none; } }
+.dark-tv.pedestal-lit { background: radial-gradient(circle at 50% 45%, #2a2010 0%, #0a0806 45%, #000 100%); }
+.pedestal-phone { padding: .9rem 1rem; border: 1px solid #4a3d22; border-radius: 14px; background: radial-gradient(ellipse at 50% 0%, rgba(255, 200, 110, .14), rgba(0, 0, 0, 0) 70%); }
+.pedestal-phone .pedestal-riddle { font-size: 1rem; gap: .35rem; }
+.maze-lit-line { margin: 0; color: #8a8478; font-style: italic; text-align: center; }
+.maze-key .mk-watcher circle { fill: #3a0d0d; stroke: #ff6b6b; stroke-width: .8; }
+.maze-key .mk-watcher text { font-size: 4.5px; text-anchor: middle; }

@@ -88,6 +88,25 @@ export const SFX = {
     tone(1245, { attack: 0.005, decay: 0.7, vol: 0.15, type: 'square', slideTo: 200 });
     tone(55, { at: 0.05, decay: 1.2, vol: 0.5, slideTo: 30 });
   },
+  // ---------- The Mirror in the Dark ----------
+  drip: () => { tone(1400 + Math.random() * 900, { decay: 0.18, vol: 0.07, slideTo: 500 }); tone(2600, { at: 0.03, decay: 0.08, vol: 0.02 }); },
+  bump: () => { tone(70, { decay: 0.35, vol: 0.5, slideTo: 40 }); noise({ decay: 0.12, vol: 0.18, from: 600, to: 150, type: 'lowpass' }); },
+  heartbeat: () => { tone(55, { decay: 0.16, vol: 0.55, slideTo: 40 }); tone(50, { at: 0.22, decay: 0.2, vol: 0.45, slideTo: 36 }); },
+  whisper: () => { noise({ attack: 0.25, decay: 1.1, vol: 0.12, from: 2500, to: 5200, q: 3 }); noise({ at: 0.5, attack: 0.2, decay: 0.8, vol: 0.08, from: 4000, to: 2000, q: 4 }); },
+  caught: () => {
+    noise({ attack: 0.01, decay: 1.2, vol: 0.4, from: 300, to: 3500, q: 0.6 });
+    tone(220, { attack: 0.01, decay: 1.0, vol: 0.2, type: 'sawtooth', slideTo: 55 });
+    tone(40, { at: 0.1, decay: 1.4, vol: 0.5, slideTo: 25 });
+  },
+  pedestal: () => {
+    [196, 247, 294, 392].forEach((f, i) => tone(f, { at: i * 0.45, attack: 1.0, decay: 3.2, vol: 0.08, type: 'triangle' }));
+    tone(784, { at: 1.8, attack: 0.6, decay: 3, vol: 0.05 });
+  },
+  lumos: () => {
+    noise({ attack: 0.4, decay: 1.6, vol: 0.18, from: 600, to: 7000, q: 0.5 });
+    [1046, 1319, 1568, 2093, 2637, 3136].forEach((f, i) => tone(f, { at: 0.2 + i * 0.07, decay: 1.6, vol: 0.07 }));
+    tone(262, { attack: 0.3, decay: 2.5, vol: 0.12, type: 'triangle' });
+  },
   // A slow, rising shimmer for the studio ident.
   swell: () => {
     [262, 330, 392, 523, 659].forEach((f, i) => tone(f, { at: i * 0.35, attack: 1.2, decay: 3.5, vol: 0.07, type: 'triangle' }));
@@ -123,6 +142,9 @@ export function soundForEvent(e) {
     case 'travel': case 'moved': return 'swish';
     case 'lesson_failed': return 'lowChime';
     case 'time_turner': return ['sparkle', 'bell'];
+    case 'maze_move': return p.kind === 'centre' ? 'chime' : p.kind === 'out' ? 'sparkle' : p.kind === 'caught' || p.kind === 'thrown' ? 'caught' : null;
+    case 'maze_riddle': return 'pedestal';
+    case 'lumos': return p.maze ? 'lumos' : null;
     default: return null;
   }
 }
@@ -163,4 +185,37 @@ export function playFile(src) {
     a.onerror = () => resolve(false);
     a.play().catch(() => resolve(false));
   });
+}
+
+// ---------- A drone and drips, for the dark ----------
+let drone = null;
+export function startDrone() {
+  if (!audioReady() || drone) return;
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0.0001, now());
+  g.gain.exponentialRampToValueAtTime(0.09, now() + 3);
+  const f = ctx.createBiquadFilter();
+  f.type = 'lowpass';
+  f.frequency.value = 220;
+  const oscs = [41, 41.7, 61.5].map((hz) => {
+    const o = ctx.createOscillator();
+    o.type = 'sawtooth';
+    o.frequency.value = hz;
+    o.connect(f);
+    o.start();
+    return o;
+  });
+  f.connect(g).connect(master);
+  const drips = setInterval(() => { if (Math.random() < 0.6) play('drip'); if (Math.random() < 0.08) play('whisper'); }, 1700);
+  drone = { g, oscs, drips };
+}
+export function stopDrone() {
+  if (!drone) return;
+  const { g, oscs, drips } = drone;
+  drone = null;
+  clearInterval(drips);
+  try {
+    g.gain.exponentialRampToValueAtTime(0.0001, now() + 1.5);
+    oscs.forEach((o) => o.stop(now() + 1.6));
+  } catch { /* already stopped */ }
 }

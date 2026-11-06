@@ -467,10 +467,271 @@ def t8(c):
     c.showPage()
 
 
+# ---------- T9 / T10: the Mirror Maze ----------
+MAZE = json.load(open(os.path.join(HERE, 'mirror-maze.json'), encoding='utf-8'))
+HOUSES = MAZE['houses']
+HOUSE_COLOUR = {'Gryffindor': '#8e1f1f', 'Hufflepuff': '#a07a12', 'Ravenclaw': '#1f3f8e', 'Slytherin': '#1f6b3a'}
+# Each house's map was drawn long ago by one student who escaped the mirror. Their own words.
+MAPMAKERS = {
+    'Gryffindor': ('Aldous Penhallow', 'I came through the glass and ran. This is all I remember. The others drew the rest.'),
+    'Hufflepuff': ('Merryn Holt', 'I walked it twice, slowly. My part is right. Trust the others for theirs.'),
+    'Ravenclaw': ('Isolde Varga', 'I measured what I could in the dark. Where my lines stop, I could not see.'),
+    'Slytherin': ('Silas Crane', 'I marked only what was useful to me. Find the others where the four roads meet. We did.'),
+}
+MZ = 165 * mm                     # maze width and height
+MX = (PW - MZ) / 2                # same place on every page, so the stack lines up
+MY = 62 * mm
+
+
+def mxy(r, c):
+    """Top-left corner of cell (r, c) in page coordinates."""
+    cs = MZ / MAZE['n']
+    return MX + c * cs, MY + MZ - r * cs
+
+
+def draw_wall(c, w, width=2.2):
+    kind, r, col = w[0], int(w[1]), int(w[2])
+    cs = MZ / MAZE['n']
+    c.setLineWidth(width)
+    c.setLineCap(1)
+    if kind == 'h':   # below cell (r, col)
+        x, y = mxy(r + 1, col)
+        c.line(x, y, x + cs, y)
+    else:             # right of cell (r, col)
+        x, y = mxy(r, col + 1)
+        c.line(x, y, x, y - cs)
+
+
+def cell_centre(r, col):
+    cs = MZ / MAZE['n']
+    x, y = mxy(r, col)
+    return x + cs / 2, y - cs / 2
+
+
+def registration(c):
+    """Crosshairs in the same four places on every map: line them up before you light the stack."""
+    c.setStrokeColor(INK)
+    c.setLineWidth(.6)
+    for x, y in ((MX - 8 * mm, MY - 8 * mm), (MX + MZ + 8 * mm, MY - 8 * mm), (MX - 8 * mm, MY + MZ + 8 * mm), (MX + MZ + 8 * mm, MY + MZ + 8 * mm)):
+        c.circle(x, y, 2.6 * mm)
+        c.line(x - 4 * mm, y, x + 4 * mm, y)
+        c.line(x, y - 4 * mm, x, y + 4 * mm)
+
+
+def wedge(c, x, y, rad, k):
+    """Quarter k of a circle: whole only when all four maps are stacked."""
+    p = c.beginPath()
+    p.moveTo(x, y)
+    p.arcTo(x - rad, y - rad, x + rad, y + rad, startAng=90 - (k + 1) * 90, extent=90)
+    p.close()
+    c.setFillColor(INK)
+    c.drawPath(p, stroke=0, fill=1)
+
+
+def quadrant_clip(c, cx, cy, k, big=400 * mm):
+    """Clip to one quarter of the page around (cx, cy): 0 top-left, 1 top-right, 2 bottom-right, 3 bottom-left."""
+    x = cx - big if k in (0, 3) else cx
+    y = cy if k in (0, 1) else cy - big
+    p = c.beginPath()
+    p.rect(x, y, big, big)
+    c.clipPath(p, stroke=0, fill=0)
+
+
+def hidden_picture(c, k):
+    """The secret only the stack shows: a great eye round the centre, and HE SEES YOU beneath the maze.
+    Each map carries one quarter of every line, so alone it is just a few odd curves."""
+    cx, cy = cell_centre(7, 7)
+    grey = colors.HexColor('#8d8d8d')
+    c.saveState()
+    quadrant_clip(c, cx, cy, k)
+    c.setStrokeColor(grey)
+    c.setLineWidth(3.2)
+    w, h = 74 * mm, 40 * mm
+    for sgn in (1, -1):  # upper and lower lids
+        p = c.beginPath()
+        p.moveTo(cx - w, cy)
+        p.curveTo(cx - w * .45, cy + sgn * h, cx + w * .45, cy + sgn * h, cx + w, cy)
+        c.drawPath(p, stroke=1, fill=0)
+    c.setLineWidth(2.4)
+    for t in range(-4, 5):  # lashes on the upper lid
+        x = cx + t * w * .19
+        frac = (x - cx) / w
+        y = cy + h * .75 * (1 - frac * frac)
+        c.line(x, y, x + t * 1.2 * mm, y + 7 * mm)
+    c.setLineWidth(3.2)
+    c.circle(cx, cy, 25 * mm)
+    c.setLineWidth(5)
+    c.circle(cx, cy, 9 * mm)
+    c.restoreState()
+    # The words, each letter split into quarters the same way.
+    msg, size = 'HE SEES YOU', 34
+    total = c.stringWidth(msg, SERIF_B, size)
+    x = PW / 2 - total / 2
+    y = MY - 27 * mm
+    for ch in msg:
+        cw = c.stringWidth(ch, SERIF_B, size)
+        if ch != ' ':
+            c.saveState()
+            quadrant_clip(c, x + cw / 2, y + size * .35, k, big=30 * mm)
+            c.setFillColor(grey)
+            c.setFont(SERIF_B, size)
+            c.drawString(x, y, ch)
+            c.restoreState()
+        x += cw
+
+
+def door_label(c, cell, side, text, colour=INK):
+    x, y = cell_centre(*cell)
+    cs = MZ / MAZE['n']
+    off = cs / 2 + 4.5 * mm
+    dx, dy = {'N': (0, off), 'S': (0, -off - 2 * mm), 'W': (-off - 3 * mm, -1 * mm), 'E': (off + 3 * mm, -1 * mm)}[side]
+    c.setFillColor(colour)
+    c.setFont(SANS_B, 7.5)
+    c.drawCentredString(x + dx, y + dy, text)
+
+
+def star_mark(c, x, y, r):
+    p = c.beginPath()
+    for i in range(10):
+        a = math.pi / 2 + i * math.pi / 5
+        rr = r if i % 2 == 0 else r * .42
+        (p.moveTo if i == 0 else p.lineTo)(x + rr * math.cos(a), y + rr * math.sin(a))
+    p.close()
+    c.setFillColor(INK)
+    c.drawPath(p, stroke=0, fill=1)
+
+
+def centre_room(c):
+    rows = [rc[0] for rc in MAZE['centre']]
+    cols = [rc[1] for rc in MAZE['centre']]
+    x0, y0 = mxy(min(rows), min(cols))
+    x1, y1 = mxy(max(rows) + 1, max(cols) + 1)
+    c.setStrokeColor(INK)
+    c.setLineWidth(.6)
+    c.setDash(2, 2)
+    c.rect(x0 + 1.5 * mm, y1 + 1.5 * mm, x1 - x0 - 3 * mm, y0 - y1 - 3 * mm)
+    c.setDash()
+    c.setFont(SERIF_I, 8)
+    c.setFillColor(INK)
+    c.drawCentredString((x0 + x1) / 2, (y0 + y1) / 2 - 1 * mm, 'the centre')
+
+
+def t9(c):
+    for i, house in enumerate(HOUSES):
+        maker, words = MAPMAKERS[house]
+        c.setFillColor(INK)
+        c.setFont(SERIF_B, 15)
+        c.drawCentredString(PW / 2, PH - M - 7 * mm, 'The way through the dark')
+        # Each signature sits on its own line, so stacked maps show all four neatly, one under another.
+        y = PH - M - 13 * mm - i * 4.6 * mm
+        c.setFillColor(colors.HexColor(HOUSE_COLOUR[house]))
+        c.setFont(SERIF_I, 8.6)
+        c.drawCentredString(PW / 2, y, f'“{words}”  {maker}, {house}, 1726')
+        registration(c)
+        hidden_picture(c, i)
+        c.setStrokeColor(INK)
+        for w in MAZE['sheets'][i]:
+            draw_wall(c, w)
+        centre_room(c)
+        for key, slices in MAZE['circles'].items():
+            if i in slices:
+                r, col = map(int, key.split(','))
+                wedge(c, *cell_centre(r, col), 3.2 * mm, i)
+        sx, sy = cell_centre(*MAZE['starts'][i])
+        star_mark(c, sx, sy, 3.6 * mm)
+        c.setFont(SANS_B, 6.5)
+        c.setFillColor(INK)
+        c.drawCentredString(sx, sy - 5.6 * mm, 'YOU')
+        door_label(c, MAZE['falseDoors'][i], MAZE['falseSides'][i], 'EXIT')
+        c.setFont(SANS, 7)
+        c.setFillColor(G.MUTED)
+        c.drawString(L, M - 2 * mm, f'The Hollow Heir · Props Book · T9 Mirror Maze, the {house} map · print at 100%')
+        c.showPage()
+
+
+def t10(c):
+    c.setFillColor(INK)
+    c.setFont(SERIF_B, 15)
+    c.drawCentredString(PW / 2, PH - M - 8 * mm, 'T10  The Mirror Maze: GM key (do not hand out)')
+    c.setFont(SANS, 8)
+    c.setFillColor(SEPIA)
+    c.drawCentredString(PW / 2, PH - M - 14 * mm, 'Every real wall. Gold: the only way out. G H R S: where each house starts. X: the bricked-up EXITs.')
+    c.setStrokeColor(colors.HexColor('#cfc3e6'))
+    c.setLineWidth(1.6)
+    for route in MAZE['routes']:
+        pts = [cell_centre(*rc) for rc in route] + [cell_centre(7, 7)]
+        for a, b in zip(pts, pts[1:]):
+            c.line(*a, *b)
+    c.setStrokeColor(GOLD)
+    c.setLineWidth(3)
+    pts = [cell_centre(7, 7)] + [cell_centre(*rc) for rc in MAZE['truePath']]
+    for a, b in zip(pts, pts[1:]):
+        c.line(*a, *b)
+    c.setStrokeColor(INK)
+    for w in MAZE['walls']:
+        draw_wall(c, w, 2)
+    centre_room(c)
+    for i, s0 in enumerate(MAZE['starts']):
+        x, y = cell_centre(*s0)
+        c.setStrokeColor(colors.HexColor(HOUSE_COLOUR[HOUSES[i]]))
+        c.setFillColor(colors.white)
+        c.circle(x, y, 3.4 * mm, stroke=1, fill=1)
+        c.setFillColor(colors.HexColor(HOUSE_COLOUR[HOUSES[i]]))
+        c.setFont(SERIF_B, 8)
+        c.drawCentredString(x, y - 1.3 * mm, HOUSES[i][0])
+    for d, sd in zip(MAZE['falseDoors'], MAZE['falseSides']):
+        door_label(c, d, sd, 'X', colors.HexColor('#a8392a'))
+    door_label(c, MAZE['exit'], MAZE['exitSide'], 'OUT', GOLD)
+    c.setFont(SANS, 8)
+    c.setFillColor(INK)
+    lines = [
+        'The phones enforce the walls, move the watcher and show the riddle. This sheet is for you to follow along.',
+        'Each house map is exact from its YOU to the centre. Beyond it, each shows only some walls, and its own EXIT is bricked up.',
+        'Stacked against the lit TV: the walls add up, every EXIT closes, the whole circles (a quarter from each map) mark the way out,',
+        'and a great eye appears round the centre, with HE SEES YOU beneath the maze.',
+    ]
+    for k, t in enumerate(lines):
+        c.drawString(MX, MY - 16 * mm - k * 4.2 * mm, t)
+    c.setFont(SANS, 7)
+    c.setFillColor(G.MUTED)
+    c.drawString(L, M - 2 * mm, 'The Hollow Heir · Props Book · T10 · GM only')
+    c.showPage()
+
+
+# ---------- T11: relic cards ----------
+def relic_card(c, x, y, w, h, r):
+    mythic = r['rarity'] == 'Mythic'
+    cutbox(c, x, y, w, h, fill=colors.white)
+    c.setStrokeColor(GOLD if mythic else colors.HexColor('#5b3f8c'))
+    c.setLineWidth(1.4 if mythic else .9)
+    c.roundRect(x + 2.5 * mm, y + 2.5 * mm, w - 5 * mm, h - 5 * mm, 2.5 * mm)
+    if mythic:
+        c.setLineWidth(.4)
+        c.roundRect(x + 4 * mm, y + 4 * mm, w - 8 * mm, h - 8 * mm, 2 * mm)
+    paras = [Paragraph(f'{r["rarity"].upper()} RELIC', S['kick']), Paragraph(r['name'], S['gifth']),
+             Paragraph(f'<i>{r["lore"]}</i>', S['gift'])]
+    if r.get('always'):
+        paras.append(Paragraph(f'<b>Always.</b> {r["always"]}', S['gift']))
+    paras.append(Paragraph(f'<b>When used.</b> {r["daily"]}', S['gift']))
+    paras.append(Paragraph(f'<b>The cost.</b> {r["drawback"]}', S['gift']))
+    text(c, x + 2 * mm, y + 2 * mm, w - 4 * mm, h - 4 * mm, paras, pad=5 * mm)
+
+
+def t11(c):
+    rel = list(D['relics'].values())
+    w, h = (IW - 6 * mm) / 2, 118 * mm
+    for p in range(0, len(rel), 4):
+        top = page(c, 'T11', f'Relic cards ({p // 4 + 1} of {(len(rel) + 3) // 4})', 'Hand over the card with the relic, in the story. Print on card if you can.')
+        for k, r in enumerate(rel[p:p + 4]):
+            row, col = divmod(k, 2)
+            relic_card(c, L + col * (w + 6 * mm), top - (row + 1) * h - row * 7 * mm, w, h, r)
+        c.showPage()
+
+
 def templates(path):
     c = canvas.Canvas(path, pagesize=A4)
     c.setTitle('The Hollow Heir: Props Book templates')
-    for f in (t1, t2, t3, t4, t5, t6, t7, t8):
+    for f in (t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11):
         f(c)
     c.save()
 
