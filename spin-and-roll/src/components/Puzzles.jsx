@@ -358,8 +358,8 @@ function Stairs({ p, st, gm, onAct }) {
 }
 
 // ---------- TV ----------
-export function TVPuzzle({ p, st, names = {} }) {
-  if (p.type === 'darkmaze') return <DarkMazeTV p={p} st={st} names={names} />;
+export function TVPuzzle({ sid, p, st, names = {} }) {
+  if (p.type === 'darkmaze') return <DarkMazeTV sid={sid} p={p} st={st} names={names} />;
   return (
     <div className={`tv-puzzle ${st.solved ? 'solved' : ''}`}>
       <h2>{p.icon} {p.title}</h2>

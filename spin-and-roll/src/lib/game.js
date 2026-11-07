@@ -875,7 +875,8 @@ async function applyMazeMove(sid, eid) {
     let dmg = 0;
     if (pz && !pz.solved && Array.isArray(p.pos)) {
       const u = e.actorUid;
-      tx.update(sSnap.ref, {
+      // Newer phones write their own spot (sessions/{sid}/maze/{uid}); only older ones need it copied here.
+      if (!p.direct) tx.update(sSnap.ref, {
         [`state.puzzle.pos.${u}`]: [p.pos[0], p.pos[1]],
         [`state.puzzle.centre.${u}`]: !!p.centre,
         [`state.puzzle.out.${u}`]: !!p.out,
@@ -908,25 +909,57 @@ const HANDLERS = {
 export const __lumosForTest = applyLumos; // for the offline checks
 export const __mazeForTest = applyMazeMove; // for the offline checks
 
+// Maze steps don't need a transaction: by now each phone saves its own spot. Old step events (from before that
+// change, or left over from a long maze) are just ticked off in big batches, so they can never clog the GM screen.
+const QUICK_MAZE = (e) => e.type === 'maze_move' && !['thrown', 'caught'].includes(e.payload?.kind);
+const ageOf = (e) => (e.createdAt?.toMillis ? Date.now() - e.createdAt.toMillis() : 0);
+
 export function useGameEngine(sid, data) {
   useEffect(() => {
     if (!data) return undefined; // wait until we know which campaign this is
     const busy = new Set();
+    // At most a few things at once, oldest first, so a flood of events can't stall the GM's own buttons.
+    const queue = [];
+    let running = 0;
+    const MAX = 3;
+    const pump = () => {
+      while (running < MAX && queue.length) {
+        const [id, fn] = queue.shift();
+        running += 1;
+        fn().catch(console.error).finally(() => { running -= 1; busy.delete(id); pump(); });
+      }
+    };
     const run = (id, fn) => {
       if (busy.has(id)) return;
       busy.add(id);
-      fn().catch(console.error).finally(() => busy.delete(id));
+      queue.push([id, fn]);
+      pump();
+    };
+    const tickOff = (ids) => {
+      for (let i = 0; i < ids.length; i += 400) {
+        const chunk = ids.slice(i, i + 400);
+        const b = writeBatch(db);
+        chunk.forEach((id) => { busy.add(id); b.update(doc(db, 'sessions', sid, 'events', id), { processed: true }); });
+        b.commit().catch(console.error).finally(() => chunk.forEach((id) => busy.delete(id)));
+      }
     };
     const stopTrades = onSnapshot(query(col(sid, 'trades'), where('status', '==', 'accepted')),
       (snap) => snap.docs.forEach((d) => run(d.id, () => executeTrade(sid, d.id))));
     const stopEvents = onSnapshot(query(col(sid, 'events'), where('processed', '==', false)),
-      (snap) => snap.docs.forEach((d) => {
-        const e = d.data();
-        const handler = HANDLERS[e.type];
-        // Gryffindor's Nerve re-rolled a natural 1 on the phone: use up today's charge first.
-        const nerve = e.payload?.nerve && e.actorUid ? () => spendTrait(sid, e.actorUid, 'nerve') : async () => {};
-        if (handler) run(d.id, () => nerve().then(() => handler(sid, d.id, data)));
-      }));
+      (snap) => {
+        const quick = [];
+        snap.docs.forEach((d) => {
+          const e = d.data();
+          if (busy.has(d.id)) return;
+          // Plain maze steps, and anything from the maze more than two minutes old, are just ticked off.
+          if (QUICK_MAZE(e) || (e.type === 'maze_move' && ageOf(e) > 120000)) { quick.push(d.id); return; }
+          const handler = HANDLERS[e.type];
+          // Gryffindor's Nerve re-rolled a natural 1 on the phone: use up today's charge first.
+          const nerve = e.payload?.nerve && e.actorUid ? () => spendTrait(sid, e.actorUid, 'nerve') : async () => {};
+          if (handler) run(d.id, () => nerve().then(() => handler(sid, d.id, data)));
+        });
+        if (quick.length) tickOff(quick);
+      });
     // Hufflepuff's Steadfast: whoever knocked them out, they get back up on 1 HP once a day.
     const stopSteadfast = onSnapshot(col(sid, 'characters'), (snap) => snap.docs
       .filter((d) => d.data().hp <= 0 && traitOf(d.data())?.trait === 'steadfast')

@@ -119,7 +119,7 @@ export function TVLive({ session, chars, profiles, data, title, answers, lessonR
   else if (quiz) stage = <div className="tv2-center"><TVQuiz quiz={quiz} answer={answers[answerKey(q.id, q.uid)]} name={nameOf(q.uid)} /></div>;
   else if (showSpin) stage = <div className="tv2-center"><TVSpin data={data} spin={spin} name={spin.uid ? nameOf(spin.uid) : spin.who ?? null} /></div>;
   else if (session.state?.puzzle && data.puzzles?.find((p) => p.id === session.state.puzzle.id)) {
-    stage = <div className="tv2-center"><TVPuzzle p={data.puzzles.find((p) => p.id === session.state.puzzle.id)} st={session.state.puzzle} names={Object.fromEntries(Object.entries(chars).map(([u, c]) => [u, c.firstName ?? c.name]))} /></div>;
+    stage = <div className="tv2-center"><TVPuzzle sid={sid} p={data.puzzles.find((p) => p.id === session.state.puzzle.id)} st={session.state.puzzle} names={Object.fromEntries(Object.entries(chars).map(([u, c]) => [u, c.firstName ?? c.name]))} /></div>;
   } else if (session.state?.lesson) {
     stage = (
       <div className="tv2-center">

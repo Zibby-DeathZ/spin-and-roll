@@ -59,6 +59,14 @@ service cloud.firestore {
         allow update, delete: if isDM();
       }
 
+      // The Mirror in the Dark: where each player is. A phone writes only its own spot.
+      match /maze/{uid} {
+        allow read: if signedIn();
+        allow write: if isDM() || (inSession(sid) && request.auth.uid == uid
+          && request.resource.data.keys().hasOnly(['pos', 'centre', 'out', 'run', 'at'])
+          && request.resource.data.pos is list && request.resource.data.pos.size() == 2);
+      }
+
       // Family claims. The doc id is the family, so each family can only be
       // claimed once. Players can't change or delete a claim after making it.
       match /claims/{familyId} {

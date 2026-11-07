@@ -1,0 +1,152 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{db}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isDM() {
+      return signedIn()
+        && get(/databases/$(db)/documents/users/$(request.auth.uid)).data.role == 'dm';
+    }
+    function inSession(sid) {
+      return signedIn()
+        && request.auth.uid in get(/databases/$(db)/documents/sessions/$(sid)).data.playerUids;
+    }
+
+    // Accounts. New accounts can only ever create themselves as players.
+    // Promote yourself to DM once, by hand, in the Firebase console.
+    match /users/{uid} {
+      allow read: if signedIn();
+      allow create: if request.auth.uid == uid && request.resource.data.role == 'player';
+      allow update: if isDM()
+        || (request.auth.uid == uid && request.resource.data.role == resource.data.role);
+
+      // Campaign results and trophies are only ever written by the DM.
+      match /history/{sid}  { allow read: if signedIn(); allow write: if isDM(); }
+      // Saved characters that carry into the next year of a series.
+      match /heroes/{series} { allow read: if signedIn(); allow write: if isDM(); }
+      match /trophies/{sid} { allow read: if signedIn(); allow write: if isDM(); }
+      // The DM's own word list for the Painted Double game. Only the DM can see it.
+      match /imposter/{campaign} { allow read, write: if isDM() && request.auth.uid == uid; }
+    }
+
+    match /sessions/{sid} {
+      allow read: if signedIn();
+      allow create, delete: if isDM();
+      // DM can change anything. A player can only add themselves to an open game.
+      allow update: if isDM() || (
+        signedIn()
+        && resource.data.status in ['lobby', 'active']
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['playerUids'])
+        && request.resource.data.playerUids.toSet()
+             == resource.data.playerUids.toSet().union([request.auth.uid].toSet())
+      );
+
+      // Character sheets: only the DM writes them. Player actions (using items,
+      // trading) go through events and trades, which the GM screen carries out.
+      match /characters/{uid} {
+        allow read: if signedIn();
+        allow write: if isDM();
+      }
+
+      // Action feed that the GM screen and TV animate from.
+      match /events/{eid} {
+        allow read: if signedIn();
+        allow create: if isDM() || (
+          inSession(sid)
+          && request.resource.data.actorUid == request.auth.uid
+          && request.resource.data.type in ['item_used', 'purchase', 'ability_used', 'spell_cast', 'attack', 'roll', 'open_chest', 'pickup', 'trade_offered', 'gift_offered', 'trade_declined', 'maze_move', 'lumos']
+        );
+        allow update, delete: if isDM();
+      }
+
+      // Family claims. The doc id is the family, so each family can only be
+      // claimed once. Players can't change or delete a claim after making it.
+      match /claims/{familyId} {
+        allow read: if signedIn();
+        allow create: if inSession(sid)
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.keys().hasOnly(['uid', 'firstName', 'carry', 'createdAt'])
+          && request.resource.data.firstName is string
+          && request.resource.data.firstName.size() > 0
+          && request.resource.data.firstName.size() <= 20;
+        allow update, delete: if isDM();
+      }
+
+      // Sorting Hat / Ollivander answers. A player can only write their own,
+      // stored as "<quiz>_<their uid>".
+      match /answers/{answerId} {
+        allow read: if signedIn();
+        allow create, update: if inSession(sid)
+          && request.resource.data.uid == request.auth.uid
+          && answerId == request.resource.data.quiz + '_' + request.auth.uid
+          && request.resource.data.picks is list
+          && request.resource.data.picks.size() <= 10;
+        allow delete: if isDM();
+      }
+
+      // Class minigame results. A player writes only their own, two attempts at most,
+      // and can't touch the fields the GM screen uses to hand out rewards.
+      match /lessons/{resultId} {
+        allow read: if signedIn();
+        allow create: if inSession(sid)
+          && request.resource.data.uid == request.auth.uid
+          && resultId == request.resource.data.lessonId + '_' + request.auth.uid
+          && request.resource.data.keys().hasOnly(['uid', 'lessonId', 'attempts', 'passed', 'score', 'updatedAt'])
+          && request.resource.data.attempts is int
+          && request.resource.data.attempts >= 1 && request.resource.data.attempts <= 2;
+        allow update: if isDM() || (
+          resource.data.uid == request.auth.uid
+          && resource.data.passed == false
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['attempts', 'passed', 'score', 'updatedAt'])
+          && request.resource.data.attempts == resource.data.attempts + 1
+          && request.resource.data.attempts <= 2
+        );
+      }
+
+      // Owl Post: private letters. Only the recipient (and the DM) can read one.
+      match /owls/{oid} {
+        allow read: if isDM() || (signedIn() && resource.data.toUid == request.auth.uid);
+        allow create, delete: if isDM();
+        allow update: if isDM() || (
+          signedIn() && resource.data.toUid == request.auth.uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read'])
+        );
+      }
+
+      // Trade offers. Only the receiver can accept or decline,
+      // only the sender can cancel, and only while pending.
+      match /trades/{tid} {
+        allow read: if signedIn();
+        allow create: if inSession(sid)
+          && request.resource.data.fromUid == request.auth.uid
+          && request.resource.data.toUid != request.auth.uid
+          && request.resource.data.status == 'pending';
+        allow update: if isDM() || (
+          resource.data.status == 'pending'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'respondedAt'])
+          && (
+            (request.auth.uid == resource.data.toUid && request.resource.data.status in ['accepted', 'declined'])
+            || (request.auth.uid == resource.data.fromUid && request.resource.data.status == 'cancelled')
+          )
+        );
+      }
+
+      // The Painted Double: each player's secret card. Only that player (and the DM) can read it,
+      // so nobody can peek at whether they are the Double or what the word is.
+      match /imposter/{uid} {
+        allow read: if isDM() || (signedIn() && request.auth.uid == uid);
+        allow write: if isDM();
+      }
+      // Votes: a player writes only their own, stored as "<round>_<their uid>".
+      match /imposterVotes/{vid} {
+        allow read: if isDM();
+        allow create, update: if inSession(sid)
+          && request.resource.data.uid == request.auth.uid
+          && vid == request.resource.data.round + '_' + request.auth.uid
+          && request.resource.data.keys().hasOnly(['round', 'uid', 'vote', 'at'])
+          && request.resource.data.vote is string;
+        allow delete: if isDM();
+      }
+    }
+  }
+}

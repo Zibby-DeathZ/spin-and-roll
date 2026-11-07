@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
+import { collection, doc, onSnapshot, setDoc } from 'firebase/firestore';
+import { db } from '../firebase';
 import { logEvent } from '../lib/game';
 import { setPuzzle } from '../lib/puzzles';
 import { SR } from './Marauders';
@@ -17,10 +19,34 @@ import { audioReady, play, startDrone, stopDrone, unlockAudio } from '../lib/sou
 // What speech recognition tends to hear when someone says "Lumos".
 export const saidLumos = (alts) => alts.some((t) => /\b(lumos|lumus|lumous|loomos|loomis|lumo|lu ?moss?|lou ?moss?|loo ?moss?)\b/i.test(t));
 
+// Where everyone is. Each phone writes its own spot straight to sessions/{sid}/maze/{uid} (fast, no queue,
+// no waiting for the GM screen). Everyone else reads them all and lays them over the puzzle's own copy
+// (which the GM-walked test students still use).
+const mazeCol = (sid) => collection(db, 'sessions', sid, 'maze');
+export function useMazeSt(sid, st) {
+  const [docs, setDocs] = useState({});
+  useEffect(() => {
+    if (!sid) return undefined;
+    return onSnapshot(mazeCol(sid), (snap) => setDocs(Object.fromEntries(snap.docs.map((d) => [d.id, d.data()]))),
+      (err) => console.error(err));
+  }, [sid]);
+  if (!st) return st;
+  const mine = Object.entries(docs).filter(([, d]) => d.run === (st.run ?? 0) && Array.isArray(d.pos));
+  if (!mine.length) return st;
+  const pos = { ...(st.pos ?? {}) }, centre = { ...(st.centre ?? {}) }, out = { ...(st.out ?? {}) };
+  for (const [u, d] of mine) {
+    // A test student moved by the GM's buttons is newer than its old phone copy: the latest write wins.
+    if ((st.at?.[u] ?? 0) > (d.at ?? 0)) continue;
+    pos[u] = d.pos; centre[u] = !!d.centre; out[u] = !!d.out;
+  }
+  return { ...st, pos, centre, out };
+}
+
 const HOUSE_ICON = { Gryffindor: '🦁', Hufflepuff: '🦡', Ravenclaw: '🦅', Slytherin: '🐍' };
 
 // ---------- TV ----------
-export function DarkMazeTV({ p, st, names }) {
+export function DarkMazeTV({ sid, p, st: raw, names }) {
+  const st = useMazeSt(sid, raw);
   const who = (m) => Object.entries(m ?? {}).filter(([, on]) => on).map(([u]) => names[u] ?? 'Someone');
   const out = who(st.out);
   const centre = Object.entries(st.pos ?? {}).filter(([u, pos]) => inCentre(p.maze, pos) && !st.out?.[u]).map(([u]) => names[u] ?? 'Someone');
@@ -134,7 +160,8 @@ function savePos(k, v) {
 
 // `gm`: a maze test student walked from the GM screen. It writes straight to the puzzle (the GM may),
 // instead of sending events for the GM screen to carry out.
-export function DarkMazePhone({ sid, uid, p, st, house, gm = false }) {
+export function DarkMazePhone({ sid, uid, p, st: raw, house, gm = false }) {
+  const st = useMazeSt(sid, raw);
   const maze = p.maze;
   const mapIdx = mapFor(maze, st, uid, house);
   const has = mapIdx != null;
@@ -173,14 +200,19 @@ export function DarkMazePhone({ sid, uid, p, st, house, gm = false }) {
     const payload = { pos: state.pos, centre: state.centre, out: state.out, kind };
     if (gm) {
       setPuzzle(sid, {
-        [`pos.${uid}`]: [state.pos[0], state.pos[1]], [`centre.${uid}`]: !!state.centre, [`out.${uid}`]: !!state.out,
+        [`pos.${uid}`]: [state.pos[0], state.pos[1]], [`centre.${uid}`]: !!state.centre, [`out.${uid}`]: !!state.out, [`at.${uid}`]: Date.now(),
         ...(kind === 'caught' ? { watcher: null } : {}),
       }).catch(console.error);
       // Still tell the TV, so the toasts and sounds play.
       if (kind !== 'step' && kind !== 'bump') logEvent(sid, { type: 'maze_move', actorUid: uid, processed: true, payload }).catch(console.error);
       return;
     }
-    logEvent(sid, { type: 'maze_move', actorUid: uid, processed: false, payload }).catch(failed);
+    setDoc(doc(db, 'sessions', sid, 'maze', uid), {
+      pos: [state.pos[0], state.pos[1]], centre: !!state.centre, out: !!state.out, run: st.run ?? 0, at: Date.now(),
+    }).then(() => setBlocked(false)).catch(failed);
+    // Only the moments that matter go to the GM screen (the mirror's cold costs HP) and the TV (toasts, sounds).
+    if (kind === 'thrown' || kind === 'caught') logEvent(sid, { type: 'maze_move', actorUid: uid, processed: false, payload: { ...payload, direct: true } }).catch(failed);
+    else if (kind === 'centre' || kind === 'out') logEvent(sid, { type: 'maze_move', actorUid: uid, processed: true, payload }).catch(console.error);
   };
   const commit = (state, kind, line) => {
     if (kind === 'caught' || kind === 'thrown') safeUntil.current = Date.now() + 8000;
@@ -331,7 +363,7 @@ export function DarkMazePhone({ sid, uid, p, st, house, gm = false }) {
 // ---------- GM screen engine: the watcher and the pedestal ----------
 // Runs on the GM screen while the maze is up (whichever tab is open).
 export function useMazeEngine(sid, data, session, chars) {
-  const pz = session?.state?.puzzle;
+  const pz = useMazeSt(sid, session?.state?.puzzle);
   const def = pz && data?.puzzles?.find((x) => x.id === pz.id);
   const live = !!def && def.type === 'darkmaze' && !pz.solved;
   const ref = useRef({});
@@ -347,7 +379,7 @@ export function useMazeEngine(sid, data, session, chars) {
         .then(() => logEvent(sid, { type: 'maze_riddle', payload: {} }))
         .catch(console.error);
     }
-  }, [live, pz?.pos, pz?.riddle]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [live, JSON.stringify(pz?.pos), pz?.riddle]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // The watcher: one step every few seconds (slower once the light is lit).
   const slow = !!pz?.lumos;
@@ -418,7 +450,8 @@ export function MazeKey({ maze, people = [], watcher = null }) {
   );
 }
 
-export function DarkMazeGM({ sid, p, st, chars, players, onSet }) {
+export function DarkMazeGM({ sid, p, st: raw, chars, players, onSet }) {
+  const st = useMazeSt(sid, raw);
   const maze = p.maze;
   const people = players.map((u) => {
     const idx = mapFor(maze, st, u, chars[u].house);
@@ -480,14 +513,14 @@ function MazeTesters({ sid, p, st, chars, players }) {
   const cur = testers.includes(who) ? who : testers[0];
   const toCentre = () => setPuzzle(sid, Object.fromEntries(testers.flatMap((u, i) => {
     const cell = p.maze.centre[(i * 2) % p.maze.centre.length];
-    return [[`pos.${u}`, [cell[0], cell[1]]], [`centre.${u}`, true], [`out.${u}`, false]];
+    return [[`pos.${u}`, [cell[0], cell[1]]], [`centre.${u}`, true], [`out.${u}`, false], [`at.${u}`, Date.now()]];
   })));
   const toStart = () => setPuzzle(sid, Object.fromEntries(testers.flatMap((u) => {
     const idx = mapFor(p.maze, st, u, chars[u].house);
     const s0 = p.maze.starts[idx];
-    return [[`pos.${u}`, [s0[0], s0[1]]], [`centre.${u}`, false], [`out.${u}`, false]];
+    return [[`pos.${u}`, [s0[0], s0[1]]], [`centre.${u}`, false], [`out.${u}`, false], [`at.${u}`, Date.now()]];
   })));
-  const allOut = () => setPuzzle(sid, Object.fromEntries(testers.flatMap((u) => [[`pos.${u}`, [p.maze.exit[0], p.maze.exit[1]]], [`out.${u}`, true]])));
+  const allOut = () => setPuzzle(sid, Object.fromEntries(testers.flatMap((u) => [[`pos.${u}`, [p.maze.exit[0], p.maze.exit[1]]], [`out.${u}`, true], [`at.${u}`, Date.now()]])));
   return (
     <section className="maze-testers">
       <h3>🧪 Walk a test student</h3>

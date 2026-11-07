@@ -91,7 +91,7 @@ export function initialState(p) {
     case 'stairs': return { rots: p.tiles.map((t) => t[1]) };
     case 'slider': return { tiles: [...p.start] };
     case 'runefloor': return { path: [], trapped: null };
-    case 'darkmaze': return { lit: {}, lightbox: false, maps: {}, pos: {}, centre: {}, out: {}, run: Date.now(), riddle: false, lumos: false, watcher: null, watcherOn: true };
+    case 'darkmaze': return { lit: {}, lightbox: false, maps: {}, pos: {}, centre: {}, out: {}, at: {}, run: Date.now(), riddle: false, lumos: false, watcher: null, watcherOn: true };
     default: return {};
   }
 }

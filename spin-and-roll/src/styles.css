@@ -2573,3 +2573,6 @@ button.status-chip.removable:hover { background: rgba(200, 60, 80, 0.3); }
 .tarot-banner.kind-none h2 { color: var(--muted); }
 @keyframes tarot-deal { from { opacity: 0; transform: translateY(-30px) rotate(-6deg) scale(.8); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .tarot-slot, .tarot-words p, .tarot-banner, .tarot-kicker { animation-duration: .01s; animation-delay: 0s !important; } }
+
+.save-err { position: sticky; top: 0; z-index: 50; padding: .5rem .9rem; background: #5c1d14; color: #ffe3dc; border-bottom: 2px solid var(--ember); font-size: .9rem; }
+.save-err .linkish { margin-left: .8rem; color: #ffe3dc; }

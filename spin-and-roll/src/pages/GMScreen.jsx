@@ -266,6 +266,17 @@ export default function GMScreen() {
     startIntro(sid);
   }, [sid, session, data, claims, chars]);
   const [tab, setTab] = useState('table');
+  // If saving anything fails (a give button, a parcel), say so plainly instead of doing nothing.
+  const [saveErr, setSaveErr] = useState('');
+  useEffect(() => {
+    const onErr = (ev) => {
+      const e = ev.reason;
+      const msg = e?.code ? `${e.code}: ${e.message}` : String(e?.message ?? e);
+      setSaveErr(msg);
+    };
+    window.addEventListener('unhandledrejection', onErr);
+    return () => window.removeEventListener('unhandledrejection', onErr);
+  }, []);
   // The right-hand panel: the party's cards (default), the feed, or hidden.
   const [side, setSide] = useState('party');
   const [view, setView] = useState(null); // a place the GM is looking at on the Table tab (null = the TV's)
@@ -287,6 +298,13 @@ export default function GMScreen() {
 
   return (
     <div className="gm">
+      {saveErr && (
+        <div className="save-err" role="alert">
+          ⚠️ Something didn’t save: {saveErr}
+          {/resource-exhausted|quota/i.test(saveErr) ? ' (Firebase’s free daily limit is used up: it resets at 9 pm Fiji time, or switch the project to the Blaze plan.)' : ''}
+          <button className="linkish" onClick={() => setSaveErr('')}>Dismiss</button>
+        </div>
+      )}
       <header className="gm-top">
         <div className="gm-title">
           <h1>{getCampaign(session.campaignId)?.title}</h1>
