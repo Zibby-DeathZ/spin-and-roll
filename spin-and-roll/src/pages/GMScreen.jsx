@@ -301,7 +301,7 @@ export default function GMScreen() {
       {saveErr && (
         <div className="save-err" role="alert">
           ⚠️ Something didn’t save: {saveErr}
-          {/resource-exhausted|quota/i.test(saveErr) ? ' (Firebase’s free daily limit is used up: it resets at 9 pm Fiji time, or switch the project to the Blaze plan.)' : ''}
+          {/resource-exhausted|quota/i.test(saveErr) ? ' (Firebase’s free daily limit is used up: it resets around 8 pm Fiji time, or switch the project to the Blaze plan.)' : ''}
           <button className="linkish" onClick={() => setSaveErr('')}>Dismiss</button>
         </div>
       )}
