@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { collection, query, where } from 'firebase/firestore';
-import { db } from '../firebase';
+import { db, LOCAL } from '../firebase';
+import { downloadJson, exportEverything } from '../lib/backup';
 import { useAuth } from '../auth/AuthProvider';
 import { campaigns, getCampaign, getCampaignData } from '../campaigns';
 import {
@@ -67,6 +68,18 @@ export default function DMDashboard() {
   const { user, profile } = useAuth();
   const [busy, setBusy] = useState('');
   const [showHidden, setShowHidden] = useState(false);
+  const [saving, setSaving] = useState('');
+  const backup = async () => {
+    setSaving('Saving… 0');
+    try {
+      const out = await exportEverything(user.uid, (n) => setSaving(`Saving… ${n}`));
+      const stamp = new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-');
+      downloadJson(out, `spin-and-roll-${LOCAL ? 'local' : 'online'}-${stamp}.json`);
+      setSaving(`Saved ${Object.keys(out.docs).length} records.`);
+    } catch (e) {
+      setSaving(`Could not save: ${e.code ?? ''} ${e.message}`);
+    }
+  };
   const sessions = useQueryList(
     query(collection(db, 'sessions'), where('dmUid', '==', user.uid)),
     [user.uid]
@@ -96,6 +109,11 @@ export default function DMDashboard() {
             <div className="seal seal-won"><strong>{past.filter((s) => s.status === 'won').length}</strong><span>Won</span></div>
             <div className="seal seal-lost"><strong>{past.filter((s) => s.status === 'lost').length}</strong><span>Lost</span></div>
           </div>
+          <p className="backup-row">
+            <span className={`where-chip ${LOCAL ? 'local' : ''}`}>{LOCAL ? '🏠 Laptop game server' : '☁️ Online'}</span>
+            <button className="btn small ghost" onClick={backup} disabled={saving.startsWith('Saving')}>💾 Back up everything</button>
+            {saving && <span className="muted small">{saving}</span>}
+          </p>
         </section>
 
         <section>

@@ -1,0 +1,8 @@
+node_modules/
+data/
+backups/
+site/
+cert/
+import/*.json
+firestore.rules
+firebase.json

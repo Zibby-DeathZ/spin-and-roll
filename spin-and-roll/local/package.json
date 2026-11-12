@@ -1,0 +1,16 @@
+{
+  "name": "spin-and-roll-local",
+  "private": true,
+  "type": "module",
+  "description": "Game night on the laptop: the Firebase Emulator as a free, unlimited database for Spin & Roll.",
+  "scripts": {
+    "start": "node start.mjs",
+    "import": "node import.mjs"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.0.0",
+    "firebase-tools": "^14.0.0",
+    "qrcode-terminal": "^0.12.0",
+    "selfsigned": "^2.4.1"
+  }
+}

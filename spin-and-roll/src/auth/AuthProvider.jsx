@@ -21,8 +21,10 @@ export function AuthProvider({ children }) {
       const snap = await getDoc(ref);
       if (!snap.exists()) {
         // Every new account starts as a player. DM is set by hand in the console.
+        // A new account on the laptop server gets its name a moment after it is created.
+        if (!user.displayName) await new Promise((r) => setTimeout(r, 800));
         await setDoc(ref, {
-          displayName: user.displayName || 'Adventurer',
+          displayName: auth.currentUser?.displayName || user.displayName || 'Adventurer',
           photoURL: user.photoURL || null,
           role: 'player',
           createdAt: serverTimestamp(),

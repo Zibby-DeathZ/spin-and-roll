@@ -1,7 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { signInWithGoogle, useAuth } from '../auth/AuthProvider';
 import Wheel from '../components/Wheel';
+import { LOCAL } from '../firebase';
+import { listLocalAccounts, newLocalAccount, signInLocal } from '../auth/localSignIn';
 
 // The front gate: the first thing players see when they type the link.
 // A night sky over a castle on a crag, embers rising, and the wheel and the die as the crest.
@@ -65,10 +67,12 @@ export default function Login() {
     left: Math.random() * 100, delay: Math.random() * 12, dur: 9 + Math.random() * 9, drift: (Math.random() - 0.5) * 120, size: 2 + Math.random() * 3,
   })), []);
 
+  const [picking, setPicking] = useState(false);
   if (!loading && user) return <Navigate to="/" replace />;
 
   const go = async () => {
     setError('');
+    if (LOCAL) { setPicking(true); return; }
     try {
       await signInWithGoogle();
     } catch (e) {
@@ -119,8 +123,9 @@ export default function Login() {
           <button className="gate-btn" onClick={go}>
             <span aria-hidden="true">⚔</span> Enter the realm
           </button>
-          <p className="gate-small">Sign in with Google to join your party’s table.</p>
+          <p className="gate-small">{LOCAL ? 'Tap your name to join your party’s table.' : 'Sign in with Google to join your party’s table.'}</p>
           {error && <p className="error">{error}</p>}
+          {LOCAL && picking && <LocalPicker onError={setError} />}
         </section>
 
         <ul className="gate-features">
@@ -128,5 +133,39 @@ export default function Login() {
         </ul>
       </div>
     </main>
+  );
+}
+
+// Laptop game server: tap your name. New players type a name once.
+function LocalPicker({ onError }) {
+  const [list, setList] = useState(null);
+  const [name, setName] = useState('');
+  const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    listLocalAccounts().then(setList).catch((e) => { onError(e.message); setList([]); });
+  }, [onError]);
+  const pick = async (fn) => {
+    setBusy(true);
+    try { await fn(); } catch (e) { onError(`Could not sign in: ${e.message}`); setBusy(false); }
+  };
+  return (
+    <div className="local-picker">
+      {list === null ? <p className="gate-small">Finding the party…</p> : (
+        <ul>
+          {list.map((u) => (
+            <li key={u.uid}>
+              <button className="local-who" disabled={busy} onClick={() => pick(() => signInLocal(u.uid))}>
+                {u.photo ? <img src={u.photo} alt="" referrerPolicy="no-referrer" /> : <span className="local-dot">{u.name[0]}</span>}
+                {u.name}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      <form className="local-new" onSubmit={(e) => { e.preventDefault(); if (name.trim()) pick(() => newLocalAccount(name.trim())); }}>
+        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="New here? Type your name" maxLength={30} />
+        <button className="btn small" disabled={busy || !name.trim()}>Join</button>
+      </form>
+    </div>
   );
 }

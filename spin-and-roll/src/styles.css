@@ -2576,3 +2576,18 @@ button.status-chip.removable:hover { background: rgba(200, 60, 80, 0.3); }
 
 .save-err { position: sticky; top: 0; z-index: 50; padding: .5rem .9rem; background: #5c1d14; color: #ffe3dc; border-bottom: 2px solid var(--ember); font-size: .9rem; }
 .save-err .linkish { margin-left: .8rem; color: #ffe3dc; }
+
+.backup-row { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; margin-top: .8rem; }
+.where-chip { font-size: .8rem; padding: .15rem .6rem; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+.where-chip.local { border-color: var(--gold); color: var(--gold); }
+
+/* Laptop game server: tap your name */
+.local-picker { margin-top: 1rem; display: grid; gap: .8rem; text-align: left; }
+.local-picker ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .4rem; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+.local-who { width: 100%; display: flex; align-items: center; gap: .5rem; padding: .55rem .7rem; border-radius: 10px; border: 1px solid var(--line); background: rgba(0, 0, 0, .3); color: var(--bone); font: inherit; cursor: pointer; }
+.local-who:hover, .local-who:focus-visible { border-color: var(--gold); }
+.local-who img, .local-dot { width: 30px; height: 30px; border-radius: 50%; flex: none; }
+.local-dot { display: grid; place-items: center; background: var(--violet); color: #fff; font-weight: 700; }
+.local-new { display: flex; gap: .4rem; }
+.local-new input { flex: 1; min-width: 0; }
+.local-new input { padding: .5rem .7rem; border-radius: 8px; border: 1px solid var(--line); background: rgba(0, 0, 0, .3); color: var(--bone); font: inherit; }
