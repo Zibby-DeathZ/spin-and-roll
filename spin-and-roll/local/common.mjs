@@ -7,7 +7,14 @@ import { fileURLToPath } from 'node:url';
 export const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const ROOT = path.resolve(HERE, '..');
 export const PORTS = { app: 5173, firestore: 8181, auth: 9199, hub: 4499 };
-export const DATA = path.join(HERE, 'data');
+// The saved game lives outside the project (in AppData on Windows), so OneDrive or any other sync tool never
+// touches it while the game is writing to it.
+export const STORE = process.env.LOCALAPPDATA ? path.join(process.env.LOCALAPPDATA, 'SpinAndRoll') : HERE;
+export const DATA = path.join(STORE, 'data');
+export const BACKUPS = path.join(STORE, 'backups');
+fs.mkdirSync(STORE, { recursive: true });
+// A game saved inside the project by an earlier version moves out once.
+if (STORE !== HERE && fs.existsSync(path.join(HERE, 'data')) && !fs.existsSync(DATA)) fs.renameSync(path.join(HERE, 'data'), DATA);
 
 // The project id comes from the app's own Firebase config (read, never changed), so the laptop database
 // and the app agree on which project they are.

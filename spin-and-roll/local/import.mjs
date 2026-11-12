@@ -8,7 +8,7 @@
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import { DATA, HERE, firebase, firebaseJs, hasData, projectId, writeFirebaseJson } from './common.mjs';
+import { BACKUPS, DATA, HERE, firebase, firebaseJs, hasData, projectId, writeFirebaseJson } from './common.mjs';
 
 const say = (...a) => console.log(...a);
 const args = process.argv.slice(2);
@@ -35,10 +35,10 @@ if (!inside) {
   if (!fs.existsSync(firebaseJs)) { say('\n✖ Run "Setup Game Night.bat" first.\n'); process.exit(1); }
   writeFirebaseJson();
   if (hasData()) {
-    const keep = path.join(HERE, 'backups', `${new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-')}-before-import`);
+    const keep = path.join(BACKUPS, `${new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-')}-before-import`);
     fs.mkdirSync(path.dirname(keep), { recursive: true });
     fs.cpSync(DATA, keep, { recursive: true });
-    say(`📦 Kept a copy of the laptop game as it was: local\\backups\\${path.basename(keep)}`);
+    say(`📦 Kept a copy of the laptop game as it was: ${keep}`);
     if (fresh) fs.rmSync(DATA, { recursive: true, force: true });
   }
   say(`📥 Importing ${path.basename(file)}…`);

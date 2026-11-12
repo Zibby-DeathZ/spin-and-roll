@@ -6,7 +6,7 @@ import path from 'node:path';
 import qrcode from 'qrcode-terminal';
 import selfsigned from 'selfsigned';
 import {
-  DATA, HERE, PORTS, ROOT, firebase, firebaseJs, hasData, lanAddresses, projectId, vite, viteJs, waitForPort, writeFirebaseJson,
+  BACKUPS, DATA, HERE, PORTS, STORE, ROOT, firebase, firebaseJs, hasData, lanAddresses, projectId, vite, viteJs, waitForPort, writeFirebaseJson,
 } from './common.mjs';
 
 const SAVE_EVERY_MIN = 3;
@@ -60,7 +60,7 @@ const env = {
 };
 
 // ---------- Safety copy of last time's game before anything starts ----------
-const backups = path.join(HERE, 'backups');
+const backups = BACKUPS;
 function backup(label) {
   if (!hasData()) return;
   fs.mkdirSync(backups, { recursive: true });
@@ -113,7 +113,7 @@ ${ips.slice(1).map((i) => `      (or https://${i.address}:${PORTS.app}  on ${i.n
 
   Sign in: tap "Sign in with Google", then tap your name in the list.
 
-  The game saves itself every ${SAVE_EVERY_MIN} minutes.
+  The game saves itself every ${SAVE_EVERY_MIN} minutes, to ${STORE}
   To finish the night: click this window and press  Ctrl + C  (once). Wait for "Game saved".
 `);
 qrcode.generate(url, { small: true }, (q) => say(q));
@@ -123,11 +123,11 @@ let saving = false;
 async function autosave() {
   if (saving) return;
   saving = true;
-  const tmp = path.join(HERE, 'data-saving');
+  const tmp = path.join(STORE, 'data-saving');
   fs.rmSync(tmp, { recursive: true, force: true });
   const r = spawnSync(...firebase(['emulators:export', tmp, '--force', '--project', pid]), { cwd: HERE, env, encoding: 'utf8' });
   if (r.status === 0 && fs.existsSync(path.join(tmp, 'firebase-export-metadata.json'))) {
-    const old = path.join(HERE, 'data-old');
+    const old = path.join(STORE, 'data-old');
     fs.rmSync(old, { recursive: true, force: true });
     if (fs.existsSync(DATA)) fs.renameSync(DATA, old);
     fs.renameSync(tmp, DATA);
