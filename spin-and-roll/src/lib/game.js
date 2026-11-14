@@ -1044,9 +1044,10 @@ export function describe(e, nameOf) {
       if (p.shielded) return { icon: '🔰', text: `${p.name} → ${target}: ${p.total} vs Defence ${p.defence}. The Blood Shield takes the whole hit and breaks!`, tone: 'violet', big: true };
       const mirror = p.mirror ? ` casts ${p.mirror} back at` : ' →';
       const ate = p.swallowed ? ` It swallows ${target}’s ${p.swallowed}${p.heal ? ` and heals ${p.heal}` : ''}, and grows!` : '';
+      const marked = p.status ? ` ${target} is ${p.status}!` : '';
       return {
         icon: p.icon,
-        text: `${p.name}${mirror} ${target}: ${p.total} vs Defence ${p.defence}${p.feared ? ' (shaking with fear)' : ''}. ${p.hit ? `Hit for ${p.dmg}!` : 'Miss.'}${ate}${p.ko ? ` ${target} is knocked out!` : ''}`,
+        text: `${p.name}${mirror} ${target}: ${p.total} vs Defence ${p.defence}${p.feared ? ' (shaking with fear)' : ''}. ${p.hit ? `Hit for ${p.dmg}!` : 'Miss.'}${ate}${marked}${p.ko ? ` ${target} is knocked out!` : ''}`,
         tone: p.hit ? 'ember' : 'muted', big: true,
       };
     }
@@ -1134,6 +1135,7 @@ export function describe(e, nameOf) {
     }
     case 'puzzle_start': return { icon: e.payload.icon, text: `A puzzle! ${e.payload.title}. Look at the TV`, tone: 'violet', big: true };
     case 'puzzle_solved': return { icon: '✨', text: `Solved: ${e.payload.title}!`, tone: 'teal', big: true };
+    case 'mvp': return { icon: '🏅', text: `${target} is MVP of Day ${e.payload?.day}! Look at the TV`, tone: 'gold', big: true };
     case 'tarot': return { icon: '🔮', text: `Professor Greaves has read the cards for ${target}. Look at the TV`, tone: 'violet', big: true };
     case 'shop_open': return { icon: '🛍️', text: 'Diagon Alley is open for shopping', tone: 'gold', big: true };
     case 'shop_closed': return { icon: '🔒', text: 'The shops are closed', tone: 'muted' };

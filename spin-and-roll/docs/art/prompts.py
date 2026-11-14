@@ -110,6 +110,7 @@ SECTIONS = [
     ]),
     ('mimics', 'Mimics (revealed)', 'public/art/mimics', 'What the mimics look like after they spring. Until then they look like an ordinary chest or person.', [
         ('hungry-trunk', 'The Hungry Trunk', 'A battered old travelling trunk that has sprung open into a huge mouth full of jagged teeth and a long tongue, belts and buckles snapping, half-swallowed books and potions inside.'),
+        ('wailing-mandrake', 'The Wailing Mandrake', 'A full-grown mandrake bursting up out of a cracked clay plant pot and loose soil, a wrinkled root-creature the size of a small child with knobbly root legs and a crown of leaves, its mouth stretched impossibly wide in a deafening scream, soil spraying, sound rings rippling outward.'),
         ('painted-double', 'The Painted Double', 'A copy of a person made of wet paint, the face sliding and smearing, a perfect smile painted on, brushstrokes where the eyes should be.'),
     ]),
     ('items', 'Items', 'public/art/items', 'Things players pick up, buy or carry. They show on the map, in the bag and in the shops.', [

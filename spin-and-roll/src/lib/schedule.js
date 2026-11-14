@@ -4,7 +4,7 @@ import { collection, doc, getDoc, getDocs, updateDoc, deleteField } from 'fireba
 import { anywhereOnFloor, floorPoint, personSpot } from './floor';
 import { db } from '../firebase';
 import { chestToken, hazardToken, itemToken } from './world';
-import { doubleToken, trunkToken } from './mimic';
+import { mimicToken } from './mimic';
 import { giveQuest } from './world';
 import { sendOwl } from './owls';
 import { bossHp } from './accuse';
@@ -70,7 +70,7 @@ function spawnToken(data, s, weakened = false) {
   if (s.type === 'item') t = itemToken(data, s.item, s.loc);
   else if (s.type === 'chest') t = chestToken(data, s.chest, s.loc);
   else if (s.type === 'hazard') t = hazardToken(data, s.hazard, s.loc);
-  else if (s.type === 'mimic') t = s.mimic === 'hungry-trunk' ? trunkToken(data, s.loc) : doubleToken(data, s.loc, s.copies ?? 'ghost');
+  else if (s.type === 'mimic') t = mimicToken(data, s.mimic, s.loc, s.copies ?? 'ghost');
   else if (s.type === 'npc') {
     const b = data.bestiary[s.npc];
     t = { kind: s.npc, name: s.name ?? b.name, icon: b.icon, npc: true, loc: s.loc };

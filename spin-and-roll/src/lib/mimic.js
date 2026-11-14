@@ -17,6 +17,19 @@ export function trunkToken(data, loc) {
   return { kind: 'chest', chest: m.looksLike, loc, name: c.name, icon: c.icon, dc: c.dc, stat: c.stat, trap: 0,
     contents: { gold: 0, items: [] }, opened: false, tried: [], mimic: 'hungry-trunk' };
 }
+// A mimic lying on the ground, looking like an ordinary item (the Wailing Mandrake).
+export function itemMimicToken(data, mimicId, loc) {
+  const m = data.mimics[mimicId];
+  const it = data.items[m.looksLike];
+  return { kind: 'item', item: m.looksLike, loc, name: it.name, icon: it.icon, mimic: mimicId };
+}
+// Any mimic, by how it is disguised.
+export function mimicToken(data, mimicId, loc, copies = 'ghost') {
+  const m = data.mimics[mimicId];
+  if (m.disguise === 'item') return itemMimicToken(data, mimicId, loc);
+  if (m.disguise === 'chest') return trunkToken(data, loc);
+  return doubleToken(data, loc, copies);
+}
 export function doubleToken(data, loc, personId) {
   const b = data.bestiary[personId];
   return { kind: personId, name: b.name, icon: b.icon, npc: true, loc, mimic: 'painted-double' };
@@ -37,7 +50,8 @@ export async function springMimic(sid, data, tokenId, byUid = null) {
       [`state.tokens.${tokenId}`]: {
         kind: `mimic-${t.mimic}`, mimic: t.mimic, revealed: true, loc: t.loc, x: t.x, y: t.y,
         name: m.name, icon: m.icon, npc: false, hp: m.hp, maxHp: m.hp, defence: m.defence,
-        belly: [], scale: 1, hoard: rand(m.hoard[0], m.hoard[1]), disguise: t.name,
+        // Some mimics carry things from the start, and drop them when beaten (the Wailing Mandrake's leaves).
+        belly: (m.drops ?? []).map((id) => ({ id, ...data.items[id] })), scale: 1, hoard: rand(m.hoard[0], m.hoard[1]), disguise: t.name,
       },
       'state.scare': { id: `${tokenId}-${Date.now()}`, at: Date.now(), name: m.name, icon: m.icon },
     });

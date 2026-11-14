@@ -413,7 +413,7 @@ The warm smiling teacher, now possessed: eyes made of swirling wet paint, paint 
 
 An ancient painter wizard half stepping out of a giant canvas, his body made of thick oil paint and canvas, a brush like a wand, beautiful and terrible, the final boss. Square creature portrait, the whole creature centred and filling the frame so it reads when cropped to a small circle, plain dark background. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
 
-## Mimics (revealed) (2)
+## Mimics (revealed) (3)
 
 What the mimics look like after they spring. Until then they look like an ordinary chest or person.
 
@@ -423,6 +423,11 @@ Folder: `public/art/mimics/`  ·  Size: 1024 × 1024, PNG
 `public/art/mimics/hungry-trunk.png`
 
 A battered old travelling trunk that has sprung open into a huge mouth full of jagged teeth and a long tongue, belts and buckles snapping, half-swallowed books and potions inside. Square monster portrait, centred, dramatic and scary, plain dark background. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
+
+### The Wailing Mandrake
+`public/art/mimics/wailing-mandrake.png`
+
+A full-grown mandrake bursting up out of a cracked clay plant pot and loose soil, a wrinkled root-creature the size of a small child with knobbly root legs and a crown of leaves, its mouth stretched impossibly wide in a deafening scream, soil spraying, sound rings rippling outward. Square monster portrait, centred, dramatic and scary, plain dark background. Painted storybook fantasy illustration, gothic magical boarding school, rich candlelit colours (deep indigo, warm gold, ember orange), soft painterly brushwork, gently eerie but child-friendly, no text, no letters, no logos, no watermark.
 
 ### The Painted Double
 `public/art/mimics/painted-double.png`

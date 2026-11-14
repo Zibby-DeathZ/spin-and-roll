@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { mvpBonus } from '../lib/mvp';
 import { castSpell, clockOf, defenceOf, fmtMod, mod, statOf, STATS } from '../lib/game';
 import { nerveRoll } from '../lib/houses';
 import { damageBonus, sendAttack, sendRoll, spellDef, STRIKE } from '../lib/combat';
@@ -39,7 +40,7 @@ function ModeToggle({ mode, setMode }) {
   );
 }
 
-function FreeRoller({ sid, c, feared, dawn }) {
+function FreeRoller({ sid, c, feared, dawn, extra = 0 }) {
   const [die, setDie] = useState(20);
   const [stat, setStat] = useState('');
   const [mode, setMode] = useState(feared ? 'dis' : 'normal');
@@ -47,13 +48,13 @@ function FreeRoller({ sid, c, feared, dawn }) {
   const [last, setLast] = useState(null);
 
   const go = async () => {
-    const m = stat ? mod(statOf(c, stat)) : 0;
+    const m = (stat ? mod(statOf(c, stat)) : 0) + (die === 20 ? extra : 0);
     let rolls, nat, nerve = false;
     if (die === 20) ({ rolls, nat, nerve = false } = nerveRoll(c, mode, dawn));
     else { rolls = rollDice({ die }).rolls; nat = rolls[0]; }
     await tumble(die, nat);
     const total = nat + m;
-    const label = `d${die}${stat ? ` + ${stat.toUpperCase()}` : ''}`;
+    const label = `d${die}${stat ? ` + ${stat.toUpperCase()}` : ''}${die === 20 && extra ? ' + MVP' : ''}`;
     setLast({ total, label, rolls, m, nerve });
     await sendRoll(sid, c.uid, { label, rolls, mod: m, total, mode: die === 20 ? mode : 'normal', ...(nerve ? { nerve: true } : {}) });
   };
@@ -74,6 +75,7 @@ function FreeRoller({ sid, c, feared, dawn }) {
         </select>
       </label>
       {die === 20 && <ModeToggle mode={mode} setMode={setMode} />}
+      {die === 20 && extra > 0 && <p className="muted small">🏅 MVP Badge: +{extra} on every d20 roll today.</p>}
       <div className="roll-out">
         <span className={`big-die ${rolling ? 'rolling' : ''}`}>{shown ?? '–'}</span>
         {last && !rolling && <span className="muted">{last.label} = <strong>{last.total}</strong></span>}
@@ -106,7 +108,7 @@ function badges(sp, c, defs) {
 }
 
 // The step-by-step cast: pick a target, roll to hit, roll the spell's die.
-function CastFlow({ sid, c, sp, targets, friends, feared, onClose, dawn }) {
+function CastFlow({ sid, c, sp, targets, friends, feared, onClose, dawn, extra = 0 }) {
   const [target, setTarget] = useState(null);
   const [mode, setMode] = useState(feared ? 'dis' : 'normal');
   const [hit, setHit] = useState(null); // { nat, total, rolls, success }
@@ -126,7 +128,7 @@ function CastFlow({ sid, c, sp, targets, friends, feared, onClose, dawn }) {
   const rollHit = async () => {
     const r = nerveRoll(c, mode, dawn);
     await tumble(20, r.nat);
-    const total = r.nat + mod(statOf(c, sp.hit));
+    const total = r.nat + mod(statOf(c, sp.hit)) + extra;
     const success = r.nat === 20 || (r.nat !== 1 && total >= target.defence);
     const h = { ...r, total, success };
     setHit(h);
@@ -148,7 +150,7 @@ function CastFlow({ sid, c, sp, targets, friends, feared, onClose, dawn }) {
       const r = nerveRoll(c, mode, dawn);
       nerve = !!r.nerve;
       await tumble(20, r.nat);
-      rolled = r.nat + mod(statOf(c, sp.check));
+      rolled = r.nat + mod(statOf(c, sp.check)) + extra;
       rollLabel = `on the ${sp.check.toUpperCase()} check`;
     } else if (sp.dice) {
       const r = rollDice(sp.dice);
@@ -161,7 +163,8 @@ function CastFlow({ sid, c, sp, targets, friends, feared, onClose, dawn }) {
       ...(nerve ? { nerve: true } : {}),
       ...(sp.targetAlly && target ? { targetUid: target.id } : {}),
     });
-    setDmg({ total: rolled });
+    // A spell with nothing to roll (Lumos) just goes to the table: no “Rolled null”.
+    if (rolled != null) setDmg({ total: rolled });
     setDone(true);
   };
 
@@ -218,7 +221,7 @@ function CastFlow({ sid, c, sp, targets, friends, feared, onClose, dawn }) {
                 {sp.check ? 'Roll d20 check' : sp.dice ? `Roll ${diceLabel(sp.dice)}` : `Cast ${sp.name}`}
               </button>
             )}
-            {done && <p className="muted">Sent to the table.</p>}
+            {done && <p className="muted">{!sp.attack && !sp.check && !sp.dice ? `${sp.name}! Cast and sent to the table.` : 'Sent to the table.'}</p>}
           </>
         )}
         <div className="actions">
@@ -251,7 +254,7 @@ export default function DiceTab({ sid, c, data, session, chars }) {
 
   return (
     <>
-      <FreeRoller sid={sid} c={c} feared={feared} dawn={clockOf(session).dawn} />
+      <FreeRoller sid={sid} c={c} feared={feared} dawn={clockOf(session).dawn} extra={mvpBonus(c, clockOf(session))} />
       <section className="spells">
         <h2>Spells and attacks</h2>
         <p className="muted small">Mana: {c.mana} / {c.maxMana}</p>
@@ -277,7 +280,7 @@ export default function DiceTab({ sid, c, data, session, chars }) {
         </ul>
         {ko && <p className="warn">You’re knocked out. Someone needs to heal you.</p>}
       </section>
-      {casting && <CastFlow sid={sid} c={c} sp={casting} targets={targets} friends={friends} feared={feared} dawn={clockOf(session).dawn} onClose={() => setCasting(null)} />}
+      {casting && <CastFlow sid={sid} c={c} sp={casting} targets={targets} friends={friends} feared={feared} dawn={clockOf(session).dawn} extra={mvpBonus(c, clockOf(session))} onClose={() => setCasting(null)} />}
     </>
   );
 }

@@ -26,6 +26,7 @@ import GMNotes from '../components/GMNotes';
 import { GMSecretGift } from '../components/SecretGift';
 import { GMRelics } from '../components/Relics';
 import { GMFortunes, GMTarot } from '../components/Tarot';
+import { GMMvp, GMMvpRow } from '../components/Mvp';
 import { useMazeEngine } from '../components/DarkMaze';
 import { setNote } from '../lib/notes';
 import { useAuth } from '../auth/AuthProvider';
@@ -99,7 +100,7 @@ function Ollivander({ sid, c, data }) {
   );
 }
 
-function CharacterControls({ sid, c, data, playerName, quizBusy, forbiddenLearner, dawn, relicHolders }) {
+function CharacterControls({ sid, c, data, playerName, quizBusy, forbiddenLearner, dawn, relicHolders, clk }) {
   const [open, setOpen] = useState(false);
   const [itemId, setItemId] = useState(Object.keys(data.items)[0] ?? '');
   const give = () => {
@@ -176,6 +177,7 @@ function CharacterControls({ sid, c, data, playerName, quizBusy, forbiddenLearne
       {data.gifts && <GMSecretGift sid={sid} c={c} data={data} dawn={dawn} />}
       {data.relics && <GMRelics sid={sid} c={c} data={data} dawn={dawn} holders={relicHolders} />}
       <GMFortunes sid={sid} c={c} />
+      {clk && <GMMvpRow sid={sid} c={c} clk={clk} />}
 
       <div className="gm-give">
         <select value={itemId} onChange={(e) => setItemId(e.target.value)} aria-label="Item to give">
@@ -238,7 +240,7 @@ function Feed({ sid, nameOf }) {
 
 const TABS = [
   ['table', '🗺️ Table'], ['day', '🕰️ Day & class'], ['quests', '📜 Quests'], ['puzzles', '🧩 Puzzles'],
-  ['shows', '🎬 TV shows'], ['players', '🧑‍🎓 Players'], ['owls', '🦉 Owl Post'], ['notes', '📓 Notes'], ['tarot', '🔮 Tarot'], ['imposter', '🎭 Double'], ['spells', '✨ Spells'], ['wheels', '🎡 Wheels & dice'], ['media', '🎞️ Media'],
+  ['shows', '🎬 TV shows'], ['players', '🧑‍🎓 Players'], ['owls', '🦉 Owl Post'], ['notes', '📓 Notes'], ['tarot', '🔮 Tarot'], ['mvp', '🏅 MVP'], ['imposter', '🎭 Double'], ['spells', '✨ Spells'], ['wheels', '🎡 Wheels & dice'], ['media', '🎞️ Media'],
 ];
 
 export default function GMScreen() {
@@ -293,7 +295,7 @@ export default function GMScreen() {
   const quizState = session.state?.quiz;
   const enc = session.state?.encounter;
   const lesson = session.state?.lesson;
-  const tabs = TABS.filter(([id]) => (id === 'day' ? data.clock : id === 'quests' ? data.quests : id === 'wheels' ? true : id === 'table' ? data.locations : id === 'puzzles' ? data.puzzles : id === 'shows' ? data.suspects : id === 'spells' ? data.spells : id === 'tarot' ? data.tarot : true));
+  const tabs = TABS.filter(([id]) => (id === 'day' ? data.clock : id === 'quests' ? data.quests : id === 'wheels' ? true : id === 'table' ? data.locations : id === 'puzzles' ? data.puzzles : id === 'shows' ? data.suspects : id === 'spells' ? data.spells : id === 'tarot' ? data.tarot : id === 'mvp' ? data.mvp : true));
   const active = tabs.some(([id]) => id === tab) ? tab : tabs[0][0];
 
   return (
@@ -376,6 +378,7 @@ export default function GMScreen() {
             onSent={(note) => note?.id && user && setNote(user.uid, sid, note.id, { done: true })} />}
           {active === 'notes' && <GMNotes sid={sid} data={data} session={session} chars={chars}
             onOwl={(uid, note) => { setOwlPreset({ uid, note, at: Date.now() }); setTab('owls'); }} />}
+          {active === 'mvp' && <GMMvp sid={sid} data={data} session={session} chars={chars} />}
           {active === 'tarot' && <GMTarot sid={sid} data={data} session={session} chars={chars} />}
           {active === 'imposter' && <GMImposter sid={sid} session={session} chars={chars} />}
           {active === 'spells' && <GMSpells sid={sid} data={data} session={session} chars={chars} />}
@@ -386,7 +389,7 @@ export default function GMScreen() {
             <section className="gm-players">
               <TestBench sid={sid} data={data} session={session} chars={chars} />
               {session.playerUids.map((u) => chars[u]
-                ? <CharacterControls key={u} sid={sid} c={chars[u]} data={data} playerName={profiles[u]?.displayName} quizBusy={!!quizState} forbiddenLearner={session.state?.forbiddenLearner} dawn={clockOf(session).dawn}
+                ? <CharacterControls key={u} sid={sid} c={chars[u]} data={data} playerName={profiles[u]?.displayName} quizBusy={!!quizState} forbiddenLearner={session.state?.forbiddenLearner} dawn={clockOf(session).dawn} clk={clockOf(session)}
                   relicHolders={Object.fromEntries(Object.values(chars).flatMap((x) => Object.keys(x.relics ?? {}).map((id) => [id, x.firstName ?? x.name])))} />
                 : <NewCharacter key={u} sid={sid} uid={u} profile={profiles[u]} data={data} />)}
               {!session.playerUids.length && <p className="muted">Players appear here once they join with the code.</p>}

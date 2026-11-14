@@ -1,8 +1,9 @@
 // Reading a clue on the phone: the note, page or runes, on parchment.
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { runeFor } from '../lib/puzzles';
 
-// A word in runes. With the notebook on, each rune the player can read shows its letter underneath.
+// A word in runes. Each rune the party has worked out (confirmed by the DM) shows its letter underneath in ink,
+// the moment the DM confirms it. Unknown runes show nothing: the players work them out on paper.
 function RuneWord({ word, read }) {
   return (
     <span className="clue-rune-word">
@@ -12,7 +13,7 @@ function RuneWord({ word, read }) {
         return (
           <span key={k} className="clue-rune-ch">
             {rune}
-            {read && <span className={`clue-under ${r ? (r.ink ? 'ink' : 'pencil') : ''}`}>{r?.letter ?? '·'}</span>}
+            {read && <span className={`clue-under ${r ? 'ink' : ''}`}>{r?.letter ?? '\u00a0'}</span>}
           </span>
         );
       })}
@@ -23,10 +24,7 @@ const runes = (text, read) => text.split(' ').map((w, i) => <RuneWord key={i} wo
 
 // `read` (optional) turns a rune into what this player knows of it, from their rune notebook.
 export default function ClueReader({ item, def, qty = 1, onClose, read = null }) {
-  const [useBook, setUseBook] = useState(false);
-  const r0 = def.read;
-  const hasRunes = !!(r0?.pages || r0?.words);
-  const reader = useBook ? read : null;
+  const reader = read;
   useEffect(() => {
     const esc = (e) => e.key === 'Escape' && onClose();
     document.addEventListener('keydown', esc);
@@ -62,12 +60,6 @@ export default function ClueReader({ item, def, qty = 1, onClose, read = null })
           <p className="clue-text">{r.text}</p>
         )}
         {r.footer && <p className="clue-footer">{r.footer}</p>}
-        {hasRunes && read && (
-          <label className="clue-nb-toggle">
-            <input type="checkbox" checked={useBook} onChange={(e) => setUseBook(e.target.checked)} />
-            📖 Hold my rune notebook beside it
-          </label>
-        )}
         <button className="btn small ghost clue-close" onClick={onClose}>Put it away</button>
       </div>
     </div>

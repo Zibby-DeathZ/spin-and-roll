@@ -93,7 +93,7 @@ export const schedule = {
     { id: 'pixies-1a', type: 'monster', kind: 'cornish-pixie', loc: 'grand-staircase', transient: true, x: 35, y: 35 },
     { id: 'pixies-1b', type: 'monster', kind: 'cornish-pixie', loc: 'grand-staircase', transient: true, x: 55, y: 30 },
   ] },
-  '2-Free time': { spawn: [{ id: 'tablet-2', type: 'item', item: 'rune-tablet-2', loc: 'greenhouses', x: 72, y: 60 }, { id: 'duelist-2', type: 'monster', kind: 'rival-duelist', loc: 'great-hall', transient: true, x: 60, y: 40 }] },
+  '2-Free time': { spawn: [{ id: 'tablet-2', type: 'item', item: 'rune-tablet-2', loc: 'greenhouses', x: 72, y: 60 }, { id: 'wailing-mandrake', type: 'mimic', mimic: 'wailing-mandrake', loc: 'greenhouses', x: 30, y: 64 }, { id: 'duelist-2', type: 'monster', kind: 'rival-duelist', loc: 'great-hall', transient: true, x: 60, y: 40 }] },
   '3-Lunch': { spawn: [{ id: 'victim-2', type: 'npc', npc: 'victim', name: 'A drained fourth-year', loc: 'library', x: 40, y: 45 }] },
   '3-Free time': { spawn: [
     { id: 'diary-1', type: 'item', item: 'diary-page', loc: 'restricted-section', x: 75, y: 35 },

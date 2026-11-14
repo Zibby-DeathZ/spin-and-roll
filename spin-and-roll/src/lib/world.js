@@ -223,6 +223,7 @@ export async function applyOpenChest(sid, eid, data) {
 
 export async function applyPickup(sid, eid, data) {
   const eRef = doc(db, 'sessions', sid, 'events', eid);
+  let sprung = null;
   await runTransaction(db, async (tx) => {
     const e = (await tx.get(eRef)).data();
     if (!e || e.processed) return;
@@ -235,6 +236,12 @@ export async function applyPickup(sid, eid, data) {
       tx.update(eRef, { processed: true, failed: true });
       return;
     }
+    // It was never a leaf at all.
+    if (t.mimic) {
+      tx.update(eRef, { processed: true, failed: true, payload: { ...e.payload, mimic: true } });
+      sprung = { id, uid: e.actorUid };
+      return;
+    }
     const inv = addToInv(cSnap.data().inventory, { id: t.item, ...data.items[t.item] });
     tx.update(cSnap.ref, { inventory: inv });
     const tokens = { ...sess.state.tokens };
@@ -242,6 +249,7 @@ export async function applyPickup(sid, eid, data) {
     tx.update(sessionRef(sid), { 'state.tokens': tokens });
     tx.update(eRef, { processed: true, payload: { ...e.payload, name: t.name, icon: t.icon } });
   });
+  if (sprung) await springMimic(sid, data, sprung.id, sprung.uid);
 }
 
 // ---------- Quests: state.quests[id] = { status, uids, done: [objective index…] } ----------

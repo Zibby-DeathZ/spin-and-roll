@@ -40,10 +40,11 @@ import HouseCrest from '../components/HouseCrest';
 import Info from '../components/Info';
 import ClueReader from '../components/ClueReader';
 import RuneNotebook, { readerFor } from '../components/RuneNotebook';
-import { knownRunes, usePencil } from '../lib/runes';
+import { knownRunes } from '../lib/runes';
 import { SecretGiftCard } from '../components/SecretGift';
 import { RelicCards } from '../components/Relics';
 import { FortuneCards } from '../components/Tarot';
+import { MvpCard } from '../components/Mvp';
 import { DarkMazePhone } from '../components/DarkMaze';
 
 function AbilityCard({ sid, c, ability, dawn }) {
@@ -166,6 +167,7 @@ function Sheet({ sid, c, currency, data, points, clk, scenes = null, loc, discov
       {fam?.ability && <AbilityCard sid={sid} c={c} ability={fam.ability} dawn={clk.dawn} />}
       <SecretGiftCard c={c} dawn={clk.dawn} />
       <RelicCards c={c} dawn={clk.dawn} />
+      <MvpCard c={c} clk={clk} />
       <FortuneCards c={c} />
       <HouseCard sid={sid} c={c} dawn={clk.dawn} hod={hod} />
       <OwlArchive owls={owls} />
@@ -214,9 +216,8 @@ function Bag({ c, sid, others, data, onGive, onOpenMap, here, runesKnown = [] })
   const [used, setUsed] = useState(null);
   const [reading, setReading] = useState(null);
   const [notebook, setNotebook] = useState(false);
-  const [pencil, setPencil] = usePencil(sid, c.uid);
   const hasRunes = (data?.puzzles ?? []).some((p) => p.type === 'cipher' || p.type === 'runefloor');
-  const read = readerFor(runesKnown, pencil);
+  const read = readerFor(runesKnown);
   const use = async (item) => {
     setUsed(item.id);
     try { await consumeItem(sid, c.uid, item.id); } finally { setTimeout(() => setUsed(null), 1200); }
@@ -246,7 +247,7 @@ function Bag({ c, sid, others, data, onGive, onOpenMap, here, runesKnown = [] })
       {hasRunes && (
         <button className="notebook-btn" onClick={() => setNotebook(true)}>
           <span className="nb-btn-icon" aria-hidden="true">📖</span>
-          <span><strong>Rune notebook</strong><span className="muted small">{runesKnown.length} of 26 runes known. Tap to read or pencil in guesses.</span></span>
+          <span><strong>Rune notebook</strong><span className="muted small">{runesKnown.length} of 26 runes worked out. Work them out on paper; the DM confirms them here.</span></span>
         </button>
       )}
       {inv.length === 0 && <p className="muted">Your bag is empty.</p>}
@@ -287,7 +288,7 @@ function Bag({ c, sid, others, data, onGive, onOpenMap, here, runesKnown = [] })
         );
       })}
       {reading && <ClueReader item={reading} def={data?.items?.[reading.id] ?? {}} qty={reading.qty} read={hasRunes ? read : null} onClose={() => setReading(null)} />}
-      {notebook && <RuneNotebook known={runesKnown} pencil={pencil} onPencil={setPencil} onClose={() => setNotebook(false)} />}
+      {notebook && <RuneNotebook known={runesKnown} onClose={() => setNotebook(false)} />}
     </>
   );
 }

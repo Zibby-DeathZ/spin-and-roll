@@ -155,10 +155,13 @@ export async function monsterAttack(sid, data, tokenId, targetUid) {
     const hit = landed && !shielded;
     const dmg = hit ? rollDice(b.dmg).total + (token.mimic === 'hungry-trunk' ? trunkBonus(token) : 0) : 0;
     const hp = Math.max(0, c.hp - dmg);
-    if (hit) tx.update(cSnap.ref, { hp });
+    // Some mimics leave a mark on every hit (the Wailing Mandrake steals your voice: Silenced).
+    const mark = hit && hp > 0 && b.onHit ? b.onHit : null;
+    if (hit) tx.update(cSnap.ref, { hp, ...(mark ? { status: addStatus(c.status ?? {}, mark.status, mark.turns, data.statusEffects ?? {}) } : {}) });
     if (shielded) tx.update(cSnap.ref, { status: removeStatuses(c.status, ['bloodshield']) });
     if (disarmed) tx.update(sessionRef(sid), { [`state.tokens.${tokenId}.disarmed`]: deleteField() });
-    result = { name: token.name, icon: token.icon, nat: d20.nat, total, defence, hit, dmg, ko: hit && hp === 0, disarmed, feared, shielded };
+    result = { name: token.name, icon: token.icon, nat: d20.nat, total, defence, hit, dmg, ko: hit && hp === 0, disarmed, feared, shielded,
+      ...(mark ? { status: data.statusEffects?.[mark.status]?.name ?? mark.status } : {}) };
   });
   if (!result) return;
   if (result.hit && pre?.mimic === 'hungry-trunk') {

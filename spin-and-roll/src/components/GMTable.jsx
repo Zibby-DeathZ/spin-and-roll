@@ -8,7 +8,7 @@ import { defenceOf } from '../lib/game';
 import {
   addToken, endFight, monsterAttack, moveToken, nextTurn, placeToken, removeToken, setTokenHp, startFight,
 } from '../lib/combat';
-import { doubleToken, springMimic, trunkToken } from '../lib/mimic';
+import { mimicToken, springMimic } from '../lib/mimic';
 import { chestToken, doorsAt, tidyRoom, hazardToken, itemToken, locOf, movePlayers, pcsAt, placeStaff, setSpotlight, showOnTV, triggerHazard } from '../lib/world';
 
 const KINDS = [['monsters', '👹 Monsters'], ['people', '🧑 People'], ['chests', '🧰 Chests'], ['items', '✨ Items'], ['hazards', '🔥 Hazards'], ['mimics', '👄 Mimics']];
@@ -71,7 +71,7 @@ export default function GMTable({ sid, data, session, chars, view = null, setVie
     if (type === 'chests') newId = await placeToken(sid, chestToken(data, id, loc.id), data);
     else if (type === 'items') newId = await placeToken(sid, itemToken(data, id, loc.id), data);
     else if (type === 'hazards') newId = await placeToken(sid, hazardToken(data, id, loc.id), data);
-    else if (type === 'mimics') newId = await placeToken(sid, id === 'hungry-trunk' ? trunkToken(data, loc.id) : doubleToken(data, loc.id, copyWho), data);
+    else if (type === 'mimics') newId = await placeToken(sid, mimicToken(data, id, loc.id, copyWho), data);
     else newId = await addToken(sid, data, id, loc.id, tokens);
     setSel(newId);
   };
@@ -82,7 +82,7 @@ export default function GMTable({ sid, data, session, chars, view = null, setVie
     chests: Object.entries(data.chests ?? {}).map(([id, c]) => [id, c.icon, c.name, `lock ${c.dc}`]),
     items: Object.entries(data.items).map(([id, it]) => [id, it.icon, it.name, '']),
     hazards: Object.entries(data.hazards ?? {}).map(([id, h]) => [id, h.icon, h.name, '']),
-    mimics: Object.entries(data.mimics ?? {}).map(([id, m]) => [id, m.icon, m.name, id === 'hungry-trunk' ? 'looks like a Locked chest' : 'copies a person']),
+    mimics: Object.entries(data.mimics ?? {}).map(([id, m]) => [id, m.icon, m.name, m.placeNote ?? (m.disguise === 'chest' ? 'looks like a Locked chest' : 'copies a person')]),
   };
 
   return (

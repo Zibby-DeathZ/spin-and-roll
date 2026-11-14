@@ -179,6 +179,10 @@ BLOCKS = [
     ]),
     ('h2', 'Version log'),
     ('table', ['Version', 'Date', 'Changes'], [
+        ['3.35', 'November 2026', 'A new mimic, the Wailing Mandrake: disguised as a Mandrake leaf, it Silences whoever it hits and leaves three real leaves when beaten. It appears by itself in the Greenhouses on Day 2, Free time. Mimics can now be disguised as items lying on the ground.'],
+        ['3.34', 'November 2026', 'Runes on paper: no more pencilling guesses on the phone. Players work the runes out on their own paper; when the DM confirms a tablet, the ink fills in live on every phone, with a little ink animation, even on a tablet held open.'],
+        ['3.33', 'November 2026', 'Fix: casting a spell with nothing to roll (Lumos, Reparo, Aguamenti) no longer shows “Rolled null” on the phone. New: the Compendium, a printed book of every item, spell, condition, shop and chest.'],
+        ['3.32', 'November 2026', 'MVP of the Day: a new MVP tab to crown a student who meets at least three requirements, a TV ceremony, +20 house points, the MVP Badge (+2 to every d20 roll the next day, added by the app) and one perk of their own.'],
         ['3.31', 'November 2026', 'The laptop game is now saved in AppData\\Local\\SpinAndRoll instead of inside the project, so it is safe even when the project sits in a OneDrive folder.'],
         ['3.30', 'November 2026', 'Game night on your laptop: the free Firebase Emulator as an unlimited database on the laptop (Setup, Import and Start Game Night files), tap-your-name sign-in, autosave and backups, and a Back up everything button on the GM dashboard.'],
         ['3.29', 'November 2026', 'Fix for a live session: the GM screen now ticks off maze steps in bulk and carries out at most three player actions at a time, so a long maze can no longer clog it and stall the give buttons. If anything fails to save, a red bar at the top of the GM screen now says why.'],

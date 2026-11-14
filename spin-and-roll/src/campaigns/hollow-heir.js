@@ -7,6 +7,7 @@ import { floors } from './hollow-heir-floors.js';
 import mirrorMaze from './mirror-maze.json' with { type: 'json' };
 import { addMissing, importSpellbook } from '../lib/spellbook.js';
 import * as tarot from './hollow-heir-tarot.js';
+import * as mvp from './hollow-heir-mvp.js';
 
 // The Hogwarts series spellbook: dark arts, blood magic and later-year spells, with Corruption and status effects.
 // Most unlock in later years; the GM Spells tab shows them locked until then.
@@ -67,7 +68,7 @@ const items = {
     read: {
       style: 'tablet', heading: 'A cracked slate from the Ancient Runes shelf',
       words: [{ pic: '🦉', word: 'OWL' }, { pic: '🌙', word: 'MOON' }, { pic: '⭐', word: 'STAR' }],
-      footer: 'Each rune is always the same letter. Pencil what you work out into your rune notebook.',
+      footer: 'Each rune is always the same letter. Work it out on paper, and tell the DM when you are sure.',
     },
   },
   'rune-tablet-2': {
@@ -75,7 +76,7 @@ const items = {
     read: {
       style: 'tablet', heading: 'A mossy slate wedged under a seed tray',
       words: [{ pic: '🍎', word: 'APPLE' }, { pic: '🌲', word: 'PINE' }, { pic: '🐸', word: 'TOAD' }],
-      footer: 'Each rune is always the same letter. Pencil what you work out into your rune notebook.',
+      footer: 'Each rune is always the same letter. Work it out on paper, and tell the DM when you are sure.',
     },
   },
   'rune-tablet-3': {
@@ -83,7 +84,7 @@ const items = {
     read: {
       style: 'tablet', heading: 'A soot-black slate from beside a fireplace',
       words: [{ pic: '🔥', word: 'FIRE' }, { pic: '🗝️', word: 'KEY' }, { pic: '🐟', word: 'FISH' }],
-      footer: 'Each rune is always the same letter. Pencil what you work out into your rune notebook.',
+      footer: 'Each rune is always the same letter. Work it out on paper, and tell the DM when you are sure.',
     },
   },
   'stolen-jars': { name: 'Stolen ingredient jars', icon: '🫙', note: 'Labelled in Grimsby’s spiky handwriting', kind: 'key', usableAt: ['dungeons'] },
@@ -926,6 +927,13 @@ export const hollowHeir = {
       behaviour: 'swallow',
       desc: 'Bites swallow a random item from the target’s bag. Each item: it grows and gains 5 max HP. Potions heal it. 3+ items: +1d6 bite. Spits everything out when beaten.',
     },
+    'wailing-mandrake': {
+      name: 'The Wailing Mandrake', icon: '🥀', disguise: 'item', looksLike: 'mandrake-leaf',
+      hp: 24, defence: 12, atk: 4, dmg: { count: 1, die: 6 }, init: 3, xp: 50, hoard: [10, 25],
+      behaviour: 'wail', onHit: { status: 'silence', turns: 1 }, drops: ['mandrake-leaf', 'mandrake-leaf', 'mandrake-leaf'],
+      placeNote: 'looks like a Mandrake leaf lying on the ground',
+      desc: 'Looks like a spare Mandrake leaf. Pick it up and a full-grown Mandrake bursts out of the soil, screaming. Every hit steals the target’s voice: Silenced for a turn, no spells. When beaten it wilts and leaves three real Mandrake leaves, plus a few Galleons it had buried.',
+    },
     'painted-double': {
       name: 'The Painted Double', icon: '🎭', disguise: 'person',
       hp: 26, defence: 14, atk: 4, dmg: { count: 1, die: 6 }, init: 3, xp: 60, hoard: [15, 30],
@@ -1085,6 +1093,9 @@ export const hollowHeir = {
 
   // Professor Greaves reads the cards in the Library. See hollow-heir-tarot.js.
   tarot: { ...tarot },
+
+  // MVP of the Day. See hollow-heir-mvp.js.
+  mvp: { ...mvp },
 };
 
 // Spellbook spells join the list without replacing this year's versions (like the secret Killing Curse).
